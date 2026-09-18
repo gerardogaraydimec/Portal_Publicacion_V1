@@ -51,6 +51,13 @@ st.markdown("""
     border-left:4px solid #f28e1c; background:#fffaf4; padding:10px 13px;
     border-radius:7px; margin:.45rem 0;
 }
+.guide-box {
+    border:1px solid #e7e7e7; background:#fcfcfc; padding:12px 14px;
+    border-radius:10px; margin:.55rem 0;
+}
+.guide-title {
+    color:#db7810; font-weight:800; margin-bottom:.25rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -129,11 +136,40 @@ with st.expander("Alcance y criterio de cálculo", expanded=False):
         "calidad $x$, para fijar un estado específico entre líquido saturado y vapor saturado."
     )
 
+MODE_LABELS = {
+    "P-T": "𝑃 – 𝑇",
+    "T-x": "𝑇 – 𝑥",
+    "P-x": "𝑃 – 𝑥",
+    "P-h": "𝑃 – ℎ",
+    "P-s": "𝑃 – 𝑠",
+    "h-s": "ℎ – 𝑠",
+}
+
+MODE_LATEX = {
+    "P-T": r"P\;-\;T",
+    "T-x": r"T\;-\;x",
+    "P-x": r"P\;-\;x",
+    "P-h": r"P\;-\;h",
+    "P-s": r"P\;-\;s",
+    "h-s": r"h\;-\;s",
+}
+
 mode = st.selectbox(
     "Par de propiedades de entrada",
-    ["P-T", "T-x", "P-x", "P-h", "P-s", "h-s"],
-    help="P absoluta. Para T-x y P-x se trabaja sobre la línea/región de saturación."
+    list(MODE_LABELS.keys()),
+    format_func=lambda key: MODE_LABELS[key],
+    help=(
+        "Seleccione las dos propiedades conocidas. La presión debe ser absoluta. "
+        "En saturación, P y T no son propiedades independientes."
+    ),
+    key="th_mode_selector",
 )
+
+sel_left, sel_right = st.columns([1.0, 3.5], vertical_alignment="center")
+with sel_left:
+    st.caption("Par seleccionado")
+with sel_right:
+    st.latex(MODE_LATEX[mode])
 
 with st.form("th_state_form"):
     a,b,c,d = st.columns([1,1,1,1.4])
@@ -143,29 +179,47 @@ with st.form("th_state_form"):
         kwargs["P_kPa"] = a.number_input("P absoluta [kPa]", value=101.325, format="%.8g")
         kwargs["T_C"] = b.number_input("T [°C]", value=120.0, format="%.8g")
         c.markdown("**Uso típico**")
-        c.caption("Líquido comprimido, vapor sobrecalentado o detección de saturación.")
+        c.caption(
+            "Identificación directa de la región a partir de presión y temperatura: "
+            "líquido comprimido, saturación, vapor sobrecalentado o estado supercrítico."
+        )
     elif mode == "T-x":
         kwargs["T_C"] = a.number_input("T [°C]", value=100.0, format="%.8g")
         kwargs["x"] = b.number_input("Calidad x [-]", value=0.5, step=0.01, format="%.6f")
-        c.markdown("**Rango de saturación**")
-        c.caption(f"{TRIPLE_T_C:.2f} a {TC_C:.3f} °C")
+        c.markdown("**Uso típico**")
+        c.caption(
+            "Estado dentro del domo de saturación definido por temperatura y calidad. "
+            f"Rango: {TRIPLE_T_C:.2f} a {TC_C:.3f} °C."
+        )
     elif mode == "P-x":
         kwargs["P_kPa"] = a.number_input("P absoluta [kPa]", value=101.325, format="%.8g")
         kwargs["x"] = b.number_input("Calidad x [-]", value=0.5, step=0.01, format="%.6f")
-        c.markdown("**Rango de saturación**")
-        c.caption(f"{TRIPLE_P_KPA:.6g} a {PC_KPA:.0f} kPa")
+        c.markdown("**Uso típico**")
+        c.caption(
+            "Estado bifásico definido mediante presión y calidad. "
+            f"Rango: {TRIPLE_P_KPA:.6g} a {PC_KPA:.0f} kPa."
+        )
     elif mode == "P-h":
         kwargs["P_kPa"] = a.number_input("P absoluta [kPa]", value=1000.0, format="%.8g")
         kwargs["h"] = b.number_input("h [kJ/kg]", value=2800.0, format="%.8g")
-        c.caption("Útil para procesos, turbinas, válvulas y balances.")
+        c.caption(
+            "Muy útil en balances de energía, turbinas, válvulas, calderas, "
+            "condensadores e intercambiadores."
+        )
     elif mode == "P-s":
         kwargs["P_kPa"] = a.number_input("P absoluta [kPa]", value=1000.0, format="%.8g")
         kwargs["s"] = b.number_input("s [kJ/kg·K]", value=6.5, format="%.8g")
-        c.caption("Útil para procesos isentrópicos y análisis de equipos.")
+        c.caption(
+            "Útil para procesos isentrópicos y para analizar turbinas, compresores, "
+            "bombas y expansiones."
+        )
     else:
         kwargs["h"] = a.number_input("h [kJ/kg]", value=2800.0, format="%.8g")
         kwargs["s"] = b.number_input("s [kJ/kg·K]", value=6.5, format="%.8g")
-        c.caption("Par útil para localizar estados en el diagrama de Mollier.")
+        c.caption(
+            "Permite ubicar directamente el estado en el diagrama h-s (Mollier) "
+            "y comparar procesos de expansión o compresión."
+        )
 
     calc = d.form_submit_button("Calcular estado", use_container_width=True)
 
@@ -319,7 +373,7 @@ with tabs[1]:
     with q4: st.plotly_chart(fig_hs,use_container_width=True,config={"displaylogo":False})
 
     st.caption(
-        "V0.1 muestra el domo de saturación y el estado calculado. "
+        "El visor muestra el domo de saturación y el estado calculado. "
         "En versiones posteriores agregaremos isolíneas y trayectorias de procesos."
     )
 
@@ -385,97 +439,220 @@ with tabs[2]:
         st.download_button("Descargar CSV",csv,"tabla_agua_mechlab.csv","text/csv")
 
 with tabs[3]:
-    st.markdown("### Relaciones fundamentales")
-    st.markdown("Para una mezcla saturada líquido-vapor:")
-    st.latex(r"y=y_f+x\,y_{fg}")
-    st.latex(r"y_{fg}=y_g-y_f")
-    st.latex(r"x=\frac{y-y_f}{y_g-y_f}")
-    st.markdown(r"donde \(y\) puede representar \(v\), \(u\), \(h\) o \(s\).")
-    st.markdown("### Identificación del estado")
-    st.markdown(r"""
-Para una presión \(P<P_c\), se compara la temperatura del estado con \(T_{sat}(P)\):
+    st.markdown("### Relaciones fundamentales de la región bifásica")
+    st.markdown(
+        "Dentro del domo de saturación, una propiedad específica puede expresarse como "
+        "una interpolación entre el estado de líquido saturado y el estado de vapor saturado."
+    )
 
-\[
-T<T_{sat}\Rightarrow \text{líquido comprimido}
-\]
+    st.latex(r"y = y_f + x\,y_{fg}")
+    st.latex(r"y_{fg} = y_g - y_f")
+    st.latex(r"x = \frac{y-y_f}{y_g-y_f}")
 
-\[
-T=T_{sat}\Rightarrow \text{estado de saturación}
-\]
+    st.markdown(
+        "La variable $y$ puede representar el volumen específico $v$, la energía interna $u$, "
+        "la entalpía $h$ o la entropía $s$."
+    )
 
-\[
-T>T_{sat}\Rightarrow \text{vapor sobrecalentado}
-\]
+    st.markdown("#### Significado de los subíndices")
+    st.markdown(
+        "- **f**: propiedad del líquido saturado.\n"
+        "- **g**: propiedad del vapor saturado.\n"
+        "- **fg**: diferencia entre vapor saturado y líquido saturado.\n"
+        "- **x**: calidad o fracción másica de vapor."
+    )
 
-Dentro del domo se requiere la calidad \(x\) u otra propiedad independiente para fijar el estado.
-""")
+    st.markdown("### Identificación del estado mediante presión y temperatura")
+    st.markdown(
+        "Para una presión inferior a la presión crítica, se compara la temperatura del estado "
+        "con la temperatura de saturación correspondiente a esa presión."
+    )
+
+    st.latex(r"P < P_c")
+    st.latex(r"T < T_{\mathrm{sat}}(P)\;\Longrightarrow\;\text{líquido comprimido o subenfriado}")
+    st.latex(r"T = T_{\mathrm{sat}}(P)\;\Longrightarrow\;\text{estado de saturación}")
+    st.latex(r"T > T_{\mathrm{sat}}(P)\;\Longrightarrow\;\text{vapor sobrecalentado}")
+
+    st.markdown(
+        "Sobre la línea de saturación, $P$ y $T$ están vinculadas y dejan de ser independientes. "
+        "Por eso, conocer solamente ambas variables no determina cuánto líquido y cuánto vapor hay."
+    )
+
+    st.markdown("### Condición de calidad")
+    st.latex(r"0 \le x \le 1")
+    st.latex(r"x=0\;\Longrightarrow\;\text{líquido saturado}")
+    st.latex(r"x=1\;\Longrightarrow\;\text{vapor saturado}")
+    st.latex(r"0<x<1\;\Longrightarrow\;\text{mezcla saturada líquido-vapor}")
+
+    st.markdown("### Punto crítico")
+    st.markdown(
+        "En el punto crítico desaparece la distinción entre líquido saturado y vapor saturado. "
+        "Por encima de esa condición ya no existe un cambio de fase líquido-vapor bien definido."
+    )
+    st.latex(r"T_c \approx 373.946\,^{\circ}\mathrm{C}")
+    st.latex(r"P_c \approx 22.064\,\mathrm{MPa}")
 
 with tabs[4]:
     st.markdown("### Tutorial de uso")
     st.markdown(
-        "Esta pestaña está pensada para aprender a usar el visor **sin convertirlo en una calculadora ciega**. "
-        "La secuencia correcta es: datos conocidos → identificación de región → propiedades → interpretación."
+        "El visor está pensado para acompañar el razonamiento termodinámico. "
+        "La secuencia recomendada es **datos conocidos → identificación de región → "
+        "propiedades → interpretación física → análisis del proceso**."
     )
 
-    st.markdown('<div class="guide-step"><b>Paso 1 · Identifica qué datos conoces</b><br>'
-                'Selecciona el par de propiedades de entrada. Por ejemplo, si conoces presión y temperatura, '
-                'usa <b>P–T</b>. Si el estado está dentro del domo y conoces la calidad, usa <b>P–x</b> o <b>T–x</b>.'
-                '</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="guide-step"><b>Paso 1 · Define qué propiedades conoces realmente</b><br>'
+        'Selecciona el par de propiedades que corresponde a la información disponible. '
+        'No todas las combinaciones son igual de convenientes para todos los problemas.'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
-    st.markdown('<div class="guide-step"><b>Paso 2 · Usa presión absoluta</b><br>'
-                'Las propiedades termodinámicas se calculan con presión absoluta. Si tu dato es manométrico, '
-                'debes convertirlo antes de ingresarlo.'
-                '</div>', unsafe_allow_html=True)
+    st.markdown("#### ¿Qué par conviene usar?")
+    g1, g2 = st.columns(2, gap="large")
+    with g1:
+        st.markdown("""
+<div class="guide-box">
+<div class="guide-title">𝑃 – 𝑇</div>
+Para identificar la región del agua a partir de presión y temperatura.
+Es el punto de partida natural para líquido comprimido, vapor sobrecalentado
+y detección de saturación.
+</div>
+<div class="guide-box">
+<div class="guide-title">𝑇 – 𝑥 / 𝑃 – 𝑥</div>
+Para estados dentro de la región bifásica. La calidad fija la posición
+entre líquido saturado y vapor saturado.
+</div>
+<div class="guide-box">
+<div class="guide-title">𝑃 – ℎ</div>
+Muy útil en balances de energía, turbinas, válvulas, calderas,
+condensadores e intercambiadores.
+</div>
+""", unsafe_allow_html=True)
+    with g2:
+        st.markdown("""
+<div class="guide-box">
+<div class="guide-title">𝑃 – 𝑠</div>
+Útil para analizar procesos isentrópicos, expansiones y compresiones,
+especialmente en turbomáquinas.
+</div>
+<div class="guide-box">
+<div class="guide-title">ℎ – 𝑠</div>
+Permite ubicar directamente un estado en el plano de Mollier y estudiar
+trayectorias de expansión o compresión.
+</div>
+<div class="guide-box">
+<div class="guide-title">Regla crítica</div>
+Dentro del domo de saturación, presión y temperatura están ligadas entre sí.
+Por eso P y T no bastan para determinar la calidad.
+</div>
+""", unsafe_allow_html=True)
 
-    st.markdown('<div class="guide-step"><b>Paso 3 · Calcula y mira primero el estado</b><br>'
-                'Antes de usar h, u, s o v, revisa si el agua está como líquido comprimido, líquido saturado, '
-                'mezcla líquido–vapor, vapor saturado, vapor sobrecalentado o fluido supercrítico.'
-                '</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="guide-step"><b>Paso 2 · Revisa las unidades y la referencia de presión</b><br>'
+        'La presión ingresada debe ser <b>absoluta</b>, no manométrica. '
+        'La temperatura se ingresa en °C y las demás propiedades en las unidades SI indicadas.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+    st.markdown("Si dispones de presión manométrica:")
+    st.latex(r"P_{\mathrm{abs}} = P_{\mathrm{man}} + P_{\mathrm{atm}}")
 
-    st.markdown('<div class="guide-step"><b>Paso 4 · Ubica el punto en los diagramas</b><br>'
-                'Los diagramas T–v, P–v, T–s y h–s muestran el mismo estado desde distintas parejas de propiedades. '
-                'El domo delimita la región de mezcla saturada.'
-                '</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="guide-step"><b>Paso 3 · Calcula el estado y revisa primero la fase</b><br>'
+        'Antes de utilizar v, u, h o s, confirma si el agua está como líquido comprimido, '
+        'líquido saturado, mezcla líquido-vapor, vapor saturado, vapor sobrecalentado '
+        'o fluido supercrítico.'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
-    st.markdown('<div class="guide-step"><b>Paso 5 · Si hay mezcla, interpreta la calidad</b><br>'
-                'La calidad x representa la fracción másica de vapor. x = 0 es líquido saturado y x = 1 es vapor saturado.'
-                '</div>', unsafe_allow_html=True)
+    st.markdown("La lógica correcta es:")
+    st.latex(
+        r"\text{datos conocidos}"
+        r"\;\Longrightarrow\;"
+        r"\text{región termodinámica}"
+        r"\;\Longrightarrow\;"
+        r"\text{propiedades del estado}"
+        r"\;\Longrightarrow\;"
+        r"\text{análisis del proceso}"
+    )
 
+    st.markdown(
+        '<div class="guide-step"><b>Paso 4 · Usa los diagramas para interpretar el estado</b><br>'
+        'Los diagramas T–v, P–v, T–s y h–s representan el mismo estado desde distintas parejas '
+        'de propiedades. El punto naranja corresponde al estado calculado y el domo delimita '
+        'la región de mezcla saturada.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown("#### Cómo leer los diagramas")
+    st.markdown(
+        "- **T–v:** ayuda a comprender calentamiento, vaporización y cambio de volumen.\n"
+        "- **P–v:** permite observar expansión, compresión y cambio de fase.\n"
+        "- **T–s:** conecta estados con transferencia de calor y análisis de ciclos.\n"
+        "- **h–s:** es especialmente útil en turbinas, compresores y procesos de flujo."
+    )
+
+    st.markdown(
+        '<div class="guide-step"><b>Paso 5 · Si el estado es bifásico, interpreta la calidad</b><br>'
+        'La calidad x representa la <b>fracción másica de vapor</b>. '
+        'No representa porcentaje de volumen y no se utiliza fuera de la región bifásica.'
+        '</div>',
+        unsafe_allow_html=True
+    )
     st.latex(r"x=\frac{m_g}{m_f+m_g}")
+    st.latex(r"0\le x\le 1")
     st.latex(r"y=y_f+x\,y_{fg}")
 
-    st.markdown("### Ejemplos rápidos")
-    ex1, ex2, ex3 = st.columns(3)
+    st.markdown("### Ejemplos guiados")
+    ex1, ex2, ex3 = st.columns(3, gap="small")
     with ex1:
-        st.markdown("**Ejemplo A · Vapor sobrecalentado**")
+        st.markdown("**Caso A · Vapor sobrecalentado**")
         st.code("P = 500 kPa\nT = 250 °C", language="text")
-        st.caption("Selecciona P–T. La aplicación debe identificar vapor sobrecalentado.")
+        st.markdown(
+            "Selecciona **𝑃 – 𝑇**. El visor compara la temperatura con la temperatura "
+            "de saturación correspondiente a esa presión y debe identificar vapor sobrecalentado."
+        )
     with ex2:
-        st.markdown("**Ejemplo B · Mezcla saturada**")
+        st.markdown("**Caso B · Mezcla saturada**")
         st.code("T = 100 °C\nx = 0.50", language="text")
-        st.caption("Selecciona T–x. Obtendrás propiedades intermedias entre f y g.")
+        st.markdown(
+            "Selecciona **𝑇 – 𝑥**. El estado queda dentro del domo, con una fracción másica "
+            "de vapor igual a 0,50."
+        )
     with ex3:
-        st.markdown("**Ejemplo C · Saturación indeterminada**")
+        st.markdown("**Caso C · Saturación con P–T**")
         st.code("P ≈ 101.325 kPa\nT ≈ 100 °C", language="text")
-        st.caption("P y T sobre saturación no bastan para conocer x.")
+        st.markdown(
+            "El visor detecta saturación, pero P y T no permiten determinar la calidad. "
+            "Debes aportar una propiedad adicional."
+        )
 
-    st.markdown("### Cómo leer las letras")
-    st.markdown(
-        "**f** = líquido saturado · **g** = vapor saturado · **fg** = diferencia entre vapor y líquido · "
-        "**x** = calidad · **v** = volumen específico · **u** = energía interna · "
-        "**h** = entalpía · **s** = entropía."
-    )
+    st.markdown("### Nomenclatura")
+    n1, n2 = st.columns(2)
+    with n1:
+        st.latex(r"f\;:\;\text{líquido saturado}")
+        st.latex(r"g\;:\;\text{vapor saturado}")
+        st.latex(r"fg\;:\;y_g-y_f")
+    with n2:
+        st.latex(r"x\;:\;\text{calidad}")
+        st.latex(r"v\;:\;\text{volumen específico}")
+        st.latex(r"u,\;h,\;s\;:\;\text{propiedades energéticas y entrópica}")
 
-    st.markdown("### Qué no debe hacerse")
+    st.markdown("### Errores frecuentes")
     st.warning(
-        "No uses una propiedad calculada sin verificar antes la región. "
-        "Tampoco interpretes la calidad fuera de la región bifásica: allí x no es una propiedad aplicable."
+        "Evita: usar presión manométrica como absoluta; interpretar x fuera del domo; "
+        "suponer que P y T son independientes en saturación; usar propiedades sin verificar "
+        "la región; o confundir calidad másica con fracción de volumen."
     )
 
     st.markdown("### Objetivo pedagógico")
     st.info(
-        "El visor busca conectar tres formas de representar el mismo problema: "
-        "la identificación del estado, las propiedades numéricas y su posición en los diagramas."
+        "La aplicación busca conectar tres representaciones del mismo problema: "
+        "la identificación del estado, las propiedades numéricas y la ubicación en los diagramas. "
+        "El resultado numérico sólo adquiere sentido cuando se comprende dónde está el estado."
     )
 
 st.divider()

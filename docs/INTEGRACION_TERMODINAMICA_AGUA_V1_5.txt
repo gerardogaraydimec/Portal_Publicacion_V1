@@ -1,0 +1,30 @@
+PD-2026-0011 — Parche MechLab Termodinámica Agua V1.5
+
+APLICAR DIRECTAMENTE SOBRE EL MECHLAB ACTUAL.
+
+REEMPLAZA:
+- pages/termodinamica_agua.py
+
+CAMBIOS:
+- Corrige ecuaciones que aparecían como texto.
+- Usa st.latex() para las relaciones principales.
+- Selector de pares con símbolos matemáticos visuales:
+  𝑃–𝑇, 𝑇–𝑥, 𝑃–𝑥, 𝑃–ℎ, 𝑃–𝑠, ℎ–𝑠.
+- El par seleccionado se renderiza además en LaTeX real.
+- Profundiza el tutorial de uso.
+- Explica cuándo conviene usar cada par de propiedades.
+- Agrega presión absoluta vs manométrica.
+- Mejora explicación de diagramas, calidad y región bifásica.
+- Agrega errores frecuentes, nomenclatura y ejemplos guiados.
+
+NO MODIFICA:
+- modules/water_props.py
+- requirements.txt
+- streamlit_app.py
+- pages/inicio.py
+
+PRUEBA LOCAL:
+.\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+COMMIT SUGERIDO:
+Corrige ecuaciones y amplía tutorial de Termodinámica en MechLab
