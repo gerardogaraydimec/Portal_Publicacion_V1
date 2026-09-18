@@ -28,11 +28,19 @@ vibracion_forzada1gdl = st.Page(
     url_path="vibracion-forzada-1gdl",
 )
 
+termodinamica_agua = st.Page(
+    "pages/termodinamica_agua.py",
+    title="Propiedades del agua y vapor",
+    icon="💧",
+    url_path="agua-vapor",
+)
+
 pg = st.navigation(
     {
         "Portal": [inicio],
         "Resistencia de Materiales": [mohr2d, mohr3d],
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
+        "Termodinámica": [termodinamica_agua],
     },
     position="top",
 )

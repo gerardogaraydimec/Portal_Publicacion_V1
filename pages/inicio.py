@@ -86,11 +86,24 @@ with c4:
     )
     st.page_link("pages/vibracion_forzada_1gdl.py", label="Abrir Vibración forzada 1-GDL", icon="↗️")
 
+c5, c6 = st.columns(2, gap="large")
+with c5:
+    st.markdown(
+        """
+        <div class="home-card">
+        <h3>Propiedades del agua y vapor</h3>
+        <p>Estados termodinámicos, regiones de fase, tablas calculadas y diagramas T-v, P-v, T-s y h-s para agua y vapor.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.page_link("pages/termodinamica_agua.py", label="Abrir Termodinámica del agua", icon="↗️")
+
 st.divider()
 st.subheader("Propósito")
 st.write(
     "MechLab se ampliará progresivamente con nuevas herramientas de resistencia de materiales, dinámica, "
-    "vibraciones, mecanismos, simulación y otras áreas de ingeniería mecánica. "
+    "vibraciones, termodinámica, mecanismos, simulación y otras áreas de ingeniería mecánica. "
     "El objetivo es disponer de recursos técnicos accesibles desde cualquier navegador, sin instalar ejecutables."
 )
 

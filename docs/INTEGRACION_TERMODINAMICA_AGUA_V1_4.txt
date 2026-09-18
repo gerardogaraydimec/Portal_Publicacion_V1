@@ -1,0 +1,34 @@
+PD-2026-0011 — Integración MechLab V1.4
+Módulo: Propiedades termodinámicas del agua y vapor
+
+COPIAR SOBRE LA RAÍZ DEL REPOSITORIO ACTUAL:
+
+REEMPLAZA:
+- streamlit_app.py
+- requirements.txt
+- pages/inicio.py
+
+AGREGA:
+- pages/termodinamica_agua.py
+- modules/water_props.py
+
+NO ES NECESARIO COPIAR ASSETS:
+La página utiliza assets/logo_card.png ya existente en MechLab.
+
+NUEVA NAVEGACIÓN:
+Termodinámica
+└── Propiedades del agua y vapor
+
+URL INTERNA:
+ /agua-vapor
+
+PRUEBA LOCAL:
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+ANTES DEL PUSH:
+Verificar Inicio, Mohr 2D, Mohr 3D, Vibraciones libres,
+Vibración forzada y Propiedades del agua y vapor.
+
+COMMIT SUGERIDO:
+Incorpora visor de propiedades del agua y vapor a GG DIMEC MechLab
