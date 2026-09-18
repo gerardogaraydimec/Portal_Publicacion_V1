@@ -1,0 +1,23 @@
+PD-2026-0011_Portal_Publicacion_V1/
+├── streamlit_app.py
+├── requirements.txt
+├── README.md
+├── .gitignore
+├── .streamlit/
+│   └── config.toml
+├── assets/
+│   ├── icon_web.png
+│   ├── logo_web.png
+│   └── logo_card.png
+├── pages/
+│   ├── inicio.py
+│   ├── mohr_2d.py
+│   └── mohr_3d.py
+├── modules/
+│   ├── mohr2d.py
+│   ├── mohr3d.py
+│   ├── plotlymohr.py
+│   └── plotly3d.py
+└── docs/
+    ├── PUBLICACION_GITHUB_STREAMLIT.md
+    └── ESTRUCTURA_PORTAL.txt
