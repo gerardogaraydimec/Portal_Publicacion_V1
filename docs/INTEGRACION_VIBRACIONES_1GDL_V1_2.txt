@@ -1,0 +1,26 @@
+PD-2026-0011 | GG DIMEC MechLab V1.2
+Integración de Vibraciones libres 1-GDL
+
+Archivos incorporados:
+- modules/vibraciones1gdl.py
+- pages/vibraciones_1gdl.py
+
+Archivos actualizados:
+- streamlit_app.py
+- pages/inicio.py
+
+Navegación agregada:
+Vibraciones y Dinámica > Vibraciones 1-GDL
+
+URL interna:
+/vibraciones-1gdl
+
+Dependencias:
+No se agregan dependencias nuevas. La herramienta utiliza numpy, plotly y streamlit,
+ya incluidos en requirements.txt del portal.
+
+Flujo recomendado:
+1. Probar localmente el portal completo.
+2. Confirmar Inicio, Mohr 2D, Mohr 3D y Vibraciones 1-GDL.
+3. Commit y Push al repositorio Portal_Publicacion_V1.
+4. Streamlit Community Cloud actualizará el despliegue existente.
