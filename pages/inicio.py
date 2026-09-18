@@ -13,7 +13,7 @@ st.markdown(
         border-radius: 14px;
         padding: 1.05rem 1.15rem;
         background: #ffffff;
-        min-height: 188px;
+        min-height: 178px;
     }
     .home-kicker {color:#f28e1c;font-weight:700;letter-spacing:.02em;}
     </style>
@@ -36,7 +36,7 @@ with c_title:
 st.divider()
 st.subheader("Herramientas disponibles")
 
-c1, c2, c3 = st.columns(3, gap="large")
+c1, c2 = st.columns(2, gap="large")
 with c1:
     st.markdown(
         """
@@ -61,17 +61,30 @@ with c2:
     )
     st.page_link("pages/mohr_3d.py", label="Abrir Mohr 3D", icon="↗️")
 
+c3, c4 = st.columns(2, gap="large")
 with c3:
     st.markdown(
         """
         <div class="home-card">
-        <h3>Vibraciones 1-GDL</h3>
+        <h3>Vibraciones libres 1-GDL</h3>
         <p>Respuesta libre masa–resorte–amortiguador, frecuencia natural, amortiguamiento, respuesta temporal y plano de fase.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.page_link("pages/vibraciones_1gdl.py", label="Abrir Vibraciones 1-GDL", icon="↗️")
+    st.page_link("pages/vibraciones_1gdl.py", label="Abrir Vibraciones libres 1-GDL", icon="↗️")
+
+with c4:
+    st.markdown(
+        """
+        <div class="home-card">
+        <h3>Vibración forzada 1-GDL</h3>
+        <p>Excitación armónica, resonancia, magnificación, fase, fuerzas, transmisibilidad y respuesta completa del sistema.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.page_link("pages/vibracion_forzada_1gdl.py", label="Abrir Vibración forzada 1-GDL", icon="↗️")
 
 st.divider()
 st.subheader("Propósito")

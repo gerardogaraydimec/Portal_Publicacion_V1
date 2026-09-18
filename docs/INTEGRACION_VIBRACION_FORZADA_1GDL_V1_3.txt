@@ -1,0 +1,21 @@
+PD-2026-0011 · GG DIMEC MechLab V1.3
+INTEGRACIÓN: VIBRACIÓN FORZADA 1-GDL
+
+Archivos incorporados:
+- modules/vibracion_forzada1gdl.py
+- pages/vibracion_forzada_1gdl.py
+
+Archivos actualizados:
+- streamlit_app.py
+- pages/inicio.py
+
+Nueva navegación:
+Vibraciones y Dinámica
+  - Vibraciones libres 1-GDL
+  - Vibración forzada 1-GDL
+
+URL interna:
+/vibracion-forzada-1gdl
+
+No requiere nuevas dependencias respecto de MechLab V1.2.
+La herramienta conserva entradas sin máximos industriales prefijados y la validación física del modelo lineal 1-GDL.

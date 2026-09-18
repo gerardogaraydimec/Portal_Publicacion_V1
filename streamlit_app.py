@@ -17,16 +17,22 @@ mohr2d = st.Page("pages/mohr_2d.py", title="Mohr 2D", icon="⭕", url_path="mohr
 mohr3d = st.Page("pages/mohr_3d.py", title="Mohr 3D", icon="🧊", url_path="mohr-3d")
 vibraciones1gdl = st.Page(
     "pages/vibraciones_1gdl.py",
-    title="Vibraciones 1-GDL",
+    title="Vibraciones libres 1-GDL",
     icon="〰️",
     url_path="vibraciones-1gdl",
+)
+vibracion_forzada1gdl = st.Page(
+    "pages/vibracion_forzada_1gdl.py",
+    title="Vibración forzada 1-GDL",
+    icon="📈",
+    url_path="vibracion-forzada-1gdl",
 )
 
 pg = st.navigation(
     {
         "Portal": [inicio],
         "Resistencia de Materiales": [mohr2d, mohr3d],
-        "Vibraciones y Dinámica": [vibraciones1gdl],
+        "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
     },
     position="top",
 )
