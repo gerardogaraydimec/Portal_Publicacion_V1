@@ -42,12 +42,21 @@ ciclos_termodinamicos = st.Page(
     url_path="ciclos-termodinamicos",
 )
 
+
+von_mises_lab = st.Page(
+    "pages/von_mises_lab.py",
+    title="Von Mises Lab",
+    icon="🧩",
+    url_path="von-mises",
+)
+
 pg = st.navigation(
     {
         "Portal": [inicio],
         "Resistencia de Materiales": [mohr2d, mohr3d],
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
+        "Elementos de Máquinas": [von_mises_lab],
     },
     position="top",
 )

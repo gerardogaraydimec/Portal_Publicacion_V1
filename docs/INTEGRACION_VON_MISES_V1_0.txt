@@ -1,0 +1,31 @@
+PD-2026-0011 · GG DIMEC MechLab
+Integración Von Mises Lab V1.0
+
+Este ZIP es un PARCHE para copiar sobre la raíz del repositorio Portal_Publicacion_V1.
+
+Archivos principales:
+- streamlit_app.py                  REEMPLAZAR
+- requirements.txt                 REEMPLAZAR (sin dependencias nuevas respecto del portal actual)
+- pages/inicio.py                  REEMPLAZAR
+- pages/von_mises_lab.py           AGREGAR
+- modules/von_mises_lab/*          AGREGAR
+- assets/logo_vm_header.png        AGREGAR
+
+Navegación resultante:
+Elementos de Máquinas
+└── Von Mises Lab
+
+URL interna:
+ /von-mises
+
+Prueba local:
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+Después de validar localmente:
+git status
+git add .
+git commit -m "Integra Von Mises Lab"
+git push
+
+Streamlit Community Cloud debería actualizar automáticamente el portal.

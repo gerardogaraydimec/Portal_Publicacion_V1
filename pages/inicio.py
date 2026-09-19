@@ -78,6 +78,15 @@ with c6:
     """, unsafe_allow_html=True)
     st.page_link("pages/ciclos_termodinamicos.py", label="Abrir Ciclos termodinámicos", icon="↗️")
 
+
+c7, c8 = st.columns(2, gap="large")
+with c7:
+    st.markdown("""
+        <div class="home-card"><h3>Von Mises Lab</h3>
+        <p>Fluencia de materiales dúctiles desde el estado uniaxial hasta el espacio 3D de esfuerzos, con Mohr, Von Mises, Tresca, cilindro de fluencia y plano π.</p></div>
+    """, unsafe_allow_html=True)
+    st.page_link("pages/von_mises_lab.py", label="Abrir Von Mises Lab", icon="↗️")
+
 st.divider()
 st.subheader("Propósito")
 st.write(
