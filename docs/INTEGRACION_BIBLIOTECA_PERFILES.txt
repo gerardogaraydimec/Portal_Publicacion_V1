@@ -1,0 +1,55 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE DE INTEGRACIÓN · BIBLIOTECA DE PERFILES ESTRUCTURALES
+
+ARCHIVOS INCLUIDOS
+- streamlit_app.py
+- pages/inicio.py
+- pages/biblioteca_perfiles_estructurales.py
+- modules/profiles_data.py
+- modules/materials.py
+- modules/providers.py
+- modules/section_plotter.py
+
+REQUISITOS DEL PORTAL
+El portal debe conservar:
+- modules/ui_brand.py
+- assets/logo_header_unificado.png
+- las páginas y módulos ya existentes de MechLab
+
+INSTALACIÓN
+1. Descomprimir el ZIP.
+2. Copiar todo el contenido directamente a la raíz de Portal_Publicacion_V1.
+3. Aceptar reemplazo de:
+   - streamlit_app.py
+   - pages/inicio.py
+4. Los archivos de la biblioteca de perfiles son nuevos.
+5. Ejecutar el portal con:
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+NAVEGACIÓN RESULTANTE
+Resistencia de Materiales
+- Mohr 2D
+- Mohr 3D
+- Cortante y Momento
+- Perfiles estructurales
+
+URL
+/perfiles-estructurales
+
+LANDING
+La tarjeta de Resistencia de Materiales incorpora:
+- etiqueta "Perfiles"
+- enlace "Biblioteca de Perfiles Estructurales"
+
+CONTENIDO
+- 107 perfiles detallados
+- IPE, IPN, HEA, HEB, UPN, SHS, RHS y CHS
+- dimensiones en LaTeX
+- propiedades A, I, S, r y propiedades complementarias cuando están soportadas
+- materiales de referencia
+- aplicaciones de Resistencia de Materiales
+- aplicaciones en diseño mecánico y estructural
+- proveedores y catálogos de referencia en Chile
+
+OBSERVACIÓN
+El módulo no muestra identificadores internos de versión ni etiquetas de trazabilidad en la interfaz.

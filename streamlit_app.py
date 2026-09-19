@@ -50,6 +50,13 @@ vigas_cortante_momento = st.Page(
     url_path="vigas-cortante-momento",
 )
 
+biblioteca_perfiles = st.Page(
+    "pages/biblioteca_perfiles_estructurales.py",
+    title="Perfiles estructurales",
+    icon="🏗️",
+    url_path="perfiles-estructurales",
+)
+
 von_mises_lab = st.Page(
     "pages/von_mises_lab.py",
     title="Von Mises Lab",
@@ -60,7 +67,7 @@ von_mises_lab = st.Page(
 pg = st.navigation(
     {
         "Portal": [inicio],
-        "Resistencia de Materiales": [mohr2d, mohr3d, vigas_cortante_momento],
+        "Resistencia de Materiales": [mohr2d, mohr3d, vigas_cortante_momento, biblioteca_perfiles],
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
         "Elementos de Máquinas": [von_mises_lab],
