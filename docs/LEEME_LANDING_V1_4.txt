@@ -1,0 +1,54 @@
+PD-2026-0011 · GG DIMEC MechLab
+LANDING PREMIUM V1.4 — PARCHE SOLO PORTADA
+
+Este parche NO toca Mohr 2D ni ninguna otra herramienta.
+
+DIAGNÓSTICO DE LA CAPTURA
+La captura mostrada corresponde todavía a la landing V1.2:
+aparecen las clases antiguas 'eyebrow', 'hero-lead', 'hero-promise',
+'ctas', 'signal-row', 'hero-photo' y 'profile-badge'.
+
+La V1.4 usa exclusivamente clases prefijadas 'gg-' y renderiza cada bloque
+mediante st.html(). De esta forma el HTML no pasa por Markdown y no puede
+convertirse en un bloque de código por la sangría.
+
+ARCHIVO A REEMPLAZAR
+- pages/inicio.py
+
+ASSETS
+- assets/gerardo_hero.jpg
+- assets/gerardo_terreno.jpg
+- assets/gerardo_industria.jpg
+- assets/brochure_simulacion.jpg
+- assets/brochure_escaneo.jpg
+- assets/brochure_formacion.jpg
+- assets/logo_mechlab_landing.png
+
+VERIFICACIÓN ANTES DE EJECUTAR
+
+1) Confirmar versión:
+Select-String -Path .\pages\inicio.py -Pattern "PREMIUM LANDING V1.4"
+
+Debe aparecer una coincidencia.
+
+2) Confirmar motor HTML:
+Select-String -Path .\pages\inicio.py -Pattern "st.html"
+
+Debe mostrar varias coincidencias.
+
+3) Confirmar que ya NO está el método anterior:
+Select-String -Path .\pages\inicio.py -Pattern "st.markdown"
+
+Debe devolver CERO resultados.
+
+SHA256 esperado de pages/inicio.py:
+1a3dbf241203bc6dcccbcbf4ac7dc1e3b2280c56a973e848f031b8155129ec7d
+
+Puedes verificarlo con:
+Get-FileHash .\pages\inicio.py -Algorithm SHA256
+
+PRUEBA LOCAL
+.\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+Al final de la portada debe leerse:
+PREMIUM LANDING V1.4
