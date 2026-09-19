@@ -19,10 +19,23 @@ st.markdown(
     #MainMenu {visibility: hidden;}
     .block-container {
         max-width: 100%;
-        padding-top: 0.15rem;
-        padding-bottom: 0.25rem;
+        /* Margen superior seguro: evita que el encabezado/logo quede
+           pegado o visualmente recortado bajo la navegación de Streamlit. */
+        padding-top: 1.05rem !important;
+        padding-bottom: 0.35rem;
         padding-left: 0.65rem;
         padding-right: 0.65rem;
+    }
+
+    /* Protección adicional del primer bloque del encabezado. */
+    div[data-testid="stMainBlockContainer"] > div:first-child {
+        overflow: visible !important;
+    }
+
+    /* El logo del encabezado debe verse completo. */
+    div[data-testid="stImage"] img {
+        overflow: visible !important;
+        object-fit: contain !important;
     }
     h1 {
         font-size: 1.18rem !important;
@@ -112,6 +125,10 @@ DEFAULTS = {
 for key, value in DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = value
+
+# Separación superior deliberada para evitar solapamiento visual con la barra
+# de navegación del portal en pantallas anchas y escalados de navegador.
+st.markdown('<div style="height:0.20rem"></div>', unsafe_allow_html=True)
 
 render_app_header(
     title="Círculo de Mohr 3D",

@@ -1,0 +1,34 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE V1.5 — LIMPIEZA LANDING + CORRECCIÓN SUPERIOR MOHR 3D
+
+CAMBIOS
+1. Landing:
+   - Se elimina del footer el texto visible "PREMIUM LANDING V1.4".
+   - Se reemplaza por:
+       Conocimiento · Ingeniería · Personas · Futuro
+   - La versión queda únicamente como dato interno del archivo.
+
+2. Círculo de Mohr 3D:
+   - Se aumenta el margen superior seguro del contenedor principal.
+   - Se agrega separación antes del encabezado.
+   - Se evita que el logo/encabezado quede visualmente recortado o pegado
+     bajo la barra de navegación.
+   - No se modifica el motor matemático ni los gráficos.
+
+ARCHIVOS A REEMPLAZAR
+- pages/inicio.py
+- pages/mohr_3d.py
+
+PRUEBA LOCAL
+.\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+VALIDAR
+- Landing: el pie ya NO debe mostrar "PREMIUM LANDING V1.4".
+- Mohr 3D: logo y encabezado deben verse completos, con aire bajo la navegación.
+- El resto de Mohr 3D debe mantener su layout compacto.
+
+Luego:
+git status
+git add pages/inicio.py pages/mohr_3d.py
+git commit -m "Limpia landing y corrige encabezado Mohr 3D"
+git push origin main

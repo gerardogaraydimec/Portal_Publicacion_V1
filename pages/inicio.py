@@ -7,7 +7,7 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 
-VERSION = "PREMIUM LANDING V1.4"
+VERSION = "PREMIUM LANDING V1.5"
 
 
 def data_uri(path: Path) -> str:
@@ -543,10 +543,6 @@ html{scroll-behavior:smooth;}
   color:#777;
   font-size:.79rem;
 }
-.gg-version{
-  color:var(--gg-orange);
-  font-weight:850;
-}
 
 @media(max-width:1100px){
   .gg-hero,.gg-vision,.gg-about{grid-template-columns:1fr;}
@@ -815,7 +811,7 @@ contact_html = f"""
 </section>
 <div class="gg-footer gg-page">
   <span>GG DIMEC SPA · Gerardo Garay Pereira · Chile</span>
-  <span class="gg-version">{VERSION}</span>
+  <span>Conocimiento · Ingeniería · Personas · Futuro</span>
 </div>
 """
 st.html(contact_html)
