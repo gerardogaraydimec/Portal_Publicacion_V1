@@ -1,0 +1,48 @@
+COMMON_EQUATIONS = {
+"power":[
+    (r"\Delta E_{ciclo}=0","Cierre energético del ciclo."),
+    (r"W_{neto}=Q_{in}-Q_{out}","Primera ley aplicada al ciclo completo."),
+    (r"\eta_{th}=\frac{W_{neto,salida}}{Q_{in}}","Eficiencia térmica."),
+    (r"\dot W=\dot m\,w","Potencia a partir del trabajo específico."),
+    (r"\dot Q=\dot m\,q","Tasa de calor a partir del calor específico."),
+],
+"refrigeration":[
+    (r"\dot Q_H=\dot Q_L+\dot W_{in}","Balance global de energía."),
+    (r"COP_R=\frac{\dot Q_L}{\dot W_{in}}","Desempeño como refrigerador."),
+    (r"COP_{HP}=\frac{\dot Q_H}{\dot W_{in}}","Desempeño como bomba de calor."),
+],
+"secondlaw":[
+    (r"\dot S_{gen}\ge 0","Generación de entropía."),
+    (r"\dot X_{dest}=T_0\dot S_{gen}","Exergía destruida."),
+    (r"\eta_{II}=\frac{\text{producto exergético}}{\text{recurso exergético}}","Eficiencia de segunda ley."),
+],
+}
+
+SOLVER_EQUATIONS = {
+"gas_carnot":[r"\eta_{Carnot}=1-\frac{T_L}{T_H}"],
+"otto":[r"r=\frac{V_1}{V_2}",r"\eta_{Otto}=1-\frac{1}{r^{k-1}}",r"MEP=\frac{w_{neto}}{v_1-v_2}"],
+"diesel":[r"r_c=\frac{V_3}{V_2}",r"\eta_{Diesel}=1-\frac{1}{r^{k-1}}\frac{r_c^k-1}{k(r_c-1)}"],
+"dual":[r"q_{in}=c_v(T_3-T_2)+c_p(T_4-T_3)"],
+"stirling":[r"\eta_{Stirling,rev}=1-\frac{T_L}{T_H}"],
+"ericsson":[r"\eta_{Ericsson,rev}=1-\frac{T_L}{T_H}"],
+"brayton_ideal":[r"r_p=\frac{P_2}{P_1}",r"\eta_{Brayton}=1-\frac{1}{r_p^{(k-1)/k}}"],
+"brayton_real":[r"\eta_c=\frac{h_{2s}-h_1}{h_2-h_1}",r"\eta_t=\frac{h_3-h_4}{h_3-h_{4s}}"],
+"brayton_regen":[r"\varepsilon_{reg}=\frac{T_{2r}-T_2}{T_4-T_2}"],
+"brayton_advanced":[r"w_c=\sum_i c_p(T_{out,i}-T_{in,i})",r"w_t=\sum_i c_p(T_{in,i}-T_{out,i})"],
+"turbojet":[r"F=\dot m(V_e-V_0)+(P_e-P_0)A_e"],
+"vapor_carnot":[r"\eta_{Carnot}=1-\frac{T_L}{T_H}"],
+"rankine_ideal":[r"w_t=h_3-h_4",r"w_p\approx v_1(P_2-P_1)",r"q_{in}=h_3-h_2"],
+"rankine_real":[r"\eta_t=\frac{h_3-h_4}{h_3-h_{4s}}",r"\eta_p=\frac{h_{2s}-h_1}{h_2-h_1}"],
+"rankine_reheat":[r"w_t=(h_3-h_4)+(h_5-h_6)",r"q_{in}=(h_3-h_2)+(h_5-h_4)"],
+"rankine_regen_open":[r"y h_6+(1-y)h_2=h_3"],
+"cogeneration":[r"\eta_{util}=\frac{\dot W_{neto}+\dot Q_{util}}{\dot Q_{in}}"],
+"combined":[r"\dot Q_{HRSG,g}=\dot Q_{HRSG,s}",r"\dot W_{tot}=\dot W_{GT}+\dot W_{ST}"],
+"basic_cop":[r"\dot Q_H=\dot Q_L+\dot W_{in}"],
+"carnot_reverse":[r"COP_{R,Carnot}=\frac{T_L}{T_H-T_L}",r"COP_{HP,Carnot}=\frac{T_H}{T_H-T_L}"],
+"vcr_ideal":[r"h_4=h_3",r"COP_R=\frac{h_1-h_4}{h_2-h_1}"],
+"vcr_real":[r"\eta_c=\frac{h_{2s}-h_1}{h_2-h_1}",r"h_4=h_3"],
+"heat_pump":[r"COP_{HP}=\frac{q_H}{w_c}"],
+"cascade":[r"\dot Q_{H,L}=\dot Q_{L,H}",r"COP_R=\frac{\dot Q_L}{\dot W_{c,L}+\dot W_{c,H}}"],
+"gas_refrigeration":[r"COP_R=\frac{q_L}{w_c-w_t}"],
+"absorption":[r"COP_{abs}=\frac{\dot Q_L}{\dot Q_G+\dot W_p}"],
+}

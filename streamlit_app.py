@@ -35,12 +35,19 @@ termodinamica_agua = st.Page(
     url_path="agua-vapor",
 )
 
+ciclos_termodinamicos = st.Page(
+    "pages/ciclos_termodinamicos.py",
+    title="Ciclos termodinámicos",
+    icon="♨️",
+    url_path="ciclos-termodinamicos",
+)
+
 pg = st.navigation(
     {
         "Portal": [inicio],
         "Resistencia de Materiales": [mohr2d, mohr3d],
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
-        "Termodinámica": [termodinamica_agua],
+        "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
     },
     position="top",
 )

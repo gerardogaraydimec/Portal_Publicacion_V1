@@ -1,0 +1,51 @@
+PD-2026-0011 · GG DIMEC MechLab
+INTEGRACIÓN CICLOS TERMODINÁMICOS V1.6 FINAL
+
+BASE INTEGRADA
+- Analizador de Ciclos Termodinámicos V1.0 Cierre
+
+COPIAR EL CONTENIDO DE ESTE PARCHE SOBRE LA RAÍZ DEL REPOSITORIO
+Portal_Publicacion_V1/
+
+ARCHIVOS A REEMPLAZAR
+- streamlit_app.py
+- requirements.txt
+- pages/inicio.py
+
+ARCHIVOS A AGREGAR
+- pages/ciclos_termodinamicos.py
+- modules/thermo_cycles/__init__.py
+- modules/thermo_cycles/catalog.py
+- modules/thermo_cycles/core.py
+- modules/thermo_cycles/gas.py
+- modules/thermo_cycles/pedagogy.py
+- modules/thermo_cycles/plots.py
+- modules/thermo_cycles/refrigeration.py
+- modules/thermo_cycles/schematics.py
+- modules/thermo_cycles/steam.py
+- modules/thermo_cycles/structural.py
+- modules/thermo_cycles/ui_math.py
+
+NO REEMPLAZAR
+- assets/
+- .streamlit/config.toml
+- páginas y módulos ya existentes de Mohr, vibraciones y propiedades del agua/vapor.
+
+NUEVA RUTA
+/ciclos-termodinamicos
+
+PRUEBA LOCAL
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+VALIDAR
+1. Inicio
+2. Mohr 2D
+3. Mohr 3D
+4. Vibraciones libres 1-GDL
+5. Vibración forzada 1-GDL
+6. Propiedades del agua y vapor
+7. Ciclos termodinámicos
+
+PUBLICACIÓN
+Luego de validar localmente: git add, commit y push. Streamlit Community Cloud actualizará el portal automáticamente.
