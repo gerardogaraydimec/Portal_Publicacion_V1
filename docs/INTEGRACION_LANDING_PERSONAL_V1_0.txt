@@ -1,0 +1,52 @@
+PD-2026-0011 · GG DIMEC MechLab
+Parche Landing Page Personal V1.0
+
+OBJETIVO
+Reemplazar únicamente la portada / Inicio del portal por una landing page completa,
+orientada a estudiantes, docentes e ingenieros y conectada con la marca personal
+de Gerardo Garay Pereira y GG DIMEC SPA.
+
+PALETA
+- Negro / antracita como base visual.
+- Naranjo corporativo #FF6900 como acento.
+- Blanco y grises neutros.
+- No se utiliza azul como color estructural de la landing.
+
+FOTOGRAFÍAS
+Se usan fotografías reales suministradas por Gerardo Garay Pereira.
+No se altera su identidad ni se generan versiones artificiales de su rostro.
+Los archivos solo se optimizaron para uso web.
+
+CONTENIDO DEL BROCHURE
+Se incorporan imágenes reales del brochure para:
+- simulación estructural y dinámica;
+- escaneo 3D e ingeniería inversa;
+- capacitación técnica.
+
+ARCHIVOS DEL PARCHE
+- pages/inicio.py
+- assets/gerardo_hero.jpg
+- assets/gerardo_terreno.jpg
+- assets/gerardo_industria.jpg
+- assets/brochure_simulacion.jpg
+- assets/brochure_escaneo.jpg
+- assets/brochure_formacion.jpg
+- assets/logo_mechlab_landing.png
+
+NO MODIFICA
+- streamlit_app.py
+- navegación superior
+- páginas de herramientas
+- motores matemáticos
+- requirements.txt
+
+INSTALACIÓN
+1. Copiar el contenido del ZIP sobre la raíz de Portal_Publicacion_V1.
+2. Aceptar reemplazo de pages/inicio.py.
+3. Ejecutar:
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+4. Revisar Inicio.
+5. Si está correcto:
+   git add .
+   git commit -m "Renueva landing page MechLab"
+   git push
