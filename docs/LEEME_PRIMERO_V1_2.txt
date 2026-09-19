@@ -1,0 +1,51 @@
+PD-2026-0011 · MechLab
+Parche V1.2 — Landing Premium + FIX definitivo Mohr 2D
+
+IMPORTANTE
+Este parche reemplaza DOS archivos:
+- pages/inicio.py
+- pages/mohr_2d.py
+
+La corrección de Mohr 2D elimina completamente LOGO_PATH de la página.
+La figura se crea con:
+    crear_figura(d, logo_path=None)
+
+Esto evita el NameError que seguía apareciendo en Streamlit Cloud.
+El logo ya se muestra correctamente mediante el encabezado corporativo.
+
+LANDING V1.2
+Se rediseñó de forma más premium y visual:
+- hero más potente;
+- navegación rápida visual;
+- rutas por tipo de usuario;
+- símbolos de ingeniería σ, ω, T–s y VM;
+- tarjetas de herramientas más interactivas;
+- flujo de uso en tres pasos;
+- fotografías personales reales;
+- imágenes del brochure;
+- negro + naranjo corporativo;
+- menos texto corrido;
+- footer identifica explícitamente 'MechLab Premium Landing V1.2'
+  para verificar que el archivo nuevo sí quedó aplicado.
+
+INSTALACIÓN
+1. Descomprime el ZIP.
+2. Copia TODO su contenido sobre la raíz de Portal_Publicacion_V1.
+3. Acepta reemplazar pages/inicio.py y pages/mohr_2d.py.
+4. Comprueba antes de subir:
+   Busca en pages/mohr_2d.py la palabra LOGO_PATH.
+   Debe devolver CERO resultados.
+5. Ejecuta:
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+6. Verifica Inicio y Mohr 2D.
+7. En Inicio, al pie debe verse: MechLab Premium Landing V1.2
+8. Luego:
+   git status
+   git add pages/inicio.py pages/mohr_2d.py assets
+   git commit -m "Landing premium y fix definitivo Mohr 2D"
+   git push
+
+VERIFICACIÓN GIT
+Después del push revisa que GitHub muestre realmente modificados:
+- pages/inicio.py
+- pages/mohr_2d.py

@@ -1,30 +1,29 @@
 
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import streamlit as st
 from modules.ui_brand import render_app_header
 
 from modules.mohr2d import calcular_estado, crear_figura
 
-ROOT = Path(__file__).resolve().parent.parent
-LOGO_PATH = ROOT / "assets" / "logo_header_unificado.png"
-
 
 st.markdown(
     """
-    <style>
-    :root {--gg-orange:#f28e1c; --gg-orange-dark:#db7810;}
-    div[data-testid="stFormSubmitButton"] button {background:#f28e1c !important;border-color:#f28e1c !important;color:white !important;}
-    div[data-testid="stFormSubmitButton"] button:hover {background:#db7810 !important;border-color:#db7810 !important;}
-    </style>
-    """,
+<style>
+:root {--gg-orange:#f28e1c; --gg-orange-dark:#db7810;}
+div[data-testid="stFormSubmitButton"] button {
+    background:#f28e1c !important;
+    border-color:#f28e1c !important;
+    color:white !important;
+}
+div[data-testid="stFormSubmitButton"] button:hover {
+    background:#db7810 !important;
+    border-color:#db7810 !important;
+}
+</style>
+""",
     unsafe_allow_html=True,
 )
 
-# ---------------------------------------------------------------------------
-# Estado persistente
-# ---------------------------------------------------------------------------
 DEFAULTS = {
     "m2_sx_base": 200.0,
     "m2_sy_base": -100.0,
@@ -36,9 +35,6 @@ for key, value in DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = value
 
-# ---------------------------------------------------------------------------
-# Encabezado
-# ---------------------------------------------------------------------------
 render_app_header(
     title="Círculo de Mohr 2D",
     subtitle="Transformación plana de esfuerzos · tensiones principales · esfuerzo cortante máximo · orientación del elemento.",
@@ -46,14 +42,10 @@ render_app_header(
     logo_width=190,
 )
 
-# ---------------------------------------------------------------------------
-# Datos base: solo se aplican cuando se presiona el botón
-# ---------------------------------------------------------------------------
 with st.sidebar:
     st.header("Estado plano de esfuerzos")
     st.caption(
-        "Los valores de σx, σy y τxy se actualizan juntos para evitar "
-        "recálculos innecesarios."
+        "Los valores de σx, σy y τxy se actualizan juntos para evitar recálculos innecesarios."
     )
 
     with st.form("form_estado_base", clear_on_submit=False):
@@ -81,7 +73,6 @@ with st.sidebar:
             step=10.0,
             format="%.1f",
         )
-
         aplicar = st.form_submit_button(
             "Actualizar estado",
             use_container_width=True,
@@ -95,13 +86,9 @@ with st.sidebar:
 
     st.divider()
     st.caption(
-        "Después de actualizar el estado base, use β en la página principal "
-        "para explorar la transformación."
+        "Después de actualizar el estado base, usa β en la página principal para explorar la transformación."
     )
 
-# ---------------------------------------------------------------------------
-# Resultados que dependen solo del estado base
-# ---------------------------------------------------------------------------
 d_base = calcular_estado(
     st.session_state.m2_sx_base,
     st.session_state.m2_sy_base,
@@ -118,10 +105,7 @@ r4.metric("θp", f"{d_base['theta_p_deg']:.2f}°")
 
 st.divider()
 
-# ---------------------------------------------------------------------------
-# Fragmento interactivo:
-# al mover β se vuelve a ejecutar solo esta sección.
-# ---------------------------------------------------------------------------
+
 @st.fragment
 def panel_rotacion():
     st.subheader("Transformación del elemento")
@@ -151,8 +135,10 @@ def panel_rotacion():
     c3.metric("σβ", f"{d['sigma_beta']:.2f}")
     c4.metric("τβ", f"{d['tau_beta']:.2f}")
 
-    logo_for_fig = str(LOGO_PATH) if LOGO_PATH.exists() else None
-    fig = crear_figura(d, logo_path=logo_for_fig)
+    # El encabezado corporativo ya contiene el logo.
+    # No se pasa ningún logo a la figura: se elimina por completo
+    # la dependencia que causaba NameError en Streamlit Cloud.
+    fig = crear_figura(d, logo_path=None)
     st.pyplot(fig, use_container_width=True)
     plt.close(fig)
 
@@ -177,4 +163,4 @@ with st.expander("Ecuaciones utilizadas", expanded=False):
     )
 
 st.divider()
-st.caption("GG DIMEC · Herramienta pedagógica MechLab.")
+st.caption("GG DIMEC · MechLab · Círculo de Mohr 2D.")

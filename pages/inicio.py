@@ -9,14 +9,15 @@ ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 
 ORANGE = "#ff6900"
-BLACK = "#0b0b0b"
-MUTED = "#6f7379"
+BLACK = "#090909"
+CHARCOAL = "#171717"
+MUTED = "#6a6d72"
+LIGHT = "#f6f6f4"
 
 
 def data_uri(path: Path) -> str:
     mime = "image/jpeg" if path.suffix.lower() in {".jpg", ".jpeg"} else "image/png"
-    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
-    return f"data:{mime};base64,{encoded}"
+    return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
 
 
 hero_img = data_uri(ASSETS / "gerardo_hero.jpg")
@@ -29,751 +30,867 @@ train_img = data_uri(ASSETS / "brochure_formacion.jpg")
 
 st.markdown(
     f"""
-    <style>
-    .block-container {{
-        max-width: 1480px;
-        padding-top: .8rem;
-        padding-bottom: 2.4rem;
-    }}
-    .stApp {{ background:#fff; color:{BLACK}; }}
-    h1,h2,h3,h4 {{ color:{BLACK}; }}
+<style>
+.block-container {{
+    max-width: 1500px;
+    padding-top: .65rem;
+    padding-bottom: 2.5rem;
+}}
+.stApp {{ background:#fff; color:{BLACK}; }}
+html {{ scroll-behavior:smooth; }}
 
-    .landing-shell {{
-        width:100%;
-        overflow:hidden;
-        border-radius:22px;
-        background:#fff;
-    }}
+:root {{
+    --orange:{ORANGE};
+    --black:{BLACK};
+    --charcoal:{CHARCOAL};
+    --muted:{MUTED};
+    --light:{LIGHT};
+    --border:#e6e6e3;
+}}
 
-    .hero {{
-        position:relative;
-        display:grid;
-        grid-template-columns: 1.1fr .9fr;
-        min-height:585px;
-        background:
-            radial-gradient(circle at 22% 18%, rgba(255,105,0,.19), transparent 29%),
-            linear-gradient(135deg,#040404 0%,#101010 60%,#1a1a1a 100%);
-        border-radius:22px;
-        overflow:hidden;
-        box-shadow:0 16px 44px rgba(0,0,0,.14);
-    }}
-    .hero:after {{
-        content:"";
-        position:absolute;
-        right:-110px;
-        top:-120px;
-        width:350px;height:350px;
-        border-radius:50%;
-        border:1px solid rgba(255,105,0,.28);
-        box-shadow:0 0 0 46px rgba(255,105,0,.04), 0 0 0 92px rgba(255,105,0,.024);
-        pointer-events:none;
-    }}
-    .hero-copy {{
-        padding:62px 56px 56px 58px;
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        z-index:2;
-    }}
-    .brand-row {{
-        display:flex;
-        align-items:center;
-        gap:14px;
-        margin-bottom:22px;
-    }}
-    .brand-row img {{
-        width:88px;
-        height:auto;
-        border-radius:10px;
-        background:#fffaf5;
-    }}
-    .brand-title {{
-        color:#fff;
-        font-weight:800;
-        letter-spacing:.04em;
-        font-size:1.03rem;
-    }}
-    .brand-sub {{
-        color:#afb3ba;
-        font-size:.82rem;
-        margin-top:2px;
-    }}
-    .eyebrow {{
-        color:{ORANGE};
-        font-weight:800;
-        letter-spacing:.08em;
-        text-transform:uppercase;
-        font-size:.84rem;
-        margin-bottom:10px;
-    }}
-    .hero h1 {{
-        color:#fff;
-        font-size:clamp(2.65rem,4.8vw,4.9rem);
-        line-height:.98;
-        margin:0 0 20px 0;
-        letter-spacing:-.035em;
-    }}
-    .hero h1 span {{ color:{ORANGE}; }}
-    .hero p {{
-        color:#d7d9dd;
-        font-size:1.06rem;
-        line-height:1.58;
-        max-width:760px;
-        margin:0 0 14px 0;
-    }}
-    .hero-vision {{
-        border-left:4px solid {ORANGE};
-        padding-left:16px;
-        color:#fff !important;
-        font-weight:600;
-        max-width:720px;
-    }}
-    .cta-row {{
-        display:flex;
-        gap:12px;
-        flex-wrap:wrap;
-        margin-top:20px;
-    }}
-    .cta {{
-        display:inline-block;
-        padding:13px 19px;
-        border-radius:11px;
-        text-decoration:none !important;
-        font-weight:800;
-        font-size:.95rem;
-        transition:.16s ease;
-    }}
-    .cta.primary {{ background:{ORANGE}; color:#fff !important; }}
-    .cta.secondary {{
-        border:1px solid rgba(255,255,255,.34);
-        color:#fff !important;
-        background:rgba(255,255,255,.04);
-    }}
-    .cta:hover {{ transform:translateY(-1px); }}
-    .hero-tags {{
-        display:flex;
-        gap:10px;
-        flex-wrap:wrap;
-        margin-top:22px;
-    }}
-    .hero-tags span {{
-        color:#fff;
-        background:#1a1a1a;
-        border:1px solid #343434;
-        border-radius:999px;
-        padding:8px 12px;
-        font-size:.85rem;
-        font-weight:700;
-    }}
-    .hero-photo {{
-        min-height:585px;
-        position:relative;
-        background:
-            linear-gradient(90deg,rgba(11,11,11,.44),rgba(11,11,11,.06)),
-            url("{hero_img}") center 30%/cover no-repeat;
-    }}
-    .hero-badge {{
-        position:absolute;
-        right:24px;
-        bottom:26px;
-        left:24px;
-        background:rgba(10,10,10,.82);
-        border:1px solid rgba(255,255,255,.14);
-        border-left:4px solid {ORANGE};
-        border-radius:14px;
-        color:#fff;
-        padding:16px 18px;
-        line-height:1.42;
-        font-size:.93rem;
-        backdrop-filter:blur(8px);
-    }}
+.landing {{
+    width:100%;
+    overflow:hidden;
+    border-radius:24px;
+}}
+.landing * {{ box-sizing:border-box; }}
 
-    .section {{
-        padding:60px 8px 10px 8px;
-    }}
-    .section.dark {{
-        margin-top:48px;
-        background:{BLACK};
-        color:#fff;
-        border-radius:22px;
-        padding:0;
-        overflow:hidden;
-    }}
-    .kicker {{
-        color:{ORANGE};
-        font-weight:800;
-        letter-spacing:.07em;
-        text-transform:uppercase;
-        font-size:.82rem;
-        margin-bottom:8px;
-    }}
-    .section h2 {{
-        font-size:clamp(2rem,3.4vw,3.18rem);
-        line-height:1.05;
-        margin:0 0 14px 0;
-        letter-spacing:-.025em;
-    }}
-    .section-intro {{
-        max-width:920px;
-        color:{MUTED};
-        font-size:1.02rem;
-        line-height:1.63;
-        margin-bottom:28px;
-    }}
+.hero {{
+    min-height:620px;
+    display:grid;
+    grid-template-columns:1.08fr .92fr;
+    border-radius:24px;
+    overflow:hidden;
+    position:relative;
+    background:
+        linear-gradient(120deg, rgba(255,105,0,.10), transparent 26%),
+        linear-gradient(135deg,#050505 0%,#0b0b0b 58%,#181818 100%);
+    box-shadow:0 18px 52px rgba(0,0,0,.15);
+}}
+.hero::before {{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size:34px 34px;
+    mask-image:linear-gradient(90deg,#000,transparent 75%);
+    pointer-events:none;
+}}
+.hero-copy {{
+    padding:58px 58px 58px 60px;
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}}
+.brandbar {{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:22px;
+}}
+.brandbar img {{
+    width:88px;
+    height:auto;
+    background:#fffaf5;
+    border-radius:11px;
+}}
+.brandname {{
+    color:#fff;
+    font-weight:900;
+    font-size:1.04rem;
+    letter-spacing:.04em;
+}}
+.brandline {{
+    color:#aeb1b5;
+    font-size:.82rem;
+    margin-top:2px;
+}}
+.eyebrow {{
+    color:var(--orange);
+    text-transform:uppercase;
+    letter-spacing:.10em;
+    font-size:.80rem;
+    font-weight:900;
+    margin-bottom:12px;
+}}
+.hero h1 {{
+    color:#fff;
+    font-size:clamp(2.8rem,4.9vw,5.1rem);
+    line-height:.97;
+    letter-spacing:-.045em;
+    margin:0 0 22px 0;
+    max-width:900px;
+}}
+.hero h1 em {{
+    color:var(--orange);
+    font-style:normal;
+}}
+.hero-lead {{
+    color:#d8d8d8;
+    font-size:1.08rem;
+    line-height:1.58;
+    max-width:760px;
+    margin:0 0 14px 0;
+}}
+.hero-promise {{
+    color:#fff;
+    border-left:4px solid var(--orange);
+    padding-left:16px;
+    font-size:1rem;
+    line-height:1.52;
+    font-weight:650;
+    max-width:730px;
+    margin-top:2px;
+}}
+.ctas {{
+    display:flex;
+    flex-wrap:wrap;
+    gap:11px;
+    margin-top:23px;
+}}
+.btn {{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none !important;
+    border-radius:11px;
+    padding:13px 18px;
+    font-weight:850;
+    font-size:.93rem;
+    transition:.16s ease;
+}}
+.btn:hover {{ transform:translateY(-1px); }}
+.btn.primary {{ color:#fff !important; background:var(--orange); }}
+.btn.dark {{
+    color:#fff !important;
+    border:1px solid #3a3a3a;
+    background:#171717;
+}}
+.signal-row {{
+    display:flex;
+    gap:9px;
+    flex-wrap:wrap;
+    margin-top:22px;
+}}
+.signal {{
+    padding:7px 10px;
+    border:1px solid #343434;
+    border-radius:999px;
+    color:#e7e7e7;
+    background:#161616;
+    font-size:.79rem;
+    font-weight:750;
+}}
+.hero-photo {{
+    min-height:620px;
+    background:
+        linear-gradient(90deg, rgba(8,8,8,.50), rgba(8,8,8,.05) 42%),
+        url("{hero_img}") center 30%/cover no-repeat;
+    position:relative;
+}}
+.hero-photo::after {{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(0deg, rgba(0,0,0,.36), transparent 45%);
+}}
+.profile-badge {{
+    position:absolute;
+    z-index:3;
+    left:25px; right:25px; bottom:25px;
+    padding:15px 17px;
+    color:#fff;
+    border-radius:14px;
+    background:rgba(7,7,7,.82);
+    border:1px solid rgba(255,255,255,.13);
+    border-left:4px solid var(--orange);
+    backdrop-filter:blur(9px);
+    font-size:.91rem;
+    line-height:1.45;
+}}
+.profile-badge b {{ font-size:1rem; }}
 
-    .icon-strip {{
-        display:grid;
-        grid-template-columns:repeat(4,1fr);
-        gap:14px;
-        margin-top:-34px;
-        position:relative;
-        z-index:5;
-        padding:0 14px;
-    }}
-    .icon-card {{
-        background:#fff;
-        border:1px solid #e7e7e7;
-        border-radius:18px;
-        padding:20px 18px;
-        box-shadow:0 12px 28px rgba(0,0,0,.06);
-        display:flex;
-        gap:14px;
-        align-items:flex-start;
-    }}
-    .icon-bubble {{
-        width:46px;height:46px;border-radius:12px;
-        background:#111; color:{ORANGE};
-        display:flex; align-items:center; justify-content:center;
-        font-size:1.25rem; font-weight:900; flex:0 0 auto;
-    }}
-    .icon-card h3 {{ margin:0 0 4px 0; font-size:1.02rem; }}
-    .icon-card p {{ margin:0; color:{MUTED}; font-size:.89rem; line-height:1.48; }}
+.floatnav {{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:13px;
+    margin:-33px 18px 0 18px;
+    position:relative;
+    z-index:8;
+}}
+.float-card {{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:18px;
+    box-shadow:0 14px 30px rgba(0,0,0,.075);
+    min-height:120px;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+}}
+.float-icon {{
+    min-width:47px;
+    height:47px;
+    border-radius:12px;
+    background:#111;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--orange);
+    font-size:1.25rem;
+    font-weight:900;
+}}
+.float-card h3 {{
+    margin:1px 0 5px 0;
+    font-size:1rem;
+}}
+.float-card p {{
+    margin:0;
+    color:var(--muted);
+    font-size:.85rem;
+    line-height:1.43;
+}}
 
-    .quick-grid {{
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:16px;
-    }}
-    .quick-card {{
-        background:#fff;
-        border:1px solid #e5e5e5;
-        border-radius:18px;
-        box-shadow:0 8px 26px rgba(0,0,0,.05);
-        padding:22px;
-    }}
-    .quick-card .qicon {{
-        width:54px;height:54px;border-radius:14px;
-        background:#111; color:{ORANGE};
-        display:flex;align-items:center;justify-content:center;
-        font-size:1.35rem; font-weight:900;
-        margin-bottom:16px;
-    }}
-    .quick-card h3 {{ margin:0 0 8px 0; font-size:1.15rem; }}
-    .quick-card ul {{
-        margin:0; padding-left:18px; color:{MUTED};
-        font-size:.91rem; line-height:1.54;
-    }}
-    .quick-card a {{
-        display:inline-block;
-        margin-top:14px;
-        font-weight:800;
-        color:{BLACK} !important;
-        text-decoration:none !important;
-    }}
-    .quick-card a:hover {{ color:{ORANGE} !important; }}
+.section {{
+    padding:64px 8px 12px 8px;
+}}
+.kicker {{
+    color:var(--orange);
+    text-transform:uppercase;
+    letter-spacing:.09em;
+    font-weight:900;
+    font-size:.79rem;
+    margin-bottom:9px;
+}}
+.section h2 {{
+    margin:0 0 14px 0;
+    font-size:clamp(2rem,3.4vw,3.25rem);
+    letter-spacing:-.03em;
+    line-height:1.04;
+}}
+.lead {{
+    color:var(--muted);
+    line-height:1.62;
+    font-size:1.01rem;
+    max-width:900px;
+    margin-bottom:27px;
+}}
 
-    .tools-grid {{
-        display:grid;
-        grid-template-columns:repeat(4,1fr);
-        gap:16px;
-        margin-top:18px;
-    }}
-    .tool-card {{
-        border-radius:18px;
-        border:1px solid #e3e3e3;
-        background:#fff;
-        padding:22px;
-        box-shadow:0 9px 28px rgba(0,0,0,.05);
-        min-height:265px;
-        display:flex;
-        flex-direction:column;
-    }}
-    .tool-icon {{
-        width:50px;height:50px;border-radius:13px;
-        display:flex;align-items:center;justify-content:center;
-        background:#111;color:{ORANGE};
-        font-weight:900;font-size:1.25rem;margin-bottom:16px;
-    }}
-    .tool-card h3 {{ margin:0 0 8px 0; font-size:1.18rem; }}
-    .tool-card p {{
-        color:{MUTED}; line-height:1.55; font-size:.91rem;
-        flex:1; margin-bottom:14px;
-    }}
-    .tool-tags {{
-        display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;
-    }}
-    .tool-tags span {{
-        background:#f7f7f7;
-        border-radius:999px;
-        padding:6px 9px;
-        font-size:.77rem;
-        font-weight:700;
-        color:#4c4f54;
-    }}
-    .tool-links a {{
-        display:block; color:{BLACK} !important;
-        font-weight:800; text-decoration:none !important;
-        margin-top:8px; font-size:.9rem;
-    }}
-    .tool-links a:hover {{ color:{ORANGE} !important; }}
+.route-grid {{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}}
+.route {{
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px;
+    background:#fff;
+    box-shadow:0 9px 25px rgba(0,0,0,.045);
+    position:relative;
+    overflow:hidden;
+}}
+.route::after {{
+    content:"";
+    position:absolute;
+    width:110px;height:110px;
+    border:1px solid rgba(255,105,0,.14);
+    border-radius:50%;
+    right:-30px;top:-35px;
+}}
+.route-icon {{
+    width:52px;height:52px;
+    border-radius:14px;
+    background:#111;
+    color:var(--orange);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:950;
+    font-size:1.18rem;
+    margin-bottom:16px;
+}}
+.route h3 {{ margin:0 0 7px 0; font-size:1.15rem; }}
+.route ul {{
+    margin:0;
+    padding-left:17px;
+    color:var(--muted);
+    font-size:.89rem;
+    line-height:1.52;
+}}
+.route a {{
+    display:inline-block;
+    margin-top:14px;
+    color:#111 !important;
+    text-decoration:none !important;
+    font-weight:850;
+    font-size:.89rem;
+}}
+.route a:hover {{ color:var(--orange) !important; }}
 
-    .steps {{
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:16px;
-    }}
-    .step {{
-        border:1px solid #e7e7e7;
-        background:#fff;
-        border-radius:18px;
-        padding:24px 22px;
-        box-shadow:0 8px 24px rgba(0,0,0,.045);
-    }}
-    .step .num {{
-        width:42px;height:42px;border-radius:11px;
-        background:#111;color:{ORANGE};
-        display:flex;align-items:center;justify-content:center;
-        font-weight:900;font-size:1rem;margin-bottom:14px;
-    }}
-    .step h3 {{ margin:0 0 8px 0; font-size:1.1rem; }}
-    .step p {{ margin:0; color:{MUTED}; line-height:1.55; font-size:.91rem; }}
+.labbar {{
+    border-radius:20px;
+    padding:25px;
+    background:#0c0c0c;
+    display:grid;
+    grid-template-columns:1.25fr repeat(4,.75fr);
+    gap:10px;
+    align-items:center;
+    color:#fff;
+}}
+.labbar-main h3 {{ margin:0 0 6px 0;color:#fff;font-size:1.20rem; }}
+.labbar-main p {{ margin:0;color:#bcbcbc;font-size:.88rem;line-height:1.45; }}
+.labmetric {{
+    border-left:1px solid #2e2e2e;
+    padding-left:15px;
+}}
+.labmetric .symbol {{
+    color:var(--orange);
+    font-size:1.25rem;
+    font-weight:950;
+}}
+.labmetric .txt {{
+    color:#d8d8d8;
+    font-size:.78rem;
+    margin-top:3px;
+}}
 
-    .vision {{
-        display:grid;
-        grid-template-columns:.84fr 1.16fr;
-        min-height:520px;
-    }}
-    .vision-photo {{
-        background:url("{field_img}") center center/cover no-repeat;
-        min-height:520px;
-    }}
-    .vision-copy {{
-        padding:56px 58px;
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        background:
-            radial-gradient(circle at 88% 18%, rgba(255,105,0,.13), transparent 30%),
-            #0c0c0c;
-    }}
-    .vision-copy h2 {{ color:#fff; }}
-    .vision-copy p {{
-        color:#d0d0d0;
-        font-size:1.01rem;
-        line-height:1.65;
-        margin:0 0 14px 0;
-    }}
-    .vision-quote {{
-        color:#fff !important;
-        border-left:4px solid {ORANGE};
-        padding-left:17px;
-        font-weight:700;
-        margin-top:8px !important;
-    }}
-    .vision-tags {{
-        display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;
-    }}
-    .vision-tags span {{
-        border:1px solid #333;
-        background:#181818;
-        color:#fff;
-        padding:9px 12px;
-        border-radius:999px;
-        font-size:.85rem;
-        font-weight:700;
-    }}
+.tools-grid {{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+}}
+.tool {{
+    border:1px solid var(--border);
+    border-radius:20px;
+    background:#fff;
+    min-height:320px;
+    padding:22px;
+    box-shadow:0 10px 28px rgba(0,0,0,.055);
+    display:flex;
+    flex-direction:column;
+    transition:.16s ease;
+}}
+.tool:hover {{
+    transform:translateY(-3px);
+    box-shadow:0 15px 34px rgba(0,0,0,.075);
+    border-color:#d7d7d2;
+}}
+.tool-head {{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:17px;
+}}
+.tool-symbol {{
+    width:56px;height:56px;border-radius:15px;
+    display:flex;align-items:center;justify-content:center;
+    background:#111;
+    color:var(--orange);
+    font-size:1.25rem;
+    font-weight:950;
+}}
+.tool-status {{
+    color:#4e5358;
+    background:#f5f5f2;
+    border-radius:999px;
+    padding:6px 9px;
+    font-size:.72rem;
+    font-weight:800;
+}}
+.tool h3 {{ margin:0 0 8px 0; font-size:1.2rem; }}
+.tool p {{
+    color:var(--muted);
+    font-size:.89rem;
+    line-height:1.5;
+    margin:0 0 14px 0;
+}}
+.tags {{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-bottom:13px;
+}}
+.tags span {{
+    background:#f6f6f3;
+    color:#555a60;
+    border-radius:999px;
+    padding:6px 8px;
+    font-size:.73rem;
+    font-weight:700;
+}}
+.tool-links {{ margin-top:auto; }}
+.tool-links a {{
+    display:block;
+    text-decoration:none !important;
+    color:#111 !important;
+    font-size:.88rem;
+    font-weight:850;
+    margin-top:8px;
+}}
+.tool-links a:hover {{ color:var(--orange) !important; }}
 
-    .about {{
-        display:grid;
-        grid-template-columns:.82fr 1.18fr;
-        gap:28px;
-        align-items:stretch;
-    }}
-    .about-card {{
-        border-radius:20px;
-        overflow:hidden;
-        min-height:430px;
-        background:
-            linear-gradient(180deg,rgba(11,11,11,.05),rgba(11,11,11,.74)),
-            url("{industry_img}") center 20%/cover no-repeat;
-        display:flex;
-        align-items:flex-end;
-        padding:24px;
-        color:#fff;
-    }}
-    .about-copy {{
-        border:1px solid #e6e6e6;
-        border-radius:20px;
-        padding:34px 36px;
-        background:#fff;
-    }}
-    .about-copy h2 {{ margin-bottom:8px; }}
-    .about-copy .role {{
-        color:{ORANGE};
-        font-weight:800;
-        margin-bottom:17px;
-    }}
-    .about-copy p {{
-        color:#555b62;
-        line-height:1.62;
-        margin-bottom:14px;
-    }}
-    .skills {{
-        display:grid;
-        grid-template-columns:repeat(2,1fr);
-        gap:9px;
-        margin-top:18px;
-    }}
-    .skills span {{
-        background:#f6f6f6;
-        border-radius:10px;
-        padding:10px 12px;
-        font-size:.88rem;
-        font-weight:700;
-    }}
+.workflow {{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}}
+.flow {{
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px;
+    background:linear-gradient(180deg,#fff,#fafaf8);
+}}
+.flow-num {{
+    width:39px;height:39px;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--orange);
+    background:#111;
+    font-weight:950;
+    margin-bottom:14px;
+}}
+.flow h3 {{ margin:0 0 7px 0; font-size:1.07rem; }}
+.flow p {{ margin:0;color:var(--muted);font-size:.88rem;line-height:1.5; }}
 
-    .gallery {{
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:16px;
-        margin-top:22px;
-    }}
-    .gcard {{
-        border-radius:18px;
-        overflow:hidden;
-        background:#111;
-        position:relative;
-        min-height:340px;
-        box-shadow:0 9px 28px rgba(0,0,0,.07);
-    }}
-    .gcard img {{
-        width:100%;height:100%;object-fit:cover;display:block;
-    }}
-    .gcard .overlay {{
-        position:absolute;left:0;right:0;bottom:0;
-        padding:38px 18px 17px 18px;
-        background:linear-gradient(transparent,rgba(0,0,0,.88));
-        color:#fff;font-weight:800;font-size:1rem;
-    }}
+.vision {{
+    display:grid;
+    grid-template-columns:.84fr 1.16fr;
+    border-radius:22px;
+    overflow:hidden;
+    background:#0b0b0b;
+}}
+.vision-photo {{
+    min-height:520px;
+    background:url("{field_img}") center center/cover no-repeat;
+}}
+.vision-copy {{
+    padding:52px 54px;
+    background:
+        radial-gradient(circle at 90% 12%,rgba(255,105,0,.12),transparent 31%),
+        #0b0b0b;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}}
+.vision h2 {{ color:#fff; }}
+.vision p {{
+    color:#cfcfcf;
+    font-size:.98rem;
+    line-height:1.61;
+    margin:0 0 13px 0;
+}}
+.quote {{
+    color:#fff !important;
+    border-left:4px solid var(--orange);
+    padding-left:16px;
+    font-weight:720;
+}}
+.badges {{
+    display:flex;gap:8px;flex-wrap:wrap;margin-top:15px;
+}}
+.badges span {{
+    border:1px solid #343434;
+    background:#171717;
+    color:#fff;
+    border-radius:999px;
+    padding:8px 10px;
+    font-size:.78rem;
+    font-weight:750;
+}}
 
-    .contact {{
-        background:{BLACK};
-        border-radius:22px;
-        margin-top:64px;
-        padding:42px 42px 30px 42px;
-        color:#fff;
-    }}
-    .contact h2 {{ color:#fff; margin-bottom:9px; }}
-    .contact p {{ color:#c9c9c9; line-height:1.6; max-width:900px; }}
-    .contact-grid {{
-        display:grid;
-        grid-template-columns:repeat(5,1fr);
-        gap:10px; margin-top:24px;
-    }}
-    .contact-grid a {{
-        text-decoration:none !important;
-        color:#fff !important;
-        background:#171717;
-        border:1px solid #303030;
-        border-radius:13px;
-        padding:14px 13px;
-        font-size:.84rem;
-        line-height:1.35;
-        min-height:70px;
-    }}
-    .contact-grid a:hover {{ border-color:{ORANGE}; }}
-    .contact-grid b {{ color:{ORANGE}; display:block; margin-bottom:4px; }}
+.about {{
+    display:grid;
+    grid-template-columns:.82fr 1.18fr;
+    gap:25px;
+}}
+.about-photo {{
+    min-height:430px;
+    border-radius:20px;
+    overflow:hidden;
+    padding:23px;
+    color:#fff;
+    display:flex;
+    align-items:flex-end;
+    background:
+        linear-gradient(180deg,transparent 38%,rgba(0,0,0,.76)),
+        url("{industry_img}") center 20%/cover no-repeat;
+}}
+.about-copy {{
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:32px 34px;
+    background:#fff;
+}}
+.role {{
+    color:var(--orange);
+    font-weight:850;
+    margin-bottom:15px;
+}}
+.about-copy p {{ color:#565b60;line-height:1.58;margin:0 0 12px 0; }}
+.skills {{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+    margin-top:17px;
+}}
+.skills span {{
+    background:#f5f5f3;
+    border-radius:10px;
+    padding:9px 11px;
+    font-size:.82rem;
+    font-weight:750;
+}}
 
-    .footer {{
-        display:flex;
-        justify-content:space-between;
-        gap:20px;
-        align-items:center;
-        padding:20px 4px 4px 4px;
-        color:#777;
-        font-size:.82rem;
-        flex-wrap:wrap;
-    }}
+.gallery {{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}}
+.gcard {{
+    min-height:340px;
+    border-radius:18px;
+    overflow:hidden;
+    position:relative;
+    background:#111;
+}}
+.gcard img {{ width:100%;height:100%;object-fit:cover;display:block; }}
+.gcap {{
+    position:absolute;
+    left:0;right:0;bottom:0;
+    padding:42px 18px 17px 18px;
+    color:#fff;
+    font-weight:850;
+    background:linear-gradient(transparent,rgba(0,0,0,.9));
+}}
 
-    @media(max-width:1100px) {{
-        .hero, .vision, .about {{ grid-template-columns:1fr; }}
-        .hero-photo {{ min-height:470px; }}
-        .icon-strip, .tools-grid {{ grid-template-columns:repeat(2,1fr); }}
-        .quick-grid, .steps, .gallery {{ grid-template-columns:1fr 1fr; }}
-        .contact-grid {{ grid-template-columns:1fr 1fr; }}
+.contact {{
+    margin-top:60px;
+    border-radius:22px;
+    background:#080808;
+    color:#fff;
+    padding:40px;
+}}
+.contact h2 {{ color:#fff;margin-bottom:8px; }}
+.contact p {{ color:#c9c9c9;line-height:1.55;max-width:880px; }}
+.socials {{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:9px;
+    margin-top:22px;
+}}
+.socials a {{
+    text-decoration:none !important;
+    color:#fff !important;
+    border:1px solid #303030;
+    background:#151515;
+    border-radius:12px;
+    padding:13px 12px;
+    min-height:67px;
+    font-size:.80rem;
+    line-height:1.35;
+}}
+.socials a:hover {{ border-color:var(--orange); }}
+.socials b {{ color:var(--orange);display:block;margin-bottom:4px; }}
+
+.footer {{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    color:#7a7a7a;
+    font-size:.80rem;
+    padding:20px 5px 3px 5px;
+}}
+
+@media(max-width:1100px) {{
+    .hero,.vision,.about {{ grid-template-columns:1fr; }}
+    .hero-photo {{ min-height:470px; }}
+    .floatnav,.tools-grid {{ grid-template-columns:repeat(2,1fr); }}
+    .route-grid,.workflow,.gallery {{ grid-template-columns:1fr 1fr; }}
+    .labbar {{ grid-template-columns:1fr 1fr; }}
+    .socials {{ grid-template-columns:1fr 1fr; }}
+}}
+@media(max-width:700px) {{
+    .hero-copy {{ padding:40px 24px; }}
+    .floatnav,.route-grid,.tools-grid,.workflow,.gallery,.skills,.socials,.labbar {{
+        grid-template-columns:1fr;
     }}
-    @media(max-width:700px) {{
-        .hero-copy {{ padding:42px 26px; }}
-        .hero-photo {{ min-height:420px; }}
-        .icon-strip, .quick-grid, .tools-grid, .steps, .gallery, .contact-grid, .skills {{
-            grid-template-columns:1fr;
-        }}
-        .vision-copy,.about-copy,.contact {{ padding:32px 24px; }}
-    }}
-    </style>
-    """,
+    .floatnav {{ margin:14px 0 0 0; }}
+    .vision-copy,.about-copy,.contact {{ padding:28px 22px; }}
+}}
+</style>
+""",
     unsafe_allow_html=True,
 )
 
 st.markdown(
     f"""
-    <div class="landing-shell">
-      <section class="hero">
-        <div class="hero-copy">
-          <div class="brand-row">
-            <img src="{logo_img}" alt="GG DIMEC">
-            <div>
-              <div class="brand-title">GG DIMEC SPA · MECHLAB</div>
-              <div class="brand-sub">Ingeniería, aprendizaje y aplicación real</div>
-            </div>
-          </div>
-          <div class="eyebrow">Ingeniería visual aplicada</div>
-          <h1>Aprende, analiza y diseña con <span>criterio técnico</span></h1>
-          <p>
-            MechLab reúne herramientas interactivas para estudiantes, docentes e ingenieros
-            que buscan comprender mejor la mecánica, la termodinámica, las vibraciones y el diseño de máquinas.
-          </p>
-          <p class="hero-vision">
-            Aquí no solo calculas. Visualizas, entiendes y conectas teoría con problemas reales
-            para formar mejor criterio de ingeniería.
-          </p>
-          <div class="cta-row">
-            <a class="cta primary" href="#herramientas">Explorar herramientas ↓</a>
-            <a class="cta secondary" href="https://www.gerardogaraydimec.com/" target="_blank">Visitar mi página web ↗</a>
-          </div>
-          <div class="hero-tags">
-            <span>Docencia</span>
-            <span>Industria</span>
-            <span>Simulación</span>
-            <span>Diseño mecánico</span>
-            <span>Aprendizaje continuo</span>
-          </div>
-        </div>
-        <div class="hero-photo">
-          <div class="hero-badge">
-            <b>Gerardo Garay Pereira</b><br>
-            Ingeniero Civil Mecánico · Docente · Fundador de GG DIMEC SPA
-          </div>
-        </div>
-      </section>
+<div class="landing">
 
-      <section class="icon-strip">
-        <div class="icon-card">
-          <div class="icon-bubble">📘</div>
-          <div><h3>Aprendizaje claro</h3><p>Herramientas pensadas para comprender, no solo para obtener un número.</p></div>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="brandbar">
+        <img src="{logo_img}" alt="GG DIMEC">
+        <div>
+          <div class="brandname">GG DIMEC SPA · MECHLAB</div>
+          <div class="brandline">Tecnología avanzada en soluciones reales · aprendizaje aplicado</div>
         </div>
-        <div class="icon-card">
-          <div class="icon-bubble">🧠</div>
-          <div><h3>Criterio técnico</h3><p>Visualización, ecuaciones y lectura física del resultado para tomar mejores decisiones.</p></div>
-        </div>
-        <div class="icon-card">
-          <div class="icon-bubble">⚙️</div>
-          <div><h3>Ingeniería aplicada</h3><p>Una forma de enseñar conectada con la realidad de diseño, análisis y terreno.</p></div>
-        </div>
-        <div class="icon-card">
-          <div class="icon-bubble">🚀</div>
-          <div><h3>Desarrollo continuo</h3><p>Un laboratorio digital en crecimiento para fortalecer tu formación profesional.</p></div>
-        </div>
-      </section>
+      </div>
 
-      <section class="section">
-        <div class="kicker">Ruta rápida</div>
-        <h2>Encuentra tu punto de entrada</h2>
-        <div class="section-intro">
-          Para que la experiencia sea más directa, MechLab se organiza también según el tipo de usuario y la necesidad de aprendizaje.
-        </div>
-        <div class="quick-grid">
-          <div class="quick-card">
-            <div class="qicon">🎓</div>
-            <h3>Si eres estudiante</h3>
-            <ul>
-              <li>Refuerza fundamentos con apoyo visual.</li>
-              <li>Entiende cómo leer ecuaciones y diagramas.</li>
-              <li>Explora estados, variables y respuesta física.</li>
-            </ul>
-            <a href="#herramientas">Ir a herramientas →</a>
-          </div>
-          <div class="quick-card">
-            <div class="qicon">🧑‍🏫</div>
-            <h3>Si eres docente</h3>
-            <ul>
-              <li>Apoya clases con material interactivo.</li>
-              <li>Muestra fenómenos de forma más intuitiva.</li>
-              <li>Conecta teoría, gráficas y visualización.</li>
-            </ul>
-            <a href="#herramientas">Ver módulos docentes →</a>
-          </div>
-          <div class="quick-card">
-            <div class="qicon">🏭</div>
-            <h3>Si eres ingeniero</h3>
-            <ul>
-              <li>Usa herramientas para revisar conceptos.</li>
-              <li>Comunica mejor análisis y resultados.</li>
-              <li>Refuerza criterio técnico aplicado.</li>
-            </ul>
-            <a href="https://www.gerardogaraydimec.com/" target="_blank">Conocer GG DIMEC →</a>
-          </div>
-        </div>
-      </section>
+      <div class="eyebrow">Ingeniería visual aplicada</div>
+      <h1>Entiende la ingeniería.<br><em>Luego úsala mejor.</em></h1>
 
-      <div id="herramientas"></div>
-      <section class="section">
-        <div class="kicker">Herramientas disponibles</div>
-        <h2>Empieza a trabajar con MechLab</h2>
-        <div class="section-intro">
-          Cada módulo está pensado para modificar datos, visualizar resultados y entender qué significa físicamente lo que estás calculando.
-        </div>
-        <div class="tools-grid">
-          <div class="tool-card">
-            <div class="tool-icon">RM</div>
-            <h3>Resistencia de Materiales</h3>
-            <p>Transformación de esfuerzos, tensiones principales, círculos de Mohr y análisis tensorial del estado resistente.</p>
-            <div class="tool-tags"><span>Mohr 2D</span><span>Mohr 3D</span><span>Esfuerzos principales</span></div>
-            <div class="tool-links">
-              <a href="/mohr-2d">Abrir Círculo de Mohr 2D →</a>
-              <a href="/mohr-3d">Abrir Círculo de Mohr 3D →</a>
-            </div>
-          </div>
-          <div class="tool-card">
-            <div class="tool-icon">VD</div>
-            <h3>Vibraciones y Dinámica</h3>
-            <p>Respuesta libre y forzada, frecuencia natural, amortiguamiento, resonancia, fase y transmisibilidad.</p>
-            <div class="tool-tags"><span>1 GDL</span><span>Respuesta temporal</span><span>Frecuencia</span></div>
-            <div class="tool-links">
-              <a href="/vibraciones-1gdl">Vibraciones libres 1-GDL →</a>
-              <a href="/vibracion-forzada-1gdl">Vibración forzada 1-GDL →</a>
-            </div>
-          </div>
-          <div class="tool-card">
-            <div class="tool-icon">TH</div>
-            <h3>Termodinámica</h3>
-            <p>Propiedades del agua y vapor, regiones de fase, diagramas y ciclos termodinámicos para aprendizaje y análisis.</p>
-            <div class="tool-tags"><span>Agua-vapor</span><span>Ciclos</span><span>Visualización</span></div>
-            <div class="tool-links">
-              <a href="/agua-vapor">Propiedades del agua y vapor →</a>
-              <a href="/ciclos-termodinamicos">Ciclos termodinámicos →</a>
-            </div>
-          </div>
-          <div class="tool-card">
-            <div class="tool-icon">EM</div>
-            <h3>Elementos de Máquinas</h3>
-            <p>Criterios de fluencia y falla, interpretación física, esfuerzos combinados y visualización geométrica del criterio.</p>
-            <div class="tool-tags"><span>Von Mises</span><span>Tresca</span><span>Falla</span></div>
-            <div class="tool-links">
-              <a href="/von-mises">Abrir Von Mises Lab →</a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <p class="hero-lead">
+        Herramientas interactivas para estudiar, enseñar y revisar conceptos de ingeniería mecánica
+        con apoyo visual, ecuaciones y lectura física del resultado.
+      </p>
 
-      <section class="section">
-        <div class="kicker">Cómo usar MechLab</div>
-        <h2>Una experiencia simple y útil</h2>
-        <div class="steps">
-          <div class="step"><div class="num">1</div><h3>Selecciona una herramienta</h3><p>Elige el tema que quieras estudiar o aplicar según tu curso, proyecto o necesidad de revisión.</p></div>
-          <div class="step"><div class="num">2</div><h3>Modifica variables</h3><p>Ajusta parámetros, observa la respuesta del sistema y revisa cómo cambia el fenómeno en tiempo real.</p></div>
-          <div class="step"><div class="num">3</div><h3>Interpreta el resultado</h3><p>No te quedes con el valor final: usa diagramas, explicaciones y ecuaciones para comprender lo que ocurre.</p></div>
-        </div>
-      </section>
+      <div class="hero-promise">
+        MechLab conecta fundamentos, visualización y experiencia industrial para ayudarte
+        a desarrollar criterio técnico, no solo a obtener respuestas.
+      </div>
 
-      <section class="section dark">
-        <div class="vision">
-          <div class="vision-photo"></div>
-          <div class="vision-copy">
-            <div class="kicker">Mi visión</div>
-            <h2>Aprender con ingeniería real</h2>
-            <p>
-              GG DIMEC nació desde la ingeniería aplicada y el trabajo con problemas reales.
-              Esa misma lógica quiero llevar al aprendizaje: comprender, modelar, visualizar, cuestionar y mejorar.
-            </p>
-            <p>
-              MechLab busca acercar herramientas de análisis a estudiantes y profesionales para que puedan
-              reforzar fundamentos, experimentar con variables y desarrollar mejor criterio técnico.
-            </p>
-            <p class="vision-quote">
-              La ingeniería más avanzada tiene sentido cuando ayuda a las personas a resolver mejor los problemas que enfrentan.
-            </p>
-            <div class="vision-tags">
-              <span>Industria real</span><span>Docencia</span><span>Simulación</span><span>Diseño mecánico</span><span>Mejora continua</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div class="ctas">
+        <a class="btn primary" href="#herramientas">Explorar herramientas ↓</a>
+        <a class="btn dark" href="https://www.gerardogaraydimec.com/" target="_blank">Conocer GG DIMEC ↗</a>
+      </div>
 
-      <section class="section">
-        <div class="kicker">Sobre mí</div>
-        <div class="about">
-          <div class="about-card">
-            <div><strong>Ingeniería en terreno</strong><br>Experiencia técnica, industria y aprendizaje conectado con la realidad.</div>
-          </div>
-          <div class="about-copy">
-            <h2>Gerardo Garay Pereira</h2>
-            <div class="role">Ingeniero Civil Mecánico · Docente · Fundador de GG DIMEC SPA</div>
-            <p>
-              Mi trabajo une ingeniería mecánica, análisis, diseño, simulación, levantamiento 3D y formación técnica.
-              Me interesa resolver problemas complejos con soluciones claras, confiables y aplicables.
-            </p>
-            <p>
-              A través de MechLab quiero compartir herramientas que sirvan para estudiar, enseñar y seguir creciendo profesionalmente,
-              acercando la experiencia de la industria al aprendizaje de ingeniería.
-            </p>
-            <div class="skills">
-              <span>Diseño mecánico</span>
-              <span>Simulación FEM / CFD</span>
-              <span>Escaneo 3D e ingeniería inversa</span>
-              <span>Docencia y capacitación</span>
-              <span>Análisis de equipos</span>
-              <span>Desarrollo de herramientas técnicas</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="kicker">Ingeniería aplicada</div>
-        <h2>De la industria a la enseñanza</h2>
-        <div class="section-intro">
-          MechLab se alimenta de una forma de trabajar que combina modelamiento, simulación, levantamiento, diseño y capacitación técnica.
-          Parte de esa experiencia está reflejada en los proyectos y servicios desarrollados por GG DIMEC.
-        </div>
-        <div class="gallery">
-          <div class="gcard"><img src="{sim_img}" alt="Simulación estructural"><div class="overlay">Simulación estructural y dinámica</div></div>
-          <div class="gcard"><img src="{scan_img}" alt="Escaneo 3D"><div class="overlay">Escaneo 3D e ingeniería inversa</div></div>
-          <div class="gcard"><img src="{train_img}" alt="Capacitación técnica"><div class="overlay">Capacitación y transferencia de conocimiento</div></div>
-        </div>
-      </section>
-
-      <section class="contact">
-        <div class="kicker">Contacto y comunidad</div>
-        <h2>Conversemos, aprendamos y construyamos mejor ingeniería</h2>
-        <p>
-          Si eres estudiante, docente, ingeniero o una empresa interesada en estas herramientas, sígueme en redes,
-          revisa el contenido de GG DIMEC y conversemos. La idea es seguir construyendo recursos que ayuden a aprender y trabajar mejor.
-        </p>
-        <div class="contact-grid">
-          <a href="mailto:gerardogaray.dimec@gmail.com"><b>Correo</b>gerardogaray.dimec@gmail.com</a>
-          <a href="tel:+56957288516"><b>Teléfono</b>+56 9 5728 8516</a>
-          <a href="https://www.instagram.com/gerardogaray.dimec/" target="_blank"><b>Instagram</b>@gerardogaray.dimec</a>
-          <a href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank"><b>LinkedIn</b>Gerardo Garay Pereira</a>
-          <a href="https://www.gerardogaraydimec.com/" target="_blank"><b>Página web</b>www.gerardogaraydimec.com</a>
-        </div>
-      </section>
-
-      <div class="footer">
-        <span>GG DIMEC SPA · Gerardo Garay Pereira · Chile</span>
-        <span>MechLab · Conocimiento · Ingeniería · Personas · Futuro</span>
+      <div class="signal-row">
+        <span class="signal">Estudiantes</span>
+        <span class="signal">Docentes</span>
+        <span class="signal">Ingenieros</span>
+        <span class="signal">Industria</span>
       </div>
     </div>
-    """,
+
+    <div class="hero-photo">
+      <div class="profile-badge">
+        <b>Gerardo Garay Pereira</b><br>
+        Ingeniero Civil Mecánico · Docente · Fundador de GG DIMEC SPA
+      </div>
+    </div>
+  </section>
+
+  <section class="floatnav">
+    <div class="float-card">
+      <div class="float-icon">σ</div>
+      <div><h3>Visualiza</h3><p>Convierte ecuaciones en estados, geometría y comportamiento observable.</p></div>
+    </div>
+    <div class="float-card">
+      <div class="float-icon">∑</div>
+      <div><h3>Analiza</h3><p>Cambia variables y entiende por qué cambia la respuesta del modelo.</p></div>
+    </div>
+    <div class="float-card">
+      <div class="float-icon">⚙</div>
+      <div><h3>Aplica</h3><p>Conecta los fundamentos con problemas propios del diseño y la industria.</p></div>
+    </div>
+    <div class="float-card">
+      <div class="float-icon">↗</div>
+      <div><h3>Crece</h3><p>Refuerza criterio técnico y construye una forma más sólida de pensar ingeniería.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="kicker">Elige tu ruta</div>
+    <h2>MechLab se adapta a cómo quieres aprender</h2>
+    <div class="route-grid">
+      <div class="route">
+        <div class="route-icon">🎓</div>
+        <h3>Estoy estudiando</h3>
+        <ul>
+          <li>Refuerza fundamentos.</li>
+          <li>Explora gráficos y ecuaciones.</li>
+          <li>Comprueba cómo responden las variables.</li>
+        </ul>
+        <a href="#herramientas">Ir a herramientas →</a>
+      </div>
+      <div class="route">
+        <div class="route-icon">▣</div>
+        <h3>Estoy enseñando</h3>
+        <ul>
+          <li>Apoya clases con recursos visuales.</li>
+          <li>Explica fenómenos de forma interactiva.</li>
+          <li>Conecta modelo, ecuación e interpretación.</li>
+        </ul>
+        <a href="#herramientas">Explorar módulos →</a>
+      </div>
+      <div class="route">
+        <div class="route-icon">🏭</div>
+        <h3>Estoy trabajando</h3>
+        <ul>
+          <li>Revisa conceptos de forma rápida.</li>
+          <li>Apoya comunicación técnica.</li>
+          <li>Conecta fundamentos con ingeniería aplicada.</li>
+        </ul>
+        <a href="https://www.gerardogaraydimec.com/" target="_blank">Ver GG DIMEC →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="labbar">
+      <div class="labbar-main">
+        <h3>MechLab en una mirada</h3>
+        <p>Un laboratorio digital para aprender desde distintos enfoques de la ingeniería mecánica.</p>
+      </div>
+      <div class="labmetric"><div class="symbol">σ</div><div class="txt">Esfuerzos y resistencia</div></div>
+      <div class="labmetric"><div class="symbol">ω</div><div class="txt">Vibraciones y dinámica</div></div>
+      <div class="labmetric"><div class="symbol">T–s</div><div class="txt">Termodinámica</div></div>
+      <div class="labmetric"><div class="symbol">VM</div><div class="txt">Diseño y falla</div></div>
+    </div>
+  </section>
+
+  <div id="herramientas"></div>
+  <section class="section">
+    <div class="kicker">Herramientas disponibles</div>
+    <h2>Entra directo al fenómeno que quieres estudiar</h2>
+    <div class="lead">
+      Menos navegación y más trabajo: cada área reúne herramientas enfocadas en visualizar,
+      modificar condiciones y comprender la respuesta física.
+    </div>
+
+    <div class="tools-grid">
+      <div class="tool">
+        <div class="tool-head"><div class="tool-symbol">σ</div><div class="tool-status">Resistencia</div></div>
+        <h3>Resistencia de Materiales</h3>
+        <p>Transformación de esfuerzos, tensiones principales, estados 2D y 3D y lectura del tensor.</p>
+        <div class="tags"><span>Mohr 2D</span><span>Mohr 3D</span><span>Principales</span></div>
+        <div class="tool-links">
+          <a href="/mohr-2d">Círculo de Mohr 2D →</a>
+          <a href="/mohr-3d">Círculo de Mohr 3D →</a>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="tool-head"><div class="tool-symbol">ω</div><div class="tool-status">Dinámica</div></div>
+        <h3>Vibraciones y Dinámica</h3>
+        <p>Respuesta libre y forzada, frecuencia natural, amortiguamiento, resonancia y transmisibilidad.</p>
+        <div class="tags"><span>1-GDL</span><span>Respuesta</span><span>Frecuencia</span></div>
+        <div class="tool-links">
+          <a href="/vibraciones-1gdl">Vibraciones libres 1-GDL →</a>
+          <a href="/vibracion-forzada-1gdl">Vibración forzada 1-GDL →</a>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="tool-head"><div class="tool-symbol">T–s</div><div class="tool-status">Energía</div></div>
+        <h3>Termodinámica</h3>
+        <p>Estados del agua y vapor, regiones termodinámicas, diagramas y ciclos de potencia o refrigeración.</p>
+        <div class="tags"><span>Agua-vapor</span><span>Ciclos</span><span>Diagramas</span></div>
+        <div class="tool-links">
+          <a href="/agua-vapor">Propiedades del agua y vapor →</a>
+          <a href="/ciclos-termodinamicos">Ciclos termodinámicos →</a>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="tool-head"><div class="tool-symbol">VM</div><div class="tool-status">Diseño</div></div>
+        <h3>Elementos de Máquinas</h3>
+        <p>Criterios de fluencia, esfuerzo equivalente, comparación con Tresca y geometría del estado multiaxial.</p>
+        <div class="tags"><span>Von Mises</span><span>Tresca</span><span>Falla</span></div>
+        <div class="tool-links">
+          <a href="/von-mises">Abrir Von Mises Lab →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="kicker">Cómo trabajar</div>
+    <h2>Tres pasos. Mucho más criterio.</h2>
+    <div class="workflow">
+      <div class="flow"><div class="flow-num">1</div><h3>Define el problema</h3><p>Selecciona la herramienta y configura las condiciones que quieres estudiar.</p></div>
+      <div class="flow"><div class="flow-num">2</div><h3>Explora la respuesta</h3><p>Mueve variables, compara escenarios y observa gráficos, estados y ecuaciones.</p></div>
+      <div class="flow"><div class="flow-num">3</div><h3>Interpreta</h3><p>Usa la lectura física para entender qué significa el resultado y cómo se conecta con ingeniería real.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="vision">
+      <div class="vision-photo"></div>
+      <div class="vision-copy">
+        <div class="kicker">Mi visión</div>
+        <h2>Aprender con ingeniería real</h2>
+        <p>
+          GG DIMEC nació desde la ingeniería aplicada y del trabajo con problemas reales.
+          Esa misma lógica quiero llevar al aprendizaje: comprender, modelar, visualizar, cuestionar y mejorar.
+        </p>
+        <p class="quote">
+          Quiero que MechLab ayude a estudiantes e ingenieros a aprender mejor y a desarrollar una forma
+          más clara, rigurosa y útil de pensar la ingeniería.
+        </p>
+        <div class="badges">
+          <span>Industria real</span><span>Docencia</span><span>Simulación</span><span>Diseño mecánico</span><span>Aprendizaje continuo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="kicker">Sobre mí</div>
+    <div class="about">
+      <div class="about-photo">
+        <div><b>Ingeniería en terreno</b><br>Experiencia técnica, industria y aprendizaje conectado con la realidad.</div>
+      </div>
+      <div class="about-copy">
+        <h2>Gerardo Garay Pereira</h2>
+        <div class="role">Ingeniero Civil Mecánico · Docente · Fundador de GG DIMEC SPA</div>
+        <p>
+          Trabajo en diseño mecánico, simulación, levantamiento 3D, análisis de equipos y formación técnica.
+          Me interesa traducir problemas complejos en soluciones claras y aplicables.
+        </p>
+        <p>
+          MechLab nace como una extensión de esa visión: compartir herramientas que ayuden a estudiar,
+          enseñar y seguir creciendo profesionalmente.
+        </p>
+        <div class="skills">
+          <span>Diseño mecánico</span><span>Simulación FEM / CFD</span>
+          <span>Escaneo 3D</span><span>Ingeniería inversa</span>
+          <span>Docencia</span><span>Capacitación técnica</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="kicker">Ingeniería aplicada</div>
+    <h2>De la industria a la enseñanza</h2>
+    <div class="lead">
+      La experiencia de GG DIMEC alimenta MechLab: modelamiento, simulación, digitalización 3D y transferencia de conocimiento.
+    </div>
+    <div class="gallery">
+      <div class="gcard"><img src="{sim_img}" alt="Simulación"><div class="gcap">Simulación estructural y dinámica</div></div>
+      <div class="gcard"><img src="{scan_img}" alt="Escaneo 3D"><div class="gcap">Escaneo 3D e ingeniería inversa</div></div>
+      <div class="gcard"><img src="{train_img}" alt="Capacitación"><div class="gcap">Capacitación y transferencia de conocimiento</div></div>
+    </div>
+  </section>
+
+  <section class="contact">
+    <div class="kicker">Contacto y comunidad</div>
+    <h2>Sigamos construyendo mejor ingeniería</h2>
+    <p>
+      Si eres estudiante, docente, ingeniero o empresa, puedes seguir mi trabajo,
+      revisar GG DIMEC y conversar conmigo sobre aprendizaje, ingeniería y colaboración.
+    </p>
+    <div class="socials">
+      <a href="mailto:gerardogaray.dimec@gmail.com"><b>Correo</b>gerardogaray.dimec@gmail.com</a>
+      <a href="tel:+56957288516"><b>Teléfono</b>+56 9 5728 8516</a>
+      <a href="https://www.instagram.com/gerardogaray.dimec/" target="_blank"><b>Instagram</b>@gerardogaray.dimec</a>
+      <a href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank"><b>LinkedIn</b>Gerardo Garay Pereira</a>
+      <a href="https://www.gerardogaraydimec.com/" target="_blank"><b>Web</b>www.gerardogaraydimec.com</a>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>GG DIMEC SPA · Gerardo Garay Pereira · Chile</span>
+    <span>MechLab Premium Landing V1.2</span>
+  </div>
+
+</div>
+""",
     unsafe_allow_html=True,
 )
