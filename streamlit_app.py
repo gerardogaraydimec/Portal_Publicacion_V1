@@ -43,6 +43,13 @@ ciclos_termodinamicos = st.Page(
 )
 
 
+vigas_cortante_momento = st.Page(
+    "pages/vigas_cortante_momento.py",
+    title="Cortante y Momento",
+    icon="📐",
+    url_path="vigas-cortante-momento",
+)
+
 von_mises_lab = st.Page(
     "pages/von_mises_lab.py",
     title="Von Mises Lab",
@@ -53,7 +60,7 @@ von_mises_lab = st.Page(
 pg = st.navigation(
     {
         "Portal": [inicio],
-        "Resistencia de Materiales": [mohr2d, mohr3d],
+        "Resistencia de Materiales": [mohr2d, mohr3d, vigas_cortante_momento],
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
         "Elementos de Máquinas": [von_mises_lab],

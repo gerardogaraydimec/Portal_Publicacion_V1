@@ -1,0 +1,68 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE DE INTEGRACIÓN · VIGAS CORTANTE Y MOMENTO V1.0
+
+OBJETIVO
+Integrar al portal MechLab el módulo:
+"Diagramas de Cortante y Momento · Vigas Básicas"
+
+ARCHIVOS DEL PARCHE
+- streamlit_app.py
+- pages/inicio.py
+- pages/vigas_cortante_momento.py
+- modules/beam_cases.py
+- modules/beam_engine.py
+- modules/beam_plotter.py
+
+REQUISITO
+El portal debe conservar los archivos compartidos ya existentes:
+- modules/ui_brand.py
+- assets/logo_header_unificado.png
+
+Estos archivos NO se incluyen para evitar reemplazar el encabezado corporativo actual.
+
+INSTALACIÓN
+1. Descomprimir el ZIP.
+2. Copiar su contenido directamente a la raíz de:
+   Portal_Publicacion_V1
+3. Aceptar reemplazo únicamente de:
+   - streamlit_app.py
+   - pages/inicio.py
+4. Los demás archivos son nuevos.
+5. Probar localmente.
+
+POWERHELL
+.\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+CAMBIOS DE NAVEGACIÓN
+Resistencia de Materiales:
+- Mohr 2D
+- Mohr 3D
+- Cortante y Momento
+
+URL NUEVA
+/vigas-cortante-momento
+
+CAMBIO EN LANDING
+La tarjeta "Resistencia de Materiales" incorpora:
+- V(x)
+- M(x)
+- acceso directo a "Cortante y Momento · Vigas básicas"
+
+REFINAMIENTO SOLICITADO
+Las reacciones ya NO se muestran con etiquetas de texto plano.
+Cada reacción se representa como fórmula LaTeX, por ejemplo:
+
+R_A = 10.000 kN
+M_A = 25.000 kN·m
+
+con R_A, R_B, M_A y M_B tipografiados matemáticamente por KaTeX/LaTeX.
+
+CONTENIDO
+16 casos clásicos:
+- 4 voladizos / empotrada-libre
+- 6 simplemente apoyadas
+- 3 empotrada + apoyo simple
+- 3 empotrada-empotrada
+
+VALIDACIÓN
+El motor se conserva desde la V0.2 previamente validada.
