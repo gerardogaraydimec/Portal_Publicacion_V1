@@ -1,0 +1,10 @@
+Encabezados unificados validados.
+von_mises_lab.py: header=True, legacy_logo=False
+ciclos_termodinamicos.py: header=True, legacy_logo=False
+inicio.py: header=True, legacy_logo=False
+mohr_3d.py: header=True, legacy_logo=False
+mohr_2d.py: header=True, legacy_logo=False
+vibracion_forzada_1gdl.py: header=True, legacy_logo=False
+termodinamica_agua.py: header=True, legacy_logo=False
+vibraciones_1gdl.py: header=True, legacy_logo=False
+Logo maestro: 1860 x 1279 px

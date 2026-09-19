@@ -3,6 +3,7 @@ from pathlib import Path
 import math
 import numpy as np
 import streamlit as st
+from modules.ui_brand import render_app_header
 
 from modules.von_mises_lab import (
     stress_tensor,
@@ -34,7 +35,6 @@ from modules.von_mises_lab import (
 )
 
 ROOT=Path(__file__).resolve().parents[1]
-LOGO=ROOT/"assets"/"logo_vm_header.png"
 
 st.markdown("""
 <style>
@@ -93,14 +93,12 @@ def matrix_latex(a,unit):
 
 
 # Header
-h1,h2=st.columns([0.85,5.15],vertical_alignment="center")
-with h1:
-    if LOGO.exists():
-        st.image(str(LOGO), width=185)
-with h2:
-    st.markdown('<div class="brand-kicker">GG DIMEC · MECHLAB · ELEMENTOS DE MÁQUINAS</div>',unsafe_allow_html=True)
-    st.title("Von Mises Lab · Fluencia bajo esfuerzos combinados")
-    st.caption("Del ensayo uniaxial al plano de fluencia y al espacio tridimensional de esfuerzos")
+render_app_header(
+    title="Von Mises Lab · Fluencia bajo esfuerzos combinados",
+    subtitle="Del ensayo uniaxial al plano de fluencia y al espacio tridimensional de esfuerzos.",
+    section="ELEMENTOS DE MÁQUINAS",
+    logo_width=190,
+)
 
 st.markdown(
     '<div class="hero"><b>Idea central:</b> un ensayo uniaxial entrega el límite de fluencia '

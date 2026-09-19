@@ -3,6 +3,7 @@ from pathlib import Path
 import math
 import pandas as pd
 import streamlit as st
+from modules.ui_brand import render_app_header
 
 from modules.thermo_cycles.catalog import CYCLE_FAMILIES, STRUCTURAL_CYCLES
 from modules.thermo_cycles import gas, steam, refrigeration
@@ -15,7 +16,7 @@ from modules.thermo_cycles.ui_math import latex_number_input, render_processes, 
 
 ROOT=Path(__file__).resolve().parent.parent
 ASSETS=ROOT/"assets"
-LOGO=ASSETS/"logo_card.png"; ICON=ASSETS/"icon_web.png"
+ICON=ASSETS/"icon_web.png"
 
 st.markdown("""
 <style>
@@ -149,13 +150,12 @@ def solver_ui(name):
 
 
 # ----- Cabecera -----
-c1,c2=st.columns([1,4.5],vertical_alignment="center")
-with c1:
-    if LOGO.exists(): st.image(str(LOGO),width=220)
-with c2:
-    st.markdown('<div class="brand-kicker">GG DIMEC · MECHLAB · TERMODINÁMICA</div>',unsafe_allow_html=True)
-    st.title("Analizador de ciclos termodinámicos")
-    st.caption("Selecciona un ciclo, modifica sus condiciones y estudia su comportamiento energético, diagramas, ecuaciones y desempeño.")
+render_app_header(
+    title="Analizador de ciclos termodinámicos",
+    subtitle="Selecciona un ciclo, modifica sus condiciones y estudia componentes, estados, energía, potencia, diagramas, ecuaciones y desempeño.",
+    section="TERMODINÁMICA",
+    logo_width=190,
+)
 
 family=st.selectbox("Familia de ciclos",list(CYCLE_FAMILIES.keys()))
 entry=st.selectbox("Ciclo / configuración",CYCLE_FAMILIES[family],format_func=lambda x:x["title"])

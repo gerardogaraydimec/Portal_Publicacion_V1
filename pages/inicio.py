@@ -1,8 +1,8 @@
 from pathlib import Path
 import streamlit as st
+from modules.ui_brand import render_app_header
 
 ROOT = Path(__file__).resolve().parent.parent
-LOGO = ROOT / "assets" / "logo_card.png"
 
 st.markdown(
     """
@@ -21,19 +21,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-c_logo, c_title = st.columns([1.1, 3.6], vertical_alignment="center")
-with c_logo:
-    if LOGO.exists():
-        st.image(str(LOGO), use_container_width=True)
-with c_title:
-    st.markdown('<div class="home-kicker">PD-2026-0011 · GG DIMEC</div>', unsafe_allow_html=True)
-    st.title("GG DIMEC MechLab")
-    st.write(
-        "Herramientas interactivas para aprender, analizar y visualizar conceptos de ingeniería mecánica "
-        "directamente desde el navegador."
-    )
+render_app_header(
+    title="GG DIMEC MechLab",
+    subtitle="Herramientas interactivas para aprender, analizar y visualizar ingeniería mecánica directamente desde el navegador.",
+    section="PORTAL PEDAGÓGICO",
+    logo_width=190,
+)
 
-st.divider()
 st.subheader("Herramientas disponibles")
 
 c1, c2 = st.columns(2, gap="large")

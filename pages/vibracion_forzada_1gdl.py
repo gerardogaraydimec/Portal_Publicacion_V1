@@ -3,11 +3,11 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
+from modules.ui_brand import render_app_header
 
 from modules.vibracion_forzada1gdl import calcular_respuesta, curva_magnificacion, puntos_adaptativos, formato
 
 ROOT = Path(__file__).resolve().parent.parent
-LOGO = ROOT / "assets" / "logo_card.png"
 
 ORANGE = "#f28e1c"
 DARK = "#262730"
@@ -23,25 +23,24 @@ div[data-testid="stMetric"]{background:#fafafa;border:1px solid #eee;border-radi
 </style>
 """, unsafe_allow_html=True)
 
-h1, h2 = st.columns([5.5, 1.15], vertical_alignment="center")
-with h1:
-    st.title("Vibración forzada armónica · Sistema 1-GDL")
-    st.caption("GG DIMEC MechLab · Respuesta de $m\\ddot{x}+c\\dot{x}+kx=F_0\\cos(\\omega t)$ con enfoque pedagógico y de ingeniería.")
-with h2:
-    if LOGO.exists():
-        st.image(str(LOGO), use_container_width=True)
+render_app_header(
+    title="Vibración forzada armónica · Sistema 1-GDL",
+    subtitle="Respuesta forzada, resonancia, magnificación, fase, transmisibilidad y fuerzas en un sistema masa–resorte–amortiguador.",
+    section="VIBRACIONES Y DINÁMICA",
+    logo_width=190,
+)
 
 with st.form("vibf_forced_inputs"):
     r1 = st.columns(4)
-    m = r1[0].number_input("Masa m [kg]", value=1.0, format="%.8g", key="vibf_m")
-    k = r1[1].number_input("Rigidez k [N/m]", value=100.0, format="%.8g", key="vibf_k")
-    c = r1[2].number_input("Amortiguamiento c [N·s/m]", value=6.0, format="%.8g", key="vibf_c")
-    F0 = r1[3].number_input("Fuerza armónica F₀ [N]", value=50.0, format="%.8g", key="vibf_F0")
+    m = r1[0].number_input("Masa m [kg]", value=1.0, format="%.8g")
+    k = r1[1].number_input("Rigidez k [N/m]", value=100.0, format="%.8g")
+    c = r1[2].number_input("Amortiguamiento c [N·s/m]", value=6.0, format="%.8g")
+    F0 = r1[3].number_input("Fuerza armónica F₀ [N]", value=50.0, format="%.8g")
     r2 = st.columns(4)
-    omega = r2[0].number_input("Frecuencia angular ω [rad/s]", value=8.0, format="%.8g", key="vibf_omega")
-    x0 = r2[1].number_input("Desplazamiento inicial x₀ [m]", value=0.1, format="%.8g", key="vibf_x0")
-    v0 = r2[2].number_input("Velocidad inicial v₀ [m/s]", value=0.0, format="%.8g", key="vibf_v0")
-    tmax = r2[3].number_input("Tiempo de análisis [s]", value=15.0, format="%.8g", key="vibf_tmax")
+    omega = r2[0].number_input("Frecuencia angular ω [rad/s]", value=8.0, format="%.8g")
+    x0 = r2[1].number_input("Desplazamiento inicial x₀ [m]", value=0.1, format="%.8g")
+    v0 = r2[2].number_input("Velocidad inicial v₀ [m/s]", value=0.0, format="%.8g")
+    tmax = r2[3].number_input("Tiempo de análisis [s]", value=15.0, format="%.8g")
     apply = st.form_submit_button("Aplicar parámetros", use_container_width=True)
 
 errs = []

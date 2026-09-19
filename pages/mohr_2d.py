@@ -2,11 +2,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import streamlit as st
+from modules.ui_brand import render_app_header
 
 from modules.mohr2d import calcular_estado, crear_figura
 
 ROOT = Path(__file__).resolve().parent.parent
-LOGO_PATH = ROOT / "assets" / "logo_web.png"
 
 
 st.markdown(
@@ -37,19 +37,17 @@ for key, value in DEFAULTS.items():
 # ---------------------------------------------------------------------------
 # Encabezado
 # ---------------------------------------------------------------------------
-st.title("Círculo de Mohr")
-st.caption(
-    "Herramienta interactiva para transformación plana de esfuerzos · "
-    "PD-2026-0011 · Portal público"
+render_app_header(
+    title="Círculo de Mohr 2D",
+    subtitle="Transformación plana de esfuerzos · tensiones principales · esfuerzo cortante máximo · orientación del elemento.",
+    section="RESISTENCIA DE MATERIALES",
+    logo_width=190,
 )
 
 # ---------------------------------------------------------------------------
 # Datos base: solo se aplican cuando se presiona el botón
 # ---------------------------------------------------------------------------
 with st.sidebar:
-    if LOGO_PATH.exists():
-        st.image(str(LOGO_PATH), use_container_width=True)
-
     st.header("Estado plano de esfuerzos")
     st.caption(
         "Los valores de σx, σy y τxy se actualizan juntos para evitar "

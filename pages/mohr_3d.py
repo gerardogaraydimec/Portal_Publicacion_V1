@@ -2,8 +2,8 @@ from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
-from PIL import Image
 import streamlit as st
+from modules.ui_brand import render_app_header
 
 from modules.plotly3d import crear_figura_3d_interactiva
 from modules.plotlymohr import crear_figura_mohr_interactiva
@@ -11,7 +11,6 @@ from modules.plotlymohr import crear_figura_mohr_interactiva
 from modules.mohr3d import recopilar_datos
 
 ROOT = Path(__file__).resolve().parent.parent
-LOGO_PATH = ROOT / "assets" / "logo_card.png"
 
 st.markdown(
     """
@@ -114,8 +113,12 @@ for key, value in DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = value
 
-st.markdown("<h1>Círculo de Mohr 3D · Herramienta compacta</h1>", unsafe_allow_html=True)
-st.markdown("<div class='mini-note'>PD-2026-0011 · Portal público · Círculo de Mohr 3D</div>", unsafe_allow_html=True)
+render_app_header(
+    title="Círculo de Mohr 3D",
+    subtitle="Tensor tridimensional de esfuerzos · tensiones principales · planos arbitrarios · transformación y visualización espacial.",
+    section="RESISTENCIA DE MATERIALES",
+    logo_width=190,
+)
 
 @st.fragment
 def tablero():
@@ -204,7 +207,7 @@ def tablero():
             key="m3_estado_3d_interactivo",
         )
 
-    tcol, lcol = st.columns([5.4, 1.15], gap="small")
+    tcol = st.container()
     sigma1, sigma2, sigma3 = datos["principal_stresses"]
     activo = datos["active_state"]
     tm = datos["tensor_rotado"]
@@ -329,10 +332,6 @@ def tablero():
                     "Los resultados principales no dependen de la orientación visual de la cámara. "
                     "Girar o acercar el modelo 3D solo cambia la perspectiva de observación."
                 )
-
-    with lcol:
-        if LOGO_PATH.exists():
-            st.image(str(LOGO_PATH), use_container_width=True)
 
     with st.expander("Ver detalle matemático adicional", expanded=False):
         st.markdown("<div class='eq-note'>Este bloque queda abajo para no ensuciar la vista principal.</div>", unsafe_allow_html=True)

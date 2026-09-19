@@ -4,10 +4,10 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
+from modules.ui_brand import render_app_header
 from modules.vibraciones1gdl import calcular_respuesta, fmt_complex
 
 ROOT = Path(__file__).resolve().parent.parent
-LOGO = ROOT / "assets" / "logo_card.png"
 
 st.markdown(
     """
@@ -43,13 +43,12 @@ def resetear():
         st.session_state[key] = value
 
 
-h1, h2 = st.columns([5.5, 1.15], vertical_alignment="center")
-with h1:
-    st.title("Vibraciones libres de un sistema de 1 GDL")
-    st.caption("Sistema masa–resorte–amortiguador · respuesta temporal · plano de fase · solución característica")
-with h2:
-    if LOGO.exists():
-        st.image(str(LOGO), use_container_width=True)
+render_app_header(
+    title="Vibraciones libres de un sistema de 1 GDL",
+    subtitle="Sistema masa–resorte–amortiguador · respuesta temporal · plano de fase · solución característica.",
+    section="VIBRACIONES Y DINÁMICA",
+    logo_width=190,
+)
 
 with st.container(border=True):
     st.markdown("**Parámetros del sistema y condiciones iniciales**")

@@ -1,0 +1,49 @@
+PD-2026-0011 · GG DIMEC MechLab
+Parche V1.1 — Encabezados corporativos unificados
+
+OBJETIVO
+- Evitar el recorte del logo en páginas con diseños diferentes.
+- Usar el mismo encabezado visual en todas las herramientas.
+- Tomar como referencia el encabezado aprobado en Von Mises Lab.
+
+APLICACIONES ACTUALIZADAS
+- Portal / Inicio
+- Círculo de Mohr 2D
+- Círculo de Mohr 3D
+- Vibraciones libres 1-GDL
+- Vibración forzada 1-GDL
+- Propiedades termodinámicas del agua y vapor
+- Ciclos termodinámicos
+- Von Mises Lab
+
+ARCHIVOS NUEVOS
+- modules/ui_brand.py
+- assets/logo_header_unificado.png
+
+ARCHIVOS A REEMPLAZAR
+- pages/inicio.py
+- pages/mohr_2d.py
+- pages/mohr_3d.py
+- pages/vibraciones_1gdl.py
+- pages/vibracion_forzada_1gdl.py
+- pages/termodinamica_agua.py
+- pages/ciclos_termodinamicos.py
+- pages/von_mises_lab.py
+
+NO CAMBIA
+- streamlit_app.py
+- requirements.txt
+- motores matemáticos existentes
+- navegación del portal
+
+INSTALACIÓN
+Copiar el contenido del ZIP sobre la raíz de Portal_Publicacion_V1 y aceptar reemplazos.
+
+PRUEBA LOCAL
+.\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+Después de validar:
+git status
+git add .
+git commit -m "Unifica encabezados MechLab"
+git push
