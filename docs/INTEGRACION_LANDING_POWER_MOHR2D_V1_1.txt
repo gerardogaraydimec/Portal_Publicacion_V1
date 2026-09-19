@@ -1,0 +1,44 @@
+PD-2026-0011 · Parche MechLab Landing Power + Mohr2D V1.1
+
+OBJETIVO
+1) Mejorar la landing page para hacerla más visual, entretenida y dirigida.
+2) Corregir error NameError en mohr_2d.py por variable LOGO_PATH no definida.
+
+CAMBIOS PRINCIPALES
+- Nueva versión de pages/inicio.py con:
+  * hero mejorado
+  * tarjetas con íconos
+  * rutas rápidas por perfil
+  * herramientas con tags y accesos
+  * sección de uso simple en 3 pasos
+  * misma identidad negro + naranjo
+- Corrección de pages/mohr_2d.py:
+  * se define LOGO_PATH
+  * se controla el paso del logo a crear_figura()
+  * se elimina el NameError reportado en despliegue web
+- Se incluyen de nuevo los assets para que el parche sea autosuficiente.
+
+ARCHIVOS
+- pages/inicio.py
+- pages/mohr_2d.py
+- assets/logo_header_unificado.png
+- assets/logo_mechlab_landing.png
+- assets/gerardo_hero.jpg
+- assets/gerardo_terreno.jpg
+- assets/gerardo_industria.jpg
+- assets/brochure_simulacion.jpg
+- assets/brochure_escaneo.jpg
+- assets/brochure_formacion.jpg
+
+INSTALACIÓN
+1. Copiar el contenido del ZIP sobre la raíz de tu portal.
+2. Aceptar reemplazos.
+3. Ejecutar local:
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+4. Validar:
+   - Inicio
+   - Mohr 2D
+5. Si está correcto:
+   git add .
+   git commit -m "Mejora landing y corrige Mohr 2D"
+   git push

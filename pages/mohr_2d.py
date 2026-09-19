@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -7,6 +8,7 @@ from modules.ui_brand import render_app_header
 from modules.mohr2d import calcular_estado, crear_figura
 
 ROOT = Path(__file__).resolve().parent.parent
+LOGO_PATH = ROOT / "assets" / "logo_header_unificado.png"
 
 
 st.markdown(
@@ -149,10 +151,8 @@ def panel_rotacion():
     c3.metric("σβ", f"{d['sigma_beta']:.2f}")
     c4.metric("τβ", f"{d['tau_beta']:.2f}")
 
-    fig = crear_figura(
-        d,
-        logo_path=LOGO_PATH if LOGO_PATH.exists() else None,
-    )
+    logo_for_fig = str(LOGO_PATH) if LOGO_PATH.exists() else None
+    fig = crear_figura(d, logo_path=logo_for_fig)
     st.pyplot(fig, use_container_width=True)
     plt.close(fig)
 
@@ -177,6 +177,4 @@ with st.expander("Ecuaciones utilizadas", expanded=False):
     )
 
 st.divider()
-st.caption(
-    "GG DIMEC · Herramienta pedagógica desarrollada en Python + Streamlit."
-)
+st.caption("GG DIMEC · Herramienta pedagógica MechLab.")

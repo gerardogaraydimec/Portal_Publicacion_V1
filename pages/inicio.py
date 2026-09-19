@@ -10,8 +10,6 @@ ASSETS = ROOT / "assets"
 
 ORANGE = "#ff6900"
 BLACK = "#0b0b0b"
-CHARCOAL = "#171717"
-SOFT = "#f6f6f6"
 MUTED = "#6f7379"
 
 
@@ -35,9 +33,9 @@ st.markdown(
     .block-container {{
         max-width: 1480px;
         padding-top: .8rem;
-        padding-bottom: 2.5rem;
+        padding-bottom: 2.4rem;
     }}
-    .stApp {{ background:#ffffff; color:{BLACK}; }}
+    .stApp {{ background:#fff; color:{BLACK}; }}
     h1,h2,h3,h4 {{ color:{BLACK}; }}
 
     .landing-shell {{
@@ -50,59 +48,57 @@ st.markdown(
     .hero {{
         position:relative;
         display:grid;
-        grid-template-columns: 1.12fr .88fr;
-        min-height:560px;
+        grid-template-columns: 1.1fr .9fr;
+        min-height:585px;
         background:
-            radial-gradient(circle at 22% 18%, rgba(255,105,0,.20), transparent 28%),
-            linear-gradient(135deg,#050505 0%,#101010 58%,#1b1b1b 100%);
+            radial-gradient(circle at 22% 18%, rgba(255,105,0,.19), transparent 29%),
+            linear-gradient(135deg,#040404 0%,#101010 60%,#1a1a1a 100%);
         border-radius:22px;
         overflow:hidden;
-        box-shadow:0 18px 50px rgba(0,0,0,.14);
+        box-shadow:0 16px 44px rgba(0,0,0,.14);
     }}
     .hero:after {{
         content:"";
         position:absolute;
-        right:-130px;
-        top:-150px;
-        width:390px;
-        height:390px;
-        border:1px solid rgba(255,105,0,.28);
+        right:-110px;
+        top:-120px;
+        width:350px;height:350px;
         border-radius:50%;
-        box-shadow:0 0 0 48px rgba(255,105,0,.04), 0 0 0 96px rgba(255,105,0,.025);
+        border:1px solid rgba(255,105,0,.28);
+        box-shadow:0 0 0 46px rgba(255,105,0,.04), 0 0 0 92px rgba(255,105,0,.024);
         pointer-events:none;
     }}
     .hero-copy {{
-        padding:64px 56px 58px 58px;
-        z-index:2;
+        padding:62px 56px 56px 58px;
         display:flex;
         flex-direction:column;
         justify-content:center;
+        z-index:2;
     }}
     .brand-row {{
         display:flex;
         align-items:center;
         gap:14px;
-        margin-bottom:26px;
+        margin-bottom:22px;
     }}
     .brand-row img {{
-        width:86px;
+        width:88px;
         height:auto;
         border-radius:10px;
         background:#fffaf5;
     }}
-    .brand-row .brandtext {{
+    .brand-title {{
         color:#fff;
         font-weight:800;
         letter-spacing:.04em;
-        font-size:1.05rem;
+        font-size:1.03rem;
     }}
-    .brand-row .brandsub {{
-        color:#aeb2b8;
+    .brand-sub {{
+        color:#afb3ba;
         font-size:.82rem;
         margin-top:2px;
     }}
     .eyebrow {{
-        display:inline-block;
         color:{ORANGE};
         font-weight:800;
         letter-spacing:.08em;
@@ -112,32 +108,31 @@ st.markdown(
     }}
     .hero h1 {{
         color:#fff;
-        font-size:clamp(2.6rem,4.6vw,4.8rem);
+        font-size:clamp(2.65rem,4.8vw,4.9rem);
         line-height:.98;
-        margin:0 0 22px 0;
+        margin:0 0 20px 0;
         letter-spacing:-.035em;
     }}
     .hero h1 span {{ color:{ORANGE}; }}
     .hero p {{
-        color:#d7d9dc;
-        font-size:1.10rem;
-        line-height:1.60;
+        color:#d7d9dd;
+        font-size:1.06rem;
+        line-height:1.58;
         max-width:760px;
-        margin:0 0 18px 0;
+        margin:0 0 14px 0;
     }}
     .hero-vision {{
         border-left:4px solid {ORANGE};
-        padding-left:17px;
+        padding-left:16px;
         color:#fff !important;
         font-weight:600;
-        margin-top:4px !important;
         max-width:720px;
     }}
     .cta-row {{
         display:flex;
         gap:12px;
         flex-wrap:wrap;
-        margin-top:22px;
+        margin-top:20px;
     }}
     .cta {{
         display:inline-block;
@@ -145,8 +140,8 @@ st.markdown(
         border-radius:11px;
         text-decoration:none !important;
         font-weight:800;
-        font-size:.96rem;
-        transition:.18s ease;
+        font-size:.95rem;
+        transition:.16s ease;
     }}
     .cta.primary {{ background:{ORANGE}; color:#fff !important; }}
     .cta.secondary {{
@@ -154,58 +149,57 @@ st.markdown(
         color:#fff !important;
         background:rgba(255,255,255,.04);
     }}
-    .cta:hover {{ transform:translateY(-1px); filter:brightness(1.04); }}
-    .audience {{
+    .cta:hover {{ transform:translateY(-1px); }}
+    .hero-tags {{
         display:flex;
         gap:10px;
         flex-wrap:wrap;
-        margin-top:26px;
+        margin-top:22px;
     }}
-    .pill {{
+    .hero-tags span {{
         color:#fff;
-        background:#1d1d1d;
-        border:1px solid #323232;
+        background:#1a1a1a;
+        border:1px solid #343434;
         border-radius:999px;
         padding:8px 12px;
-        font-size:.86rem;
+        font-size:.85rem;
         font-weight:700;
     }}
-
     .hero-photo {{
-        min-height:560px;
+        min-height:585px;
         position:relative;
         background:
-            linear-gradient(90deg,rgba(11,11,11,.45),rgba(11,11,11,.02)),
-            url("{hero_img}") center 34%/cover no-repeat;
+            linear-gradient(90deg,rgba(11,11,11,.44),rgba(11,11,11,.06)),
+            url("{hero_img}") center 30%/cover no-repeat;
     }}
-    .hero-photo .badge {{
+    .hero-badge {{
         position:absolute;
-        right:26px;
-        bottom:28px;
-        left:26px;
-        background:rgba(10,10,10,.80);
-        backdrop-filter:blur(8px);
+        right:24px;
+        bottom:26px;
+        left:24px;
+        background:rgba(10,10,10,.82);
         border:1px solid rgba(255,255,255,.14);
         border-left:4px solid {ORANGE};
         border-radius:14px;
         color:#fff;
         padding:16px 18px;
-        font-size:.94rem;
-        line-height:1.45;
+        line-height:1.42;
+        font-size:.93rem;
+        backdrop-filter:blur(8px);
     }}
 
     .section {{
-        padding:68px 8px 12px 8px;
+        padding:60px 8px 10px 8px;
     }}
     .section.dark {{
-        margin-top:54px;
+        margin-top:48px;
         background:{BLACK};
         color:#fff;
         border-radius:22px;
         padding:0;
         overflow:hidden;
     }}
-    .section-kicker {{
+    .kicker {{
         color:{ORANGE};
         font-weight:800;
         letter-spacing:.07em;
@@ -214,47 +208,79 @@ st.markdown(
         margin-bottom:8px;
     }}
     .section h2 {{
-        font-size:clamp(2rem,3.4vw,3.25rem);
+        font-size:clamp(2rem,3.4vw,3.18rem);
         line-height:1.05;
-        margin:0 0 15px 0;
+        margin:0 0 14px 0;
         letter-spacing:-.025em;
     }}
     .section-intro {{
-        max-width:900px;
+        max-width:920px;
         color:{MUTED};
-        font-size:1.04rem;
-        line-height:1.65;
-        margin-bottom:30px;
+        font-size:1.02rem;
+        line-height:1.63;
+        margin-bottom:28px;
     }}
 
-    .benefits {{
+    .icon-strip {{
         display:grid;
         grid-template-columns:repeat(4,1fr);
         gap:14px;
+        margin-top:-34px;
+        position:relative;
+        z-index:5;
+        padding:0 14px;
     }}
-    .benefit {{
-        border:1px solid #e7e7e7;
+    .icon-card {{
         background:#fff;
-        border-radius:16px;
-        padding:21px 20px;
-        box-shadow:0 8px 24px rgba(0,0,0,.045);
+        border:1px solid #e7e7e7;
+        border-radius:18px;
+        padding:20px 18px;
+        box-shadow:0 12px 28px rgba(0,0,0,.06);
+        display:flex;
+        gap:14px;
+        align-items:flex-start;
     }}
-    .benefit .num {{
-        color:{ORANGE};
-        font-weight:900;
-        font-size:1.05rem;
-        margin-bottom:10px;
+    .icon-bubble {{
+        width:46px;height:46px;border-radius:12px;
+        background:#111; color:{ORANGE};
+        display:flex; align-items:center; justify-content:center;
+        font-size:1.25rem; font-weight:900; flex:0 0 auto;
     }}
-    .benefit h3 {{
-        margin:0 0 8px 0;
-        font-size:1.08rem;
+    .icon-card h3 {{ margin:0 0 4px 0; font-size:1.02rem; }}
+    .icon-card p {{ margin:0; color:{MUTED}; font-size:.89rem; line-height:1.48; }}
+
+    .quick-grid {{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:16px;
     }}
-    .benefit p {{
-        color:{MUTED};
-        font-size:.92rem;
-        line-height:1.55;
-        margin:0;
+    .quick-card {{
+        background:#fff;
+        border:1px solid #e5e5e5;
+        border-radius:18px;
+        box-shadow:0 8px 26px rgba(0,0,0,.05);
+        padding:22px;
     }}
+    .quick-card .qicon {{
+        width:54px;height:54px;border-radius:14px;
+        background:#111; color:{ORANGE};
+        display:flex;align-items:center;justify-content:center;
+        font-size:1.35rem; font-weight:900;
+        margin-bottom:16px;
+    }}
+    .quick-card h3 {{ margin:0 0 8px 0; font-size:1.15rem; }}
+    .quick-card ul {{
+        margin:0; padding-left:18px; color:{MUTED};
+        font-size:.91rem; line-height:1.54;
+    }}
+    .quick-card a {{
+        display:inline-block;
+        margin-top:14px;
+        font-weight:800;
+        color:{BLACK} !important;
+        text-decoration:none !important;
+    }}
+    .quick-card a:hover {{ color:{ORANGE} !important; }}
 
     .tools-grid {{
         display:grid;
@@ -268,37 +294,59 @@ st.markdown(
         background:#fff;
         padding:22px;
         box-shadow:0 9px 28px rgba(0,0,0,.05);
-        min-height:245px;
+        min-height:265px;
         display:flex;
         flex-direction:column;
     }}
     .tool-icon {{
-        width:48px;height:48px;
-        border-radius:12px;
+        width:50px;height:50px;border-radius:13px;
         display:flex;align-items:center;justify-content:center;
-        background:{BLACK};
-        color:{ORANGE};
-        font-weight:900;
-        font-size:1.22rem;
-        margin-bottom:17px;
+        background:#111;color:{ORANGE};
+        font-weight:900;font-size:1.25rem;margin-bottom:16px;
     }}
-    .tool-card h3 {{ margin:0 0 9px 0; font-size:1.22rem; }}
+    .tool-card h3 {{ margin:0 0 8px 0; font-size:1.18rem; }}
     .tool-card p {{
-        color:{MUTED};
-        line-height:1.55;
-        font-size:.92rem;
-        flex:1;
-        margin-bottom:16px;
+        color:{MUTED}; line-height:1.55; font-size:.91rem;
+        flex:1; margin-bottom:14px;
+    }}
+    .tool-tags {{
+        display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;
+    }}
+    .tool-tags span {{
+        background:#f7f7f7;
+        border-radius:999px;
+        padding:6px 9px;
+        font-size:.77rem;
+        font-weight:700;
+        color:#4c4f54;
     }}
     .tool-links a {{
-        display:block;
-        color:{BLACK} !important;
-        font-weight:800;
-        text-decoration:none !important;
-        margin-top:8px;
-        font-size:.91rem;
+        display:block; color:{BLACK} !important;
+        font-weight:800; text-decoration:none !important;
+        margin-top:8px; font-size:.9rem;
     }}
     .tool-links a:hover {{ color:{ORANGE} !important; }}
+
+    .steps {{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:16px;
+    }}
+    .step {{
+        border:1px solid #e7e7e7;
+        background:#fff;
+        border-radius:18px;
+        padding:24px 22px;
+        box-shadow:0 8px 24px rgba(0,0,0,.045);
+    }}
+    .step .num {{
+        width:42px;height:42px;border-radius:11px;
+        background:#111;color:{ORANGE};
+        display:flex;align-items:center;justify-content:center;
+        font-weight:900;font-size:1rem;margin-bottom:14px;
+    }}
+    .step h3 {{ margin:0 0 8px 0; font-size:1.1rem; }}
+    .step p {{ margin:0; color:{MUTED}; line-height:1.55; font-size:.91rem; }}
 
     .vision {{
         display:grid;
@@ -321,9 +369,9 @@ st.markdown(
     .vision-copy h2 {{ color:#fff; }}
     .vision-copy p {{
         color:#d0d0d0;
-        font-size:1.02rem;
-        line-height:1.66;
-        margin:0 0 15px 0;
+        font-size:1.01rem;
+        line-height:1.65;
+        margin:0 0 14px 0;
     }}
     .vision-quote {{
         color:#fff !important;
@@ -333,7 +381,7 @@ st.markdown(
         margin-top:8px !important;
     }}
     .vision-tags {{
-        display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;
+        display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;
     }}
     .vision-tags span {{
         border:1px solid #333;
@@ -341,7 +389,7 @@ st.markdown(
         color:#fff;
         padding:9px 12px;
         border-radius:999px;
-        font-size:.86rem;
+        font-size:.85rem;
         font-weight:700;
     }}
 
@@ -352,19 +400,17 @@ st.markdown(
         align-items:stretch;
     }}
     .about-card {{
-        background:#111;
         border-radius:20px;
         overflow:hidden;
         min-height:430px;
         background:
-            linear-gradient(180deg,rgba(11,11,11,.05),rgba(11,11,11,.72)),
+            linear-gradient(180deg,rgba(11,11,11,.05),rgba(11,11,11,.74)),
             url("{industry_img}") center 20%/cover no-repeat;
         display:flex;
         align-items:flex-end;
         padding:24px;
         color:#fff;
     }}
-    .about-card strong {{ font-size:1.18rem; }}
     .about-copy {{
         border:1px solid #e6e6e6;
         border-radius:20px;
@@ -396,13 +442,13 @@ st.markdown(
         font-weight:700;
     }}
 
-    .industry-gallery {{
+    .gallery {{
         display:grid;
         grid-template-columns:repeat(3,1fr);
         gap:16px;
         margin-top:22px;
     }}
-    .industry-card {{
+    .gcard {{
         border-radius:18px;
         overflow:hidden;
         background:#111;
@@ -410,16 +456,14 @@ st.markdown(
         min-height:340px;
         box-shadow:0 9px 28px rgba(0,0,0,.07);
     }}
-    .industry-card img {{
+    .gcard img {{
         width:100%;height:100%;object-fit:cover;display:block;
     }}
-    .industry-card .overlay {{
+    .gcard .overlay {{
         position:absolute;left:0;right:0;bottom:0;
         padding:38px 18px 17px 18px;
         background:linear-gradient(transparent,rgba(0,0,0,.88));
-        color:#fff;
-        font-weight:800;
-        font-size:1rem;
+        color:#fff;font-weight:800;font-size:1rem;
     }}
 
     .contact {{
@@ -434,8 +478,7 @@ st.markdown(
     .contact-grid {{
         display:grid;
         grid-template-columns:repeat(5,1fr);
-        gap:10px;
-        margin-top:24px;
+        gap:10px; margin-top:24px;
     }}
     .contact-grid a {{
         text-decoration:none !important;
@@ -456,25 +499,23 @@ st.markdown(
         justify-content:space-between;
         gap:20px;
         align-items:center;
-        padding:22px 4px 4px 4px;
+        padding:20px 4px 4px 4px;
         color:#777;
         font-size:.82rem;
         flex-wrap:wrap;
     }}
 
-    @media(max-width:1000px) {{
-        .hero {{ grid-template-columns:1fr; }}
+    @media(max-width:1100px) {{
+        .hero, .vision, .about {{ grid-template-columns:1fr; }}
         .hero-photo {{ min-height:470px; }}
-        .benefits,.tools-grid {{ grid-template-columns:repeat(2,1fr); }}
-        .vision,.about {{ grid-template-columns:1fr; }}
-        .vision-photo {{ min-height:440px; }}
-        .industry-gallery {{ grid-template-columns:1fr 1fr; }}
+        .icon-strip, .tools-grid {{ grid-template-columns:repeat(2,1fr); }}
+        .quick-grid, .steps, .gallery {{ grid-template-columns:1fr 1fr; }}
         .contact-grid {{ grid-template-columns:1fr 1fr; }}
     }}
-    @media(max-width:650px) {{
+    @media(max-width:700px) {{
         .hero-copy {{ padding:42px 26px; }}
         .hero-photo {{ min-height:420px; }}
-        .benefits,.tools-grid,.industry-gallery,.contact-grid,.skills {{
+        .icon-strip, .quick-grid, .tools-grid, .steps, .gallery, .contact-grid, .skills {{
             grid-template-columns:1fr;
         }}
         .vision-copy,.about-copy,.contact {{ padding:32px 24px; }}
@@ -492,66 +533,112 @@ st.markdown(
           <div class="brand-row">
             <img src="{logo_img}" alt="GG DIMEC">
             <div>
-              <div class="brandtext">GG DIMEC SPA · MECHLAB</div>
-              <div class="brandsub">Ingeniería, aprendizaje y aplicación real</div>
+              <div class="brand-title">GG DIMEC SPA · MECHLAB</div>
+              <div class="brand-sub">Ingeniería, aprendizaje y aplicación real</div>
             </div>
           </div>
           <div class="eyebrow">Ingeniería visual aplicada</div>
           <h1>Aprende, analiza y diseña con <span>criterio técnico</span></h1>
           <p>
-            MechLab es un espacio de herramientas interactivas para estudiantes, docentes e ingenieros
-            que quieren comprender mejor la mecánica, la termodinámica, las vibraciones y el diseño de máquinas.
+            MechLab reúne herramientas interactivas para estudiantes, docentes e ingenieros
+            que buscan comprender mejor la mecánica, la termodinámica, las vibraciones y el diseño de máquinas.
           </p>
           <p class="hero-vision">
-            Quiero acompañarte a aprender mejor, visualizar lo que estás estudiando y desarrollar una forma
-            de pensar la ingeniería más clara, rigurosa y conectada con problemas reales.
+            Aquí no solo calculas. Visualizas, entiendes y conectas teoría con problemas reales
+            para formar mejor criterio de ingeniería.
           </p>
           <div class="cta-row">
             <a class="cta primary" href="#herramientas">Explorar herramientas ↓</a>
             <a class="cta secondary" href="https://www.gerardogaraydimec.com/" target="_blank">Visitar mi página web ↗</a>
           </div>
-          <div class="audience">
-            <span class="pill">Para estudiantes</span>
-            <span class="pill">Para docentes</span>
-            <span class="pill">Para ingenieros</span>
+          <div class="hero-tags">
+            <span>Docencia</span>
+            <span>Industria</span>
+            <span>Simulación</span>
+            <span>Diseño mecánico</span>
+            <span>Aprendizaje continuo</span>
           </div>
         </div>
         <div class="hero-photo">
-          <div class="badge">
+          <div class="hero-badge">
             <b>Gerardo Garay Pereira</b><br>
             Ingeniero Civil Mecánico · Docente · Fundador de GG DIMEC SPA
           </div>
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-kicker">¿Para qué sirve MechLab?</div>
-        <h2>Una herramienta para entender mejor la ingeniería</h2>
-        <div class="section-intro">
-          No busca reemplazar los fundamentos. Busca ayudarte a verlos, explorarlos y conectarlos:
-          ecuaciones, estados, geometría, respuesta de sistemas y criterios de diseño, reunidos en herramientas
-          que puedas utilizar para estudiar, enseñar o profundizar un análisis.
+      <section class="icon-strip">
+        <div class="icon-card">
+          <div class="icon-bubble">📘</div>
+          <div><h3>Aprendizaje claro</h3><p>Herramientas pensadas para comprender, no solo para obtener un número.</p></div>
         </div>
-        <div class="benefits">
-          <div class="benefit"><div class="num">01</div><h3>Visualizar conceptos</h3><p>Representaciones interactivas para entender variables, estados y fenómenos complejos.</p></div>
-          <div class="benefit"><div class="num">02</div><h3>Aprender con criterio</h3><p>Ecuaciones, explicaciones y análisis para avanzar más allá de una respuesta numérica.</p></div>
-          <div class="benefit"><div class="num">03</div><h3>Practicar análisis</h3><p>Modifica condiciones, compara resultados y estudia cómo responde el modelo.</p></div>
-          <div class="benefit"><div class="num">04</div><h3>Conectar teoría y realidad</h3><p>Una mirada construida desde la docencia, el diseño mecánico y la experiencia industrial.</p></div>
+        <div class="icon-card">
+          <div class="icon-bubble">🧠</div>
+          <div><h3>Criterio técnico</h3><p>Visualización, ecuaciones y lectura física del resultado para tomar mejores decisiones.</p></div>
+        </div>
+        <div class="icon-card">
+          <div class="icon-bubble">⚙️</div>
+          <div><h3>Ingeniería aplicada</h3><p>Una forma de enseñar conectada con la realidad de diseño, análisis y terreno.</p></div>
+        </div>
+        <div class="icon-card">
+          <div class="icon-bubble">🚀</div>
+          <div><h3>Desarrollo continuo</h3><p>Un laboratorio digital en crecimiento para fortalecer tu formación profesional.</p></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="kicker">Ruta rápida</div>
+        <h2>Encuentra tu punto de entrada</h2>
+        <div class="section-intro">
+          Para que la experiencia sea más directa, MechLab se organiza también según el tipo de usuario y la necesidad de aprendizaje.
+        </div>
+        <div class="quick-grid">
+          <div class="quick-card">
+            <div class="qicon">🎓</div>
+            <h3>Si eres estudiante</h3>
+            <ul>
+              <li>Refuerza fundamentos con apoyo visual.</li>
+              <li>Entiende cómo leer ecuaciones y diagramas.</li>
+              <li>Explora estados, variables y respuesta física.</li>
+            </ul>
+            <a href="#herramientas">Ir a herramientas →</a>
+          </div>
+          <div class="quick-card">
+            <div class="qicon">🧑‍🏫</div>
+            <h3>Si eres docente</h3>
+            <ul>
+              <li>Apoya clases con material interactivo.</li>
+              <li>Muestra fenómenos de forma más intuitiva.</li>
+              <li>Conecta teoría, gráficas y visualización.</li>
+            </ul>
+            <a href="#herramientas">Ver módulos docentes →</a>
+          </div>
+          <div class="quick-card">
+            <div class="qicon">🏭</div>
+            <h3>Si eres ingeniero</h3>
+            <ul>
+              <li>Usa herramientas para revisar conceptos.</li>
+              <li>Comunica mejor análisis y resultados.</li>
+              <li>Refuerza criterio técnico aplicado.</li>
+            </ul>
+            <a href="https://www.gerardogaraydimec.com/" target="_blank">Conocer GG DIMEC →</a>
+          </div>
         </div>
       </section>
 
       <div id="herramientas"></div>
       <section class="section">
-        <div class="section-kicker">Herramientas disponibles</div>
+        <div class="kicker">Herramientas disponibles</div>
         <h2>Empieza a trabajar con MechLab</h2>
         <div class="section-intro">
-          Cada módulo está pensado para que puedas modificar datos, visualizar resultados y entender qué significa físicamente lo que estás calculando.
+          Cada módulo está pensado para modificar datos, visualizar resultados y entender qué significa físicamente lo que estás calculando.
         </div>
         <div class="tools-grid">
           <div class="tool-card">
             <div class="tool-icon">RM</div>
             <h3>Resistencia de Materiales</h3>
-            <p>Transformación de esfuerzos, estados principales, visualización 2D y 3D y análisis tensorial.</p>
+            <p>Transformación de esfuerzos, tensiones principales, círculos de Mohr y análisis tensorial del estado resistente.</p>
+            <div class="tool-tags"><span>Mohr 2D</span><span>Mohr 3D</span><span>Esfuerzos principales</span></div>
             <div class="tool-links">
               <a href="/mohr-2d">Abrir Círculo de Mohr 2D →</a>
               <a href="/mohr-3d">Abrir Círculo de Mohr 3D →</a>
@@ -561,6 +648,7 @@ st.markdown(
             <div class="tool-icon">VD</div>
             <h3>Vibraciones y Dinámica</h3>
             <p>Respuesta libre y forzada, frecuencia natural, amortiguamiento, resonancia, fase y transmisibilidad.</p>
+            <div class="tool-tags"><span>1 GDL</span><span>Respuesta temporal</span><span>Frecuencia</span></div>
             <div class="tool-links">
               <a href="/vibraciones-1gdl">Vibraciones libres 1-GDL →</a>
               <a href="/vibracion-forzada-1gdl">Vibración forzada 1-GDL →</a>
@@ -569,7 +657,8 @@ st.markdown(
           <div class="tool-card">
             <div class="tool-icon">TH</div>
             <h3>Termodinámica</h3>
-            <p>Propiedades del agua y vapor, regiones de fase, diagramas y análisis de ciclos termodinámicos.</p>
+            <p>Propiedades del agua y vapor, regiones de fase, diagramas y ciclos termodinámicos para aprendizaje y análisis.</p>
+            <div class="tool-tags"><span>Agua-vapor</span><span>Ciclos</span><span>Visualización</span></div>
             <div class="tool-links">
               <a href="/agua-vapor">Propiedades del agua y vapor →</a>
               <a href="/ciclos-termodinamicos">Ciclos termodinámicos →</a>
@@ -578,7 +667,8 @@ st.markdown(
           <div class="tool-card">
             <div class="tool-icon">EM</div>
             <h3>Elementos de Máquinas</h3>
-            <p>Criterios de fluencia y falla, interpretación física, estados multiaxiales y visualización geométrica.</p>
+            <p>Criterios de fluencia y falla, interpretación física, esfuerzos combinados y visualización geométrica del criterio.</p>
+            <div class="tool-tags"><span>Von Mises</span><span>Tresca</span><span>Falla</span></div>
             <div class="tool-links">
               <a href="/von-mises">Abrir Von Mises Lab →</a>
             </div>
@@ -586,11 +676,21 @@ st.markdown(
         </div>
       </section>
 
+      <section class="section">
+        <div class="kicker">Cómo usar MechLab</div>
+        <h2>Una experiencia simple y útil</h2>
+        <div class="steps">
+          <div class="step"><div class="num">1</div><h3>Selecciona una herramienta</h3><p>Elige el tema que quieras estudiar o aplicar según tu curso, proyecto o necesidad de revisión.</p></div>
+          <div class="step"><div class="num">2</div><h3>Modifica variables</h3><p>Ajusta parámetros, observa la respuesta del sistema y revisa cómo cambia el fenómeno en tiempo real.</p></div>
+          <div class="step"><div class="num">3</div><h3>Interpreta el resultado</h3><p>No te quedes con el valor final: usa diagramas, explicaciones y ecuaciones para comprender lo que ocurre.</p></div>
+        </div>
+      </section>
+
       <section class="section dark">
         <div class="vision">
           <div class="vision-photo"></div>
           <div class="vision-copy">
-            <div class="section-kicker">Mi visión</div>
+            <div class="kicker">Mi visión</div>
             <h2>Aprender con ingeniería real</h2>
             <p>
               GG DIMEC nació desde la ingeniería aplicada y el trabajo con problemas reales.
@@ -604,14 +704,14 @@ st.markdown(
               La ingeniería más avanzada tiene sentido cuando ayuda a las personas a resolver mejor los problemas que enfrentan.
             </p>
             <div class="vision-tags">
-              <span>Industria real</span><span>Docencia</span><span>Simulación</span><span>Diseño mecánico</span><span>Aprendizaje continuo</span>
+              <span>Industria real</span><span>Docencia</span><span>Simulación</span><span>Diseño mecánico</span><span>Mejora continua</span>
             </div>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <div class="section-kicker">Sobre mí</div>
+        <div class="kicker">Sobre mí</div>
         <div class="about">
           <div class="about-card">
             <div><strong>Ingeniería en terreno</strong><br>Experiencia técnica, industria y aprendizaje conectado con la realidad.</div>
@@ -640,21 +740,21 @@ st.markdown(
       </section>
 
       <section class="section">
-        <div class="section-kicker">Ingeniería aplicada</div>
+        <div class="kicker">Ingeniería aplicada</div>
         <h2>De la industria a la enseñanza</h2>
         <div class="section-intro">
           MechLab se alimenta de una forma de trabajar que combina modelamiento, simulación, levantamiento, diseño y capacitación técnica.
           Parte de esa experiencia está reflejada en los proyectos y servicios desarrollados por GG DIMEC.
         </div>
-        <div class="industry-gallery">
-          <div class="industry-card"><img src="{sim_img}" alt="Simulación estructural"><div class="overlay">Simulación estructural y dinámica</div></div>
-          <div class="industry-card"><img src="{scan_img}" alt="Escaneo 3D"><div class="overlay">Escaneo 3D e ingeniería inversa</div></div>
-          <div class="industry-card"><img src="{train_img}" alt="Capacitación técnica"><div class="overlay">Capacitación y transferencia de conocimiento</div></div>
+        <div class="gallery">
+          <div class="gcard"><img src="{sim_img}" alt="Simulación estructural"><div class="overlay">Simulación estructural y dinámica</div></div>
+          <div class="gcard"><img src="{scan_img}" alt="Escaneo 3D"><div class="overlay">Escaneo 3D e ingeniería inversa</div></div>
+          <div class="gcard"><img src="{train_img}" alt="Capacitación técnica"><div class="overlay">Capacitación y transferencia de conocimiento</div></div>
         </div>
       </section>
 
       <section class="contact">
-        <div class="section-kicker">Contacto y comunidad</div>
+        <div class="kicker">Contacto y comunidad</div>
         <h2>Conversemos, aprendamos y construyamos mejor ingeniería</h2>
         <p>
           Si eres estudiante, docente, ingeniero o una empresa interesada en estas herramientas, sígueme en redes,
