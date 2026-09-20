@@ -1,0 +1,33 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE · CONTACTO Y COMUNIDAD V3
+
+OBJETIVO
+Mejorar la presencia del contacto personal y de comunidad en la landing sin recargar la navegación.
+
+CAMBIOS
+1. Nueva barra de contacto rápido inmediatamente bajo el hero principal.
+2. Accesos directos a:
+   - Correo
+   - Teléfono
+   - Instagram
+   - LinkedIn
+   - Sitio web
+3. Iconografía SVG integrada, sin dependencias externas.
+4. Hover y comportamiento responsive para escritorio, tablet y móvil.
+5. Rediseño de la sección inferior “Contacto y comunidad”.
+6. Mensaje de comunidad y colaboración más visible.
+7. Footer actualizado con el lema corporativo.
+8. Se mantienen intactas las familias de herramientas y sus rutas.
+
+ARCHIVO A REEMPLAZAR
+pages/inicio.py
+
+NO MODIFICA
+- streamlit_app.py
+- módulos técnicos
+- rutas de herramientas
+- assets existentes
+- navegación de familias
+
+INSTALACIÓN
+Copiar pages/inicio.py sobre el mismo archivo del repositorio Portal_Publicacion_V1.

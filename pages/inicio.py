@@ -7,7 +7,7 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 
-VERSION = "FAMILIAS DE HERRAMIENTAS V2"
+VERSION = "CONTACTO Y COMUNIDAD V3"
 
 
 def data_uri(path: Path) -> str:
@@ -23,6 +23,12 @@ logo_img = data_uri(ASSETS / "logo_mechlab_landing.png")
 sim_img = data_uri(ASSETS / "brochure_simulacion.jpg")
 scan_img = data_uri(ASSETS / "brochure_escaneo.jpg")
 training_img = data_uri(ASSETS / "brochure_formacion.jpg")
+
+ICON_MAIL = """<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.5h17v11h-17z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4.2 7.2 7.8 6.1 7.8-6.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
+ICON_PHONE = """<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.1 3.7 4.4 5.3c-.8.5-.9 1.5-.6 2.4 1.8 5.5 6.1 9.8 11.6 11.6.9.3 1.9.2 2.4-.6l1.6-2.7c.4-.7.2-1.6-.5-2l-3.2-1.7c-.6-.3-1.4-.2-1.8.3l-1.2 1.4a13.4 13.4 0 0 1-3.7-3.7l1.4-1.2c.5-.4.6-1.2.3-1.8L9 4.2c-.4-.7-1.2-.9-1.9-.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
+ICON_INSTAGRAM = """<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="6.6" r="1.15" fill="currentColor"/></svg>"""
+ICON_LINKEDIN = """<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.1" y="3.1" width="17.8" height="17.8" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7.3 10v7M7.3 7.3v.1M10.7 17v-7m0 3.1c.5-1.9 4.9-2.4 4.9 1V17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>"""
+ICON_WEB = """<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.7 12h16.6M12 3.4c2.3 2.3 3.5 5.1 3.5 8.6S14.3 18.3 12 20.6M12 3.4C9.7 5.7 8.5 8.5 8.5 12s1.2 6.3 3.5 8.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>"""
 
 css = """
 <style>
@@ -192,13 +198,68 @@ html{scroll-behavior:smooth;}
 }
 .gg-profile strong{font-size:1rem;}
 
+.gg-contact-rail{
+  position:relative;
+  z-index:7;
+  display:grid;
+  grid-template-columns:1.35fr repeat(5,1fr);
+  gap:8px;
+  margin:-27px 24px 0;
+  padding:10px;
+  background:rgba(255,255,255,.97);
+  border:1px solid var(--gg-line);
+  border-radius:18px;
+  box-shadow:0 16px 34px rgba(0,0,0,.10);
+  backdrop-filter:blur(10px);
+}
+.gg-contact-rail-intro{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:8px 12px;
+}
+.gg-contact-rail-intro b{font-size:.93rem;color:#161616;}
+.gg-contact-rail-intro span{font-size:.76rem;color:var(--gg-muted);margin-top:2px;line-height:1.35;}
+.gg-quick-contact{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  border-radius:12px;
+  padding:9px 10px;
+  color:#171717!important;
+  transition:.18s ease;
+  border:1px solid transparent;
+}
+.gg-quick-contact:hover{
+  border-color:#ffd6ba;
+  background:#fff6ef;
+  transform:translateY(-1px);
+}
+.gg-quick-icon{
+  flex:0 0 34px;
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  color:#fff;
+  background:#111;
+}
+.gg-quick-icon svg{width:19px;height:19px;display:block;}
+.gg-quick-contact:hover .gg-quick-icon{background:var(--gg-orange);}
+.gg-quick-copy{min-width:0;}
+.gg-quick-copy b{display:block;font-size:.76rem;line-height:1.05;}
+.gg-quick-copy span{display:block;margin-top:3px;font-size:.69rem;color:#70747a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
 .gg-value-strip{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:13px;
   position:relative;
   z-index:5;
-  margin:-32px 18px 0;
+  margin:14px 18px 0;
 }
 .gg-value{
   display:flex;
@@ -508,31 +569,71 @@ html{scroll-behavior:smooth;}
 
 .gg-contact{
   margin-top:60px;
-  padding:40px;
-  border-radius:22px;
+  padding:38px 40px 40px;
+  border-radius:24px;
   color:#fff;
-  background:#080808;
+  background:
+    radial-gradient(circle at 88% 12%,rgba(255,105,0,.19),transparent 29%),
+    linear-gradient(135deg,#070707,#111 68%,#181818);
+  border:1px solid #242424;
+  box-shadow:0 18px 46px rgba(0,0,0,.12);
+}
+.gg-contact-head{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:32px;
+  align-items:end;
 }
 .gg-contact h2{color:#fff;margin:0 0 8px;}
-.gg-contact p{color:#c9c9c9;line-height:1.55;max-width:880px;}
+.gg-contact p{color:#c9c9c9;line-height:1.55;max-width:850px;margin-bottom:0;}
+.gg-contact-cta{
+  border-left:3px solid var(--gg-orange);
+  padding:5px 0 5px 15px;
+  color:#f1f1f1;
+  font-size:.88rem;
+  line-height:1.5;
+}
+.gg-contact-cta b{color:#fff;}
 .gg-socials{
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  gap:9px;
-  margin-top:21px;
+  gap:10px;
+  margin-top:24px;
 }
 .gg-socials a{
-  min-height:67px;
-  padding:13px 12px;
+  min-height:88px;
+  padding:14px;
   border:1px solid #303030;
-  border-radius:12px;
+  border-radius:14px;
   color:#fff!important;
   background:#151515;
-  font-size:.79rem;
-  line-height:1.35;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  transition:.18s ease;
+  min-width:0;
 }
-.gg-socials a:hover{border-color:var(--gg-orange);}
-.gg-socials b{display:block;color:var(--gg-orange);margin-bottom:4px;}
+.gg-socials a:hover{
+  border-color:var(--gg-orange);
+  background:#1b1b1b;
+  transform:translateY(-2px);
+}
+.gg-social-icon{
+  flex:0 0 42px;
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:11px;
+  color:var(--gg-orange);
+  background:#090909;
+  border:1px solid #292929;
+}
+.gg-social-icon svg{width:23px;height:23px;display:block;}
+.gg-social-copy{min-width:0;}
+.gg-socials b{display:block;color:#fff;margin-bottom:4px;font-size:.82rem;}
+.gg-socials span{display:block;color:#aeb1b5;font-size:.72rem;line-height:1.3;overflow-wrap:anywhere;}
 
 .gg-footer{
   display:flex;
@@ -550,11 +651,15 @@ html{scroll-behavior:smooth;}
   .gg-value-strip,.gg-tools{grid-template-columns:repeat(2,1fr);}
   .gg-route-grid,.gg-flow,.gg-gallery{grid-template-columns:1fr 1fr;}
   .gg-dashboard{grid-template-columns:1fr 1fr;}
+  .gg-contact-rail{grid-template-columns:1.25fr repeat(2,1fr);margin:-18px 12px 0;}
+  .gg-contact-head{grid-template-columns:1fr;}
   .gg-socials{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:700px){
   .gg-hero-copy{padding:40px 24px;}
   .gg-value-strip{margin:14px 0 0;}
+  .gg-contact-rail{grid-template-columns:1fr;margin:12px 0 0;}
+  .gg-contact-rail-intro{padding:8px 10px 3px;}
   .gg-value-strip,.gg-route-grid,.gg-tools,.gg-flow,.gg-gallery,.gg-dashboard,.gg-socials,.gg-skills{grid-template-columns:1fr;}
   .gg-vision-copy,.gg-about-copy,.gg-contact{padding:28px 22px;}
 }
@@ -603,6 +708,28 @@ hero_html = f"""
       Ingeniero Civil Mecánico · Docente · Fundador de GG DIMEC SPA
     </div>
   </div>
+</section>
+
+<section class="gg-contact-rail" aria-label="Contacto rápido">
+  <div class="gg-contact-rail-intro">
+    <b>Conversemos de ingeniería</b>
+    <span>Contacto directo · comunidad · colaboración</span>
+  </div>
+  <a class="gg-quick-contact" href="mailto:gerardogaray.dimec@gmail.com">
+    <div class="gg-quick-icon">{ICON_MAIL}</div><div class="gg-quick-copy"><b>Correo</b><span>gerardogaray.dimec@gmail.com</span></div>
+  </a>
+  <a class="gg-quick-contact" href="tel:+56957288516">
+    <div class="gg-quick-icon">{ICON_PHONE}</div><div class="gg-quick-copy"><b>Teléfono</b><span>+56 9 5728 8516</span></div>
+  </a>
+  <a class="gg-quick-contact" href="https://www.instagram.com/gerardogaray.dimec/" target="_blank">
+    <div class="gg-quick-icon">{ICON_INSTAGRAM}</div><div class="gg-quick-copy"><b>Instagram</b><span>@gerardogaray.dimec</span></div>
+  </a>
+  <a class="gg-quick-contact" href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank">
+    <div class="gg-quick-icon">{ICON_LINKEDIN}</div><div class="gg-quick-copy"><b>LinkedIn</b><span>Gerardo Garay Pereira</span></div>
+  </a>
+  <a class="gg-quick-contact" href="https://www.gerardogaraydimec.com/" target="_blank">
+    <div class="gg-quick-icon">{ICON_WEB}</div><div class="gg-quick-copy"><b>Sitio web</b><span>gerardogaraydimec.com</span></div>
+  </a>
 </section>
 
 <section class="gg-value-strip">
@@ -833,24 +960,48 @@ gallery_html = f"""
 st.html(gallery_html)
 
 contact_html = f"""
+<div id="contacto"></div>
 <section class="gg-contact gg-page">
-  <div class="gg-kicker">Contacto y comunidad</div>
-  <h2>Sigamos construyendo mejor ingeniería</h2>
-  <p>
-    Si eres estudiante, docente, ingeniero o empresa, puedes seguir mi trabajo,
-    revisar GG DIMEC y conversar conmigo sobre aprendizaje, ingeniería y colaboración.
-  </p>
+  <div class="gg-contact-head">
+    <div>
+      <div class="gg-kicker">Contacto y comunidad</div>
+      <h2>La ingeniería también se construye conversando</h2>
+      <p>
+        Sigue el desarrollo de MechLab, revisa proyectos de GG DIMEC o conversemos directamente
+        sobre ingeniería, docencia, colaboración y nuevas herramientas.
+      </p>
+    </div>
+    <div class="gg-contact-cta">
+      <b>¿Tienes una idea, observación o desafío?</b><br>
+      Escríbeme. MechLab también crece desde las preguntas y necesidades reales de quienes lo usan.
+    </div>
+  </div>
   <div class="gg-socials">
-    <a href="mailto:gerardogaray.dimec@gmail.com"><b>Correo</b>gerardogaray.dimec@gmail.com</a>
-    <a href="tel:+56957288516"><b>Teléfono</b>+56 9 5728 8516</a>
-    <a href="https://www.instagram.com/gerardogaray.dimec/" target="_blank"><b>Instagram</b>@gerardogaray.dimec</a>
-    <a href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank"><b>LinkedIn</b>Gerardo Garay Pereira</a>
-    <a href="https://www.gerardogaraydimec.com/" target="_blank"><b>Web</b>www.gerardogaraydimec.com</a>
+    <a href="mailto:gerardogaray.dimec@gmail.com">
+      <div class="gg-social-icon">{ICON_MAIL}</div>
+      <div class="gg-social-copy"><b>Correo</b><span>gerardogaray.dimec@gmail.com</span></div>
+    </a>
+    <a href="tel:+56957288516">
+      <div class="gg-social-icon">{ICON_PHONE}</div>
+      <div class="gg-social-copy"><b>Teléfono</b><span>+56 9 5728 8516</span></div>
+    </a>
+    <a href="https://www.instagram.com/gerardogaray.dimec/" target="_blank">
+      <div class="gg-social-icon">{ICON_INSTAGRAM}</div>
+      <div class="gg-social-copy"><b>Instagram</b><span>@gerardogaray.dimec</span></div>
+    </a>
+    <a href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank">
+      <div class="gg-social-icon">{ICON_LINKEDIN}</div>
+      <div class="gg-social-copy"><b>LinkedIn</b><span>Gerardo Garay Pereira</span></div>
+    </a>
+    <a href="https://www.gerardogaraydimec.com/" target="_blank">
+      <div class="gg-social-icon">{ICON_WEB}</div>
+      <div class="gg-social-copy"><b>Sitio web</b><span>www.gerardogaraydimec.com</span></div>
+    </a>
   </div>
 </section>
 <div class="gg-footer gg-page">
   <span>GG DIMEC SPA · Gerardo Garay Pereira · Chile</span>
-  <span>Conocimiento · Ingeniería · Personas · Futuro</span>
+  <span>Tecnología Avanzada en Soluciones Reales. Tu confianza, nuestro mayor orgullo.</span>
 </div>
 """
 st.html(contact_html)
