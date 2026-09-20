@@ -71,6 +71,13 @@ fluidos_reales_reynolds_perdidas = st.Page(
     url_path="fluidos-reales-reynolds-perdidas",
 )
 
+bombas_curvas_sistema = st.Page(
+    "pages/bombas_curvas_sistema.py",
+    title="Bombas y Curvas de Sistema",
+    icon="⚙️",
+    url_path="bombas-curvas-sistema",
+)
+
 von_mises_lab = st.Page(
     "pages/von_mises_lab.py",
     title="Von Mises Lab",
@@ -83,7 +90,7 @@ pg = st.navigation(
         "Portal": [inicio],
         "Resistencia de Materiales": [mohr2d, mohr3d, vigas_cortante_momento, biblioteca_perfiles],
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
-        "Mecánica de Fluidos": [fluidos_continuidad_bernoulli, fluidos_reales_reynolds_perdidas],
+        "Mecánica de Fluidos": [fluidos_continuidad_bernoulli, fluidos_reales_reynolds_perdidas, bombas_curvas_sistema],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
         "Elementos de Máquinas": [von_mises_lab],
     },

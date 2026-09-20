@@ -1,0 +1,67 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE DE INTEGRACIÓN · BOMBAS Y CURVAS DE SISTEMA
+
+ARCHIVOS INCLUIDOS
+- streamlit_app.py
+- pages/inicio.py
+- pages/bombas_curvas_sistema.py
+- modules/pump_data.py
+- modules/pump_engine.py
+- modules/pump_plotter.py
+- modules/fluid_real_engine.py
+
+REQUISITOS DEL PORTAL
+El portal debe conservar:
+- modules/ui_brand.py
+- assets/logo_header_unificado.png
+- todos los módulos ya existentes de MechLab
+
+INSTALACIÓN
+1. Descomprimir el ZIP.
+2. Copiar todo el contenido directamente a la raíz de Portal_Publicacion_V1.
+3. Aceptar reemplazo de:
+   - streamlit_app.py
+   - pages/inicio.py
+   - modules/fluid_real_engine.py
+4. Los archivos de bombas son nuevos.
+5. Ejecutar:
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+NAVEGACIÓN RESULTANTE
+Mecánica de Fluidos
+- Continuidad y Bernoulli
+- Flujo real en tuberías
+- Bombas y Curvas de Sistema
+
+URL
+/bombas-curvas-sistema
+
+LANDING
+La tarjeta de Mecánica de Fluidos queda actualizada con:
+- Bernoulli
+- Reynolds
+- Moody
+- Darcy
+- Bombas
+- NPSH
+
+y tres accesos:
+- Continuidad y Bernoulli
+- Reynolds y pérdidas en tuberías
+- Bombas y Curvas de Sistema
+
+CONTENIDO DEL MÓDULO
+- altura estática por cota y presión;
+- pérdidas mediante el motor de Reynolds/Darcy ya utilizado por MechLab;
+- curva de sistema;
+- curva pedagógica de bomba ajustada a tres puntos;
+- punto de operación;
+- eficiencia y potencia;
+- sensibilidad a diámetro, K y cota;
+- leyes de afinidad;
+- bombas en serie y paralelo;
+- succión y NPSH;
+- aplicaciones industriales.
+
+OBSERVACIÓN
+La página integrada no utiliza st.set_page_config propio y no reemplaza ui_brand.py ni los logos corporativos.

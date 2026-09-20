@@ -694,11 +694,12 @@ tools_html = """
     <div class="gg-tool">
       <div class="gg-tool-top"><div class="gg-tool-symbol">Q</div><span class="gg-status">Fluidos</span></div>
       <h3>Mecánica de Fluidos</h3>
-      <p>Del flujo ideal al flujo real: continuidad, energía, régimen, fricción y pérdidas en sistemas de tuberías.</p>
-      <div class="gg-tags"><span>Continuidad</span><span>Bernoulli</span><span>Reynolds</span><span>Moody</span><span>Darcy</span><span>Bombas</span></div>
+      <p>Del balance de energía al comportamiento real de tuberías y máquinas hidráulicas: continuidad, pérdidas y punto de operación de bombas.</p>
+      <div class="gg-tags"><span>Bernoulli</span><span>Reynolds</span><span>Moody</span><span>Darcy</span><span>Bombas</span><span>NPSH</span></div>
       <div class="gg-tool-links">
         <a href="/fluidos-continuidad-bernoulli">Continuidad y Bernoulli →</a>
         <a href="/fluidos-reales-reynolds-perdidas">Reynolds y pérdidas en tuberías →</a>
+        <a href="/bombas-curvas-sistema">Bombas y Curvas de Sistema →</a>
       </div>
     </div>
     <div class="gg-tool">
