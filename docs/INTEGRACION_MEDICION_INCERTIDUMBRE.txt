@@ -1,0 +1,57 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE DE INTEGRACIÓN · MEDICIÓN E INCERTIDUMBRE
+
+NUEVA PÁGINA
+- Medición e Incertidumbre · ¿La pieza cumple?
+- URL: /medicion-incertidumbre
+
+NAVEGACIÓN RESULTANTE
+Metrología y Fabricación
+- Ajustes y Tolerancias ISO
+- Medición e Incertidumbre
+
+ARCHIVOS INCLUIDOS
+- streamlit_app.py
+- pages/inicio.py
+- pages/medicion_incertidumbre.py
+- modules/measurement_data.py
+- modules/uncertainty_engine.py
+- modules/uncertainty_plotter.py
+
+NO REEMPLAZA
+- modules/ui_brand.py
+- assets/logo_header_unificado.png
+- ajustes_tolerancias_iso.py ni sus motores
+- módulos de otras áreas de MechLab
+
+CONTENIDO INTEGRADO
+- conceptos metrológicos;
+- repetibilidad y Tipo A;
+- presupuesto de incertidumbre editable;
+- resolución, calibración, temperatura, método y operador;
+- coeficientes de sensibilidad;
+- errores de coseno y Abbe;
+- fuerza de medición;
+- corrección térmica a 20 °C;
+- conformidad y banda de guarda;
+- selección del sistema de medición;
+- plan de medición y ficha de liberación.
+
+CONVENCIÓN DIMENSIONAL
+- dimensiones: hasta 0.001 mm;
+- incertidumbres: micras enteras;
+- cálculos internos con precisión adicional.
+
+INSTALACIÓN
+1. Descomprimir el ZIP.
+2. Copiar todo el contenido directamente sobre la raíz de Portal_Publicacion_V1.
+3. Aceptar reemplazo de:
+   - streamlit_app.py
+   - pages/inicio.py
+4. Los archivos del módulo Medición e Incertidumbre son nuevos.
+5. Ejecutar:
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+DEPENDENCIAS
+El módulo utiliza streamlit, plotly y pandas.

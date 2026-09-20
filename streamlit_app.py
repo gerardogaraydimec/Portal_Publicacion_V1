@@ -85,6 +85,13 @@ ajustes_tolerancias_iso = st.Page(
     url_path="ajustes-tolerancias-iso",
 )
 
+medicion_incertidumbre = st.Page(
+    "pages/medicion_incertidumbre.py",
+    title="Medición e Incertidumbre",
+    icon="🔬",
+    url_path="medicion-incertidumbre",
+)
+
 von_mises_lab = st.Page(
     "pages/von_mises_lab.py",
     title="Von Mises Lab",
@@ -99,7 +106,7 @@ pg = st.navigation(
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
         "Mecánica de Fluidos": [fluidos_continuidad_bernoulli, fluidos_reales_reynolds_perdidas, bombas_curvas_sistema],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
-        "Metrología y Fabricación": [ajustes_tolerancias_iso],
+        "Metrología y Fabricación": [ajustes_tolerancias_iso, medicion_incertidumbre],
         "Elementos de Máquinas": [von_mises_lab],
     },
     position="top",
