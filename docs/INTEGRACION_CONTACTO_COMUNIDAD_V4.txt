@@ -1,0 +1,37 @@
+PD-2026-0011 · MECHLAB
+PARCHE CONTACTO Y COMUNIDAD V4
+
+OBJETIVO
+Corregir la ausencia visual de iconos/logos en los accesos de contacto y reforzar la barra superior de contacto rápido.
+
+CAMBIOS
+1. Barra de contacto bajo el hero:
+   - fondo negro/antracita;
+   - textos principales en naranja corporativo;
+   - datos secundarios en naranja suave;
+   - accesos clickeables para correo, teléfono, Instagram, LinkedIn y sitio web;
+   - iconos PNG embebidos como data URI para evitar que Streamlit o el navegador eliminen SVG inline.
+
+2. Contacto y comunidad inferior:
+   - conserva el diseño aprobado;
+   - agrega los mismos iconos visibles y coherentes con la identidad GG DIMEC.
+
+ARCHIVOS DEL PARCHE
+- pages/inicio.py
+- streamlit_app.py (sin cambios funcionales respecto de V3, se mantiene para integración completa)
+- assets/contact_mail.png
+- assets/contact_phone.png
+- assets/contact_instagram.png
+- assets/contact_linkedin.png
+- assets/contact_web.png
+
+INSTALACIÓN
+Descomprimir sobre la raíz de Portal_Publicacion_V1 y aceptar reemplazo de pages/inicio.py.
+Los cinco archivos PNG son nuevos y deben quedar dentro de assets/.
+
+NO MODIFICA
+- herramientas existentes;
+- módulos de cálculo;
+- navegación por familias;
+- logo principal;
+- branding compartido ui_brand.py.

@@ -7,7 +7,7 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 
-VERSION = "CONTACTO Y COMUNIDAD V3"
+VERSION = "CONTACTO Y COMUNIDAD V4"
 
 
 def data_uri(path: Path) -> str:
@@ -23,12 +23,11 @@ logo_img = data_uri(ASSETS / "logo_mechlab_landing.png")
 sim_img = data_uri(ASSETS / "brochure_simulacion.jpg")
 scan_img = data_uri(ASSETS / "brochure_escaneo.jpg")
 training_img = data_uri(ASSETS / "brochure_formacion.jpg")
-
-ICON_MAIL = """<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.5h17v11h-17z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4.2 7.2 7.8 6.1 7.8-6.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
-ICON_PHONE = """<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.1 3.7 4.4 5.3c-.8.5-.9 1.5-.6 2.4 1.8 5.5 6.1 9.8 11.6 11.6.9.3 1.9.2 2.4-.6l1.6-2.7c.4-.7.2-1.6-.5-2l-3.2-1.7c-.6-.3-1.4-.2-1.8.3l-1.2 1.4a13.4 13.4 0 0 1-3.7-3.7l1.4-1.2c.5-.4.6-1.2.3-1.8L9 4.2c-.4-.7-1.2-.9-1.9-.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
-ICON_INSTAGRAM = """<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="6.6" r="1.15" fill="currentColor"/></svg>"""
-ICON_LINKEDIN = """<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.1" y="3.1" width="17.8" height="17.8" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7.3 10v7M7.3 7.3v.1M10.7 17v-7m0 3.1c.5-1.9 4.9-2.4 4.9 1V17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>"""
-ICON_WEB = """<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.7 12h16.6M12 3.4c2.3 2.3 3.5 5.1 3.5 8.6S14.3 18.3 12 20.6M12 3.4C9.7 5.7 8.5 8.5 8.5 12s1.2 6.3 3.5 8.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>"""
+mail_icon = data_uri(ASSETS / "contact_mail.png")
+phone_icon = data_uri(ASSETS / "contact_phone.png")
+instagram_icon = data_uri(ASSETS / "contact_instagram.png")
+linkedin_icon = data_uri(ASSETS / "contact_linkedin.png")
+web_icon = data_uri(ASSETS / "contact_web.png")
 
 css = """
 <style>
@@ -206,10 +205,10 @@ html{scroll-behavior:smooth;}
   gap:8px;
   margin:-27px 24px 0;
   padding:10px;
-  background:rgba(255,255,255,.97);
-  border:1px solid var(--gg-line);
+  background:linear-gradient(135deg,#070707,#111 74%,#18100b);
+  border:1px solid #2b2b2b;
   border-radius:18px;
-  box-shadow:0 16px 34px rgba(0,0,0,.10);
+  box-shadow:0 16px 34px rgba(0,0,0,.18);
   backdrop-filter:blur(10px);
 }
 .gg-contact-rail-intro{
@@ -218,8 +217,8 @@ html{scroll-behavior:smooth;}
   justify-content:center;
   padding:8px 12px;
 }
-.gg-contact-rail-intro b{font-size:.93rem;color:#161616;}
-.gg-contact-rail-intro span{font-size:.76rem;color:var(--gg-muted);margin-top:2px;line-height:1.35;}
+.gg-contact-rail-intro b{font-size:.93rem;color:var(--gg-orange);}
+.gg-contact-rail-intro span{font-size:.76rem;color:#ffb27d;margin-top:2px;line-height:1.35;}
 .gg-quick-contact{
   display:flex;
   align-items:center;
@@ -227,13 +226,14 @@ html{scroll-behavior:smooth;}
   min-width:0;
   border-radius:12px;
   padding:9px 10px;
-  color:#171717!important;
+  color:var(--gg-orange)!important;
   transition:.18s ease;
-  border:1px solid transparent;
+  border:1px solid #2d2d2d;
+  background:#101010;
 }
 .gg-quick-contact:hover{
-  border-color:#ffd6ba;
-  background:#fff6ef;
+  border-color:var(--gg-orange);
+  background:#171717;
   transform:translateY(-1px);
 }
 .gg-quick-icon{
@@ -244,14 +244,14 @@ html{scroll-behavior:smooth;}
   align-items:center;
   justify-content:center;
   border-radius:10px;
-  color:#fff;
-  background:#111;
+  color:var(--gg-orange);
+  background:#070707;
 }
-.gg-quick-icon svg{width:19px;height:19px;display:block;}
-.gg-quick-contact:hover .gg-quick-icon{background:var(--gg-orange);}
+.gg-quick-icon img{width:20px;height:20px;display:block;object-fit:contain;}
+.gg-quick-contact:hover .gg-quick-icon{border-color:var(--gg-orange);}
 .gg-quick-copy{min-width:0;}
-.gg-quick-copy b{display:block;font-size:.76rem;line-height:1.05;}
-.gg-quick-copy span{display:block;margin-top:3px;font-size:.69rem;color:#70747a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gg-quick-copy b{display:block;font-size:.76rem;line-height:1.05;color:var(--gg-orange);}
+.gg-quick-copy span{display:block;margin-top:3px;font-size:.69rem;color:#ffb27d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .gg-value-strip{
   display:grid;
@@ -630,7 +630,7 @@ html{scroll-behavior:smooth;}
   background:#090909;
   border:1px solid #292929;
 }
-.gg-social-icon svg{width:23px;height:23px;display:block;}
+.gg-social-icon img{width:24px;height:24px;display:block;object-fit:contain;}
 .gg-social-copy{min-width:0;}
 .gg-socials b{display:block;color:#fff;margin-bottom:4px;font-size:.82rem;}
 .gg-socials span{display:block;color:#aeb1b5;font-size:.72rem;line-height:1.3;overflow-wrap:anywhere;}
@@ -716,19 +716,19 @@ hero_html = f"""
     <span>Contacto directo · comunidad · colaboración</span>
   </div>
   <a class="gg-quick-contact" href="mailto:gerardogaray.dimec@gmail.com">
-    <div class="gg-quick-icon">{ICON_MAIL}</div><div class="gg-quick-copy"><b>Correo</b><span>gerardogaray.dimec@gmail.com</span></div>
+    <div class="gg-quick-icon"><img src="{mail_icon}" alt="Correo"></div><div class="gg-quick-copy"><b>Correo</b><span>gerardogaray.dimec@gmail.com</span></div>
   </a>
   <a class="gg-quick-contact" href="tel:+56957288516">
-    <div class="gg-quick-icon">{ICON_PHONE}</div><div class="gg-quick-copy"><b>Teléfono</b><span>+56 9 5728 8516</span></div>
+    <div class="gg-quick-icon"><img src="{phone_icon}" alt="Teléfono"></div><div class="gg-quick-copy"><b>Teléfono</b><span>+56 9 5728 8516</span></div>
   </a>
   <a class="gg-quick-contact" href="https://www.instagram.com/gerardogaray.dimec/" target="_blank">
-    <div class="gg-quick-icon">{ICON_INSTAGRAM}</div><div class="gg-quick-copy"><b>Instagram</b><span>@gerardogaray.dimec</span></div>
+    <div class="gg-quick-icon"><img src="{instagram_icon}" alt="Instagram"></div><div class="gg-quick-copy"><b>Instagram</b><span>@gerardogaray.dimec</span></div>
   </a>
   <a class="gg-quick-contact" href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank">
-    <div class="gg-quick-icon">{ICON_LINKEDIN}</div><div class="gg-quick-copy"><b>LinkedIn</b><span>Gerardo Garay Pereira</span></div>
+    <div class="gg-quick-icon"><img src="{linkedin_icon}" alt="LinkedIn"></div><div class="gg-quick-copy"><b>LinkedIn</b><span>Gerardo Garay Pereira</span></div>
   </a>
   <a class="gg-quick-contact" href="https://www.gerardogaraydimec.com/" target="_blank">
-    <div class="gg-quick-icon">{ICON_WEB}</div><div class="gg-quick-copy"><b>Sitio web</b><span>gerardogaraydimec.com</span></div>
+    <div class="gg-quick-icon"><img src="{web_icon}" alt="Sitio web"></div><div class="gg-quick-copy"><b>Sitio web</b><span>gerardogaraydimec.com</span></div>
   </a>
 </section>
 
@@ -978,23 +978,23 @@ contact_html = f"""
   </div>
   <div class="gg-socials">
     <a href="mailto:gerardogaray.dimec@gmail.com">
-      <div class="gg-social-icon">{ICON_MAIL}</div>
+      <div class="gg-social-icon"><img src="{mail_icon}" alt="Correo"></div>
       <div class="gg-social-copy"><b>Correo</b><span>gerardogaray.dimec@gmail.com</span></div>
     </a>
     <a href="tel:+56957288516">
-      <div class="gg-social-icon">{ICON_PHONE}</div>
+      <div class="gg-social-icon"><img src="{phone_icon}" alt="Teléfono"></div>
       <div class="gg-social-copy"><b>Teléfono</b><span>+56 9 5728 8516</span></div>
     </a>
     <a href="https://www.instagram.com/gerardogaray.dimec/" target="_blank">
-      <div class="gg-social-icon">{ICON_INSTAGRAM}</div>
+      <div class="gg-social-icon"><img src="{instagram_icon}" alt="Instagram"></div>
       <div class="gg-social-copy"><b>Instagram</b><span>@gerardogaray.dimec</span></div>
     </a>
     <a href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank">
-      <div class="gg-social-icon">{ICON_LINKEDIN}</div>
+      <div class="gg-social-icon"><img src="{linkedin_icon}" alt="LinkedIn"></div>
       <div class="gg-social-copy"><b>LinkedIn</b><span>Gerardo Garay Pereira</span></div>
     </a>
     <a href="https://www.gerardogaraydimec.com/" target="_blank">
-      <div class="gg-social-icon">{ICON_WEB}</div>
+      <div class="gg-social-icon"><img src="{web_icon}" alt="Sitio web"></div>
       <div class="gg-social-copy"><b>Sitio web</b><span>www.gerardogaraydimec.com</span></div>
     </a>
   </div>
