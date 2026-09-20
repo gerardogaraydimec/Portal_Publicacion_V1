@@ -1,0 +1,87 @@
+PD-2026-0011 · GG DIMEC MECHLAB
+PARCHE · FAMILIAS DE HERRAMIENTAS Y NAVEGACIÓN V2
+
+OBJETIVO
+Reorganizar MechLab como una plataforma de herramientas de ingeniería, sin presentarlo como una malla curricular.
+
+ARQUITECTURA DEFINIDA
+1. Resistencia y Estructuras
+   Pregunta guía: ¿Cómo resiste?
+   - Mohr 2D
+   - Mohr 3D
+   - Cortante y Momento
+   - Perfiles estructurales
+
+2. Máquinas y Componentes
+   Pregunta guía: ¿Cómo lo dimensiono?
+   - Von Mises Lab
+
+3. Dinámica y Vibraciones
+   Pregunta guía: ¿Cómo responde?
+   - Vibraciones libres 1-GDL
+   - Vibración forzada 1-GDL
+
+4. Fluidos y Energía
+   Pregunta guía: ¿Cómo fluye y se transforma la energía?
+   - Continuidad y Bernoulli
+   - Flujo real en tuberías
+   - Bombas y Curvas de Sistema
+   - Propiedades del agua y vapor
+   - Ciclos termodinámicos
+
+5. Metrología y Calidad
+   Pregunta guía: ¿Cómo especifico, mido y verifico?
+   - Ajustes y Tolerancias ISO
+   - Medición e Incertidumbre
+   - Tolerancias Geométricas ISO GPS
+
+6. Simulación y Cálculo Numérico
+   Pregunta guía: ¿Cómo lo modelo?
+   - Familia definida en el landing para FEM, CFD, térmico, modal, mallado y convergencia.
+   - No se agrega todavía como sección vacía en la navegación superior; se incorporará a la navegación cuando exista su primer laboratorio activo.
+
+CAMBIOS DE NAVEGACIÓN
+Se reemplazan las categorías anteriores:
+- Resistencia de Materiales
+- Vibraciones y Dinámica
+- Mecánica de Fluidos
+- Termodinámica
+- Metrología y Fabricación
+- Elementos de Máquinas
+
+por las nuevas familias activas:
+- Resistencia y Estructuras
+- Máquinas y Componentes
+- Dinámica y Vibraciones
+- Fluidos y Energía
+- Metrología y Calidad
+
+LANDING
+- Las seis familias aparecen en una grilla fija de 3 columnas x 2 filas en escritorio.
+- En tablet se reorganizan a 2 columnas.
+- En móvil se muestran en 1 columna.
+- Cada familia incluye una pregunta guía, explicación, etiquetas y accesos a sus herramientas.
+- La narrativa deja explícito que MechLab no es una malla curricular, sino una colección organizada de herramientas técnicas.
+- Fluidos y Termodinámica se integran en una sola familia: Fluidos y Energía.
+- Elementos de Máquinas pasa a Máquinas y Componentes.
+- Metrología y Fabricación pasa a Metrología y Calidad.
+- Simulación y Cálculo Numérico queda visible como sexta familia para mantener estable la arquitectura futura sin crear un menú vacío.
+
+ARCHIVOS DEL PARCHE
+- streamlit_app.py
+- pages/inicio.py
+- docs/INTEGRACION_FAMILIAS_NAVEGACION_V2.txt
+
+INSTALACIÓN
+1. Descomprimir el parche en la raíz de Portal_Publicacion_V1.
+2. Aceptar el reemplazo de:
+   - streamlit_app.py
+   - pages/inicio.py
+3. No se reemplazan módulos, logos ni páginas técnicas.
+
+VALIDACIÓN
+- Compilación Python de streamlit_app.py: OK
+- Compilación Python de pages/inicio.py: OK
+
+NOTA DE DISEÑO
+Este parche cambia arquitectura, navegación y narrativa del landing. No modifica cálculos, ecuaciones ni contenido interno de las herramientas ya publicadas.

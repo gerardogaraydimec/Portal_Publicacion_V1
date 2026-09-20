@@ -7,7 +7,7 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 
-VERSION = "PREMIUM LANDING V1.5"
+VERSION = "FAMILIAS DE HERRAMIENTAS V2"
 
 
 def data_uri(path: Path) -> str:
@@ -314,7 +314,7 @@ html{scroll-behavior:smooth;}
 
 .gg-tools{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  grid-template-columns:repeat(3,1fr);
   gap:16px;
 }
 .gg-tool{
@@ -640,21 +640,21 @@ routes_html = """
   </div>
 </section>
 """
-st.html(routes_html)
+
 
 dashboard_html = """
 <section class="gg-section gg-page">
   <div class="gg-dashboard">
     <div>
-      <h3>MechLab en una mirada</h3>
-      <p>Un laboratorio digital para aprender ingeniería mecánica desde distintos enfoques.</p>
+      <h3>Una misma lógica de ingeniería</h3>
+      <p>Familias reconocibles para encontrar herramientas según el problema que necesitas estudiar, diseñar, medir o verificar.</p>
     </div>
-    <div class="gg-stat"><strong>σ</strong><span>Resistencia y esfuerzos</span></div>
-    <div class="gg-stat"><strong>ω</strong><span>Vibraciones y dinámica</span></div>
-    <div class="gg-stat"><strong>Q</strong><span>Fluidos y energía</span></div>
-    <div class="gg-stat"><strong>T–s</strong><span>Termodinámica</span></div>
-    <div class="gg-stat"><strong>µm</strong><span>Metrología y fabricación</span></div>
-    <div class="gg-stat"><strong>VM</strong><span>Diseño y falla</span></div>
+    <div class="gg-stat"><strong>σ</strong><span>Resistencia y estructuras</span></div>
+    <div class="gg-stat"><strong>⚙</strong><span>Máquinas y componentes</span></div>
+    <div class="gg-stat"><strong>ω</strong><span>Dinámica y vibraciones</span></div>
+    <div class="gg-stat"><strong>Q·E</strong><span>Fluidos y energía</span></div>
+    <div class="gg-stat"><strong>µm</strong><span>Metrología y calidad</span></div>
+    <div class="gg-stat"><strong>CAE</strong><span>Simulación y cálculo numérico</span></div>
   </div>
 </section>
 """
@@ -663,18 +663,20 @@ st.html(dashboard_html)
 tools_html = """
 <div id="herramientas"></div>
 <section class="gg-section gg-page">
-  <div class="gg-kicker">Herramientas disponibles</div>
-  <h2>Entra directo al fenómeno que quieres estudiar</h2>
+  <div class="gg-kicker">Familias de herramientas</div>
+  <h2>Encuentra la herramienta por el tipo de problema que estás resolviendo</h2>
   <div class="gg-intro">
-    Menos navegación y más trabajo: cada área reúne herramientas enfocadas en visualizar,
-    modificar condiciones y comprender la respuesta física.
+    MechLab no está organizado como una malla curricular. Las herramientas se agrupan en familias técnicas
+    reconocibles para estudiantes e ingenieros, manteniendo una narrativa común: comprender el comportamiento,
+    diseñar componentes, estudiar la respuesta dinámica, trabajar con fluidos y energía, verificar la conformidad
+    y modelar numéricamente los sistemas.
   </div>
   <div class="gg-tools">
     <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">σ</div><span class="gg-status">Resistencia</span></div>
-      <h3>Resistencia de Materiales</h3>
-      <p>Transformación de esfuerzos, diagramas de vigas y propiedades de perfiles estructurales.</p>
-      <div class="gg-tags"><span>Mohr 2D</span><span>Mohr 3D</span><span>V(x)</span><span>M(x)</span><span>Perfiles</span></div>
+      <div class="gg-tool-top"><div class="gg-tool-symbol">σ</div><span class="gg-status">¿Cómo resiste?</span></div>
+      <h3>Resistencia y Estructuras</h3>
+      <p>Cargas, esfuerzos, tensiones, diagramas y propiedades geométricas para comprender cómo responde un sólido o una estructura.</p>
+      <div class="gg-tags"><span>Esfuerzos</span><span>Vigas</span><span>Mohr</span><span>Perfiles</span></div>
       <div class="gg-tool-links">
         <a href="/mohr-2d">Círculo de Mohr 2D →</a>
         <a href="/mohr-3d">Círculo de Mohr 3D →</a>
@@ -682,59 +684,70 @@ tools_html = """
         <a href="/perfiles-estructurales">Biblioteca de Perfiles Estructurales →</a>
       </div>
     </div>
+
     <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">ω</div><span class="gg-status">Dinámica</span></div>
-      <h3>Vibraciones y Dinámica</h3>
-      <p>Respuesta libre y forzada, frecuencia natural, amortiguamiento y resonancia.</p>
-      <div class="gg-tags"><span>1-GDL</span><span>Respuesta</span><span>Frecuencia</span></div>
+      <div class="gg-tool-top"><div class="gg-tool-symbol">⚙</div><span class="gg-status">¿Cómo lo dimensiono?</span></div>
+      <h3>Máquinas y Componentes</h3>
+      <p>Herramientas para analizar, dimensionar y verificar componentes que forman parte de máquinas y sistemas mecánicos.</p>
+      <div class="gg-tags"><span>Diseño</span><span>Componentes</span><span>Falla</span><span>Seguridad</span></div>
+      <div class="gg-tool-links">
+        <a href="/von-mises">Von Mises Lab →</a>
+      </div>
+    </div>
+
+    <div class="gg-tool">
+      <div class="gg-tool-top"><div class="gg-tool-symbol">ω</div><span class="gg-status">¿Cómo responde?</span></div>
+      <h3>Dinámica y Vibraciones</h3>
+      <p>Movimiento, respuesta temporal, frecuencia natural, amortiguamiento, excitación y resonancia de sistemas mecánicos.</p>
+      <div class="gg-tags"><span>1-GDL</span><span>Respuesta</span><span>Frecuencia</span><span>Resonancia</span></div>
       <div class="gg-tool-links">
         <a href="/vibraciones-1gdl">Vibraciones libres 1-GDL →</a>
         <a href="/vibracion-forzada-1gdl">Vibración forzada 1-GDL →</a>
       </div>
     </div>
+
     <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">Q</div><span class="gg-status">Fluidos</span></div>
-      <h3>Mecánica de Fluidos</h3>
-      <p>Del balance de energía al comportamiento real de tuberías y máquinas hidráulicas: continuidad, pérdidas y punto de operación de bombas.</p>
-      <div class="gg-tags"><span>Bernoulli</span><span>Reynolds</span><span>Moody</span><span>Darcy</span><span>Bombas</span><span>NPSH</span></div>
+      <div class="gg-tool-top"><div class="gg-tool-symbol">Q·E</div><span class="gg-status">¿Cómo fluye y transforma?</span></div>
+      <h3>Fluidos y Energía</h3>
+      <p>Flujo, presión, pérdidas, bombeo, propiedades termodinámicas y transformación de energía en sistemas reales.</p>
+      <div class="gg-tags"><span>Bernoulli</span><span>Reynolds</span><span>Bombas</span><span>Agua-vapor</span><span>Ciclos</span></div>
       <div class="gg-tool-links">
         <a href="/fluidos-continuidad-bernoulli">Continuidad y Bernoulli →</a>
         <a href="/fluidos-reales-reynolds-perdidas">Reynolds y pérdidas en tuberías →</a>
         <a href="/bombas-curvas-sistema">Bombas y Curvas de Sistema →</a>
-      </div>
-    </div>
-    <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">T–s</div><span class="gg-status">Energía</span></div>
-      <h3>Termodinámica</h3>
-      <p>Estados del agua y vapor, regiones termodinámicas, diagramas y ciclos.</p>
-      <div class="gg-tags"><span>Agua-vapor</span><span>Ciclos</span><span>Diagramas</span></div>
-      <div class="gg-tool-links">
         <a href="/agua-vapor">Propiedades del agua y vapor →</a>
         <a href="/ciclos-termodinamicos">Ciclos termodinámicos →</a>
       </div>
     </div>
+
     <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">µm</div><span class="gg-status">Metrología</span></div>
-      <h3>Metrología y Fabricación</h3>
-      <p>De la especificación dimensional y geométrica a la fabricación, inspección y decisión de conformidad: ajustes, incertidumbre, referencias y tolerancias geométricas.</p>
-      <div class="gg-tags"><span>ISO 286</span><span>Ajustes</span><span>Incertidumbre</span><span>ISO GPS</span><span>Referencias</span><span>Posición</span><span>Oscilación</span></div>
+      <div class="gg-tool-top"><div class="gg-tool-symbol">µm</div><span class="gg-status">¿Cómo verifico?</span></div>
+      <h3>Metrología y Calidad</h3>
+      <p>Especificación, tolerancias, medición, incertidumbre y conformidad para decidir si una pieza cumple lo que realmente necesita.</p>
+      <div class="gg-tags"><span>ISO 286</span><span>Incertidumbre</span><span>ISO GPS</span><span>Conformidad</span></div>
       <div class="gg-tool-links">
         <a href="/ajustes-tolerancias-iso">Ajustes y Tolerancias ISO →</a>
         <a href="/medicion-incertidumbre">Medición e Incertidumbre →</a>
         <a href="/tolerancias-geometricas-iso-gps">Tolerancias Geométricas ISO GPS →</a>
       </div>
     </div>
+
     <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">VM</div><span class="gg-status">Diseño</span></div>
-      <h3>Elementos de Máquinas</h3>
-      <p>Criterios de fluencia, esfuerzo equivalente y estados multiaxiales.</p>
-      <div class="gg-tags"><span>Von Mises</span><span>Tresca</span><span>Falla</span></div>
-      <div class="gg-tool-links"><a href="/von-mises">Abrir Von Mises Lab →</a></div>
+      <div class="gg-tool-top"><div class="gg-tool-symbol">CAE</div><span class="gg-status">¿Cómo lo modelo?</span></div>
+      <h3>Simulación y Cálculo Numérico</h3>
+      <p>Modelado computacional para estudiar el comportamiento de sistemas mediante discretización, simulación, interpretación y validación.</p>
+      <div class="gg-tags"><span>FEM</span><span>CFD</span><span>Térmico</span><span>Modal</span><span>Mallado</span><span>Convergencia</span></div>
+      <div class="gg-tool-links">
+        <span style="display:block;color:#777;font-size:.83rem;line-height:1.45;margin-top:8px;">Familia definida para reunir los laboratorios de simulación y análisis numérico de MechLab.</span>
+      </div>
     </div>
   </div>
 </section>
 """
 st.html(tools_html)
+
+# Rutas por tipo de usuario, después de presentar la arquitectura de familias.
+st.html(routes_html)
 
 flow_html = """
 <section class="gg-section gg-page">

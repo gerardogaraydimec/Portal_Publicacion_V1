@@ -109,12 +109,31 @@ von_mises_lab = st.Page(
 pg = st.navigation(
     {
         "Portal": [inicio],
-        "Resistencia de Materiales": [mohr2d, mohr3d, vigas_cortante_momento, biblioteca_perfiles],
-        "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
-        "Mecánica de Fluidos": [fluidos_continuidad_bernoulli, fluidos_reales_reynolds_perdidas, bombas_curvas_sistema],
-        "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
-        "Metrología y Fabricación": [ajustes_tolerancias_iso, medicion_incertidumbre, tolerancias_geometricas_iso_gps],
-        "Elementos de Máquinas": [von_mises_lab],
+        "Resistencia y Estructuras": [
+            mohr2d,
+            mohr3d,
+            vigas_cortante_momento,
+            biblioteca_perfiles,
+        ],
+        "Máquinas y Componentes": [
+            von_mises_lab,
+        ],
+        "Dinámica y Vibraciones": [
+            vibraciones1gdl,
+            vibracion_forzada1gdl,
+        ],
+        "Fluidos y Energía": [
+            fluidos_continuidad_bernoulli,
+            fluidos_reales_reynolds_perdidas,
+            bombas_curvas_sistema,
+            termodinamica_agua,
+            ciclos_termodinamicos,
+        ],
+        "Metrología y Calidad": [
+            ajustes_tolerancias_iso,
+            medicion_incertidumbre,
+            tolerancias_geometricas_iso_gps,
+        ],
     },
     position="top",
 )
