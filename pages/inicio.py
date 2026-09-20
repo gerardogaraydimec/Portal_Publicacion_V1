@@ -716,11 +716,12 @@ tools_html = """
     <div class="gg-tool">
       <div class="gg-tool-top"><div class="gg-tool-symbol">µm</div><span class="gg-status">Metrología</span></div>
       <h3>Metrología y Fabricación</h3>
-      <p>De la especificación dimensional a la fabricación y a una decisión de conformidad respaldada por medición, incertidumbre y control.</p>
-      <div class="gg-tags"><span>ISO 286</span><span>Ajustes</span><span>IT</span><span>Incertidumbre</span><span>Conformidad</span><span>Control</span></div>
+      <p>De la especificación dimensional y geométrica a la fabricación, inspección y decisión de conformidad: ajustes, incertidumbre, referencias y tolerancias geométricas.</p>
+      <div class="gg-tags"><span>ISO 286</span><span>Ajustes</span><span>Incertidumbre</span><span>ISO GPS</span><span>Referencias</span><span>Posición</span><span>Oscilación</span></div>
       <div class="gg-tool-links">
         <a href="/ajustes-tolerancias-iso">Ajustes y Tolerancias ISO →</a>
         <a href="/medicion-incertidumbre">Medición e Incertidumbre →</a>
+        <a href="/tolerancias-geometricas-iso-gps">Tolerancias Geométricas ISO GPS →</a>
       </div>
     </div>
     <div class="gg-tool">

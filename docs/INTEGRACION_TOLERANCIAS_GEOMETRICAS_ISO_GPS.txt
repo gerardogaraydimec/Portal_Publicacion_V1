@@ -1,0 +1,46 @@
+PD-2026-0011 · PARCHE MECHLAB
+TOLERANCIAS GEOMÉTRICAS · ISO GPS / GD&T · V1.2 CHILE
+
+OBJETIVO
+Integrar al portal GG DIMEC MechLab la versión V1.2 Chile del módulo de tolerancias geométricas.
+
+ARCHIVOS NUEVOS
+- pages/tolerancias_geometricas_iso_gps.py
+- modules/gdt_data.py
+- modules/gdt_engine.py
+- modules/gdt_plotter.py
+
+ARCHIVOS ACTUALIZADOS
+- streamlit_app.py
+- pages/inicio.py
+
+NO REEMPLAZA
+- modules/ui_brand.py
+- logos ni assets existentes
+- módulos de Ajustes y Tolerancias ISO
+- módulo de Medición e Incertidumbre
+
+NAVEGACIÓN
+Metrología y Fabricación
+1. Ajustes y Tolerancias ISO
+2. Medición e Incertidumbre
+3. Tolerancias Geométricas ISO GPS
+
+RUTA NUEVA
+/tolerancias-geometricas-iso-gps
+
+TERMINOLOGÍA DE ESTA VERSIÓN
+- Marco de tolerancia
+- Referencia especificada / datum
+- Referencias A-B-C
+- Redondez
+- Oscilación circular
+- Oscilación total
+- Requisito de máximo material (MMR)
+
+INSTALACIÓN
+Descomprimir el ZIP directamente sobre la raíz de Portal_Publicacion_V1 y aceptar reemplazar:
+- streamlit_app.py
+- pages/inicio.py
+
+Los demás archivos son nuevos.

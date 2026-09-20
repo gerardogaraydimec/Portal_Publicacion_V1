@@ -92,6 +92,13 @@ medicion_incertidumbre = st.Page(
     url_path="medicion-incertidumbre",
 )
 
+tolerancias_geometricas_iso_gps = st.Page(
+    "pages/tolerancias_geometricas_iso_gps.py",
+    title="Tolerancias Geométricas ISO GPS",
+    icon="📐",
+    url_path="tolerancias-geometricas-iso-gps",
+)
+
 von_mises_lab = st.Page(
     "pages/von_mises_lab.py",
     title="Von Mises Lab",
@@ -106,7 +113,7 @@ pg = st.navigation(
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
         "Mecánica de Fluidos": [fluidos_continuidad_bernoulli, fluidos_reales_reynolds_perdidas, bombas_curvas_sistema],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
-        "Metrología y Fabricación": [ajustes_tolerancias_iso, medicion_incertidumbre],
+        "Metrología y Fabricación": [ajustes_tolerancias_iso, medicion_incertidumbre, tolerancias_geometricas_iso_gps],
         "Elementos de Máquinas": [von_mises_lab],
     },
     position="top",
