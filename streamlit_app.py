@@ -78,6 +78,13 @@ bombas_curvas_sistema = st.Page(
     url_path="bombas-curvas-sistema",
 )
 
+ajustes_tolerancias_iso = st.Page(
+    "pages/ajustes_tolerancias_iso.py",
+    title="Ajustes y Tolerancias ISO",
+    icon="📏",
+    url_path="ajustes-tolerancias-iso",
+)
+
 von_mises_lab = st.Page(
     "pages/von_mises_lab.py",
     title="Von Mises Lab",
@@ -92,6 +99,7 @@ pg = st.navigation(
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
         "Mecánica de Fluidos": [fluidos_continuidad_bernoulli, fluidos_reales_reynolds_perdidas, bombas_curvas_sistema],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
+        "Metrología y Fabricación": [ajustes_tolerancias_iso],
         "Elementos de Máquinas": [von_mises_lab],
     },
     position="top",

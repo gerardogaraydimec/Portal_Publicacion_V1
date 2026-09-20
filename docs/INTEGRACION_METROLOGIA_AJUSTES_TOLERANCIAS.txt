@@ -1,0 +1,63 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE DE INTEGRACIÓN · METROLOGÍA Y FABRICACIÓN
+AJUSTES Y TOLERANCIAS ISO
+
+CONVENCIÓN DIMENSIONAL
+- Dimensiones lineales en mm: máximo 3 decimales.
+- Desviaciones, juegos e interferencias: micras enteras.
+- No se muestra falsa resolución submicrométrica en la interfaz.
+- Los cálculos internos conservan precisión matemática adicional.
+
+ARCHIVOS
+- streamlit_app.py
+- pages/inicio.py
+- pages/ajustes_tolerancias_iso.py
+- modules/metrology_data.py
+- modules/tolerance_engine.py
+- modules/tolerance_plotter.py
+- modules/engineering_support.py
+
+NAVEGACIÓN
+Metrología y Fabricación
+- Ajustes y Tolerancias ISO
+
+URL
+/ajustes-tolerancias-iso
+
+LANDING
+Se agrega una nueva tarjeta:
+Metrología y Fabricación
+- ISO 286
+- Ajustes
+- IT
+- Cp/Cpk
+- Montaje
+- Control
+
+CONTENIDO
+- lógica de tablas ISO 286;
+- sistema base agujero y base eje;
+- límites, juego, transición e interferencia;
+- intérprete de tabla;
+- comparación de ajustes;
+- fabricación y rutas de proceso;
+- control de calidad y capacidad Cp/Cpk;
+- plan de control;
+- montaje y expansión térmica;
+- condiciones operacionales;
+- verificación dimensional.
+
+INSTALACIÓN
+1. Descomprimir.
+2. Copiar el contenido a la raíz de Portal_Publicacion_V1.
+3. Aceptar reemplazo de:
+   - streamlit_app.py
+   - pages/inicio.py
+4. Los demás archivos son nuevos.
+5. Ejecutar:
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+NO REEMPLAZA
+- modules/ui_brand.py
+- assets/logo_header_unificado.png
+- módulos existentes de otras áreas.

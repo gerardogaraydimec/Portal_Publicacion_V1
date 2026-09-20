@@ -298,7 +298,7 @@ html{scroll-behavior:smooth;}
 
 .gg-dashboard{
   display:grid;
-  grid-template-columns:1.20fr repeat(5,.70fr);
+  grid-template-columns:1.18fr repeat(6,.68fr);
   gap:10px;
   align-items:center;
   border-radius:20px;
@@ -653,6 +653,7 @@ dashboard_html = """
     <div class="gg-stat"><strong>ω</strong><span>Vibraciones y dinámica</span></div>
     <div class="gg-stat"><strong>Q</strong><span>Fluidos y energía</span></div>
     <div class="gg-stat"><strong>T–s</strong><span>Termodinámica</span></div>
+    <div class="gg-stat"><strong>µm</strong><span>Metrología y fabricación</span></div>
     <div class="gg-stat"><strong>VM</strong><span>Diseño y falla</span></div>
   </div>
 </section>
@@ -710,6 +711,15 @@ tools_html = """
       <div class="gg-tool-links">
         <a href="/agua-vapor">Propiedades del agua y vapor →</a>
         <a href="/ciclos-termodinamicos">Ciclos termodinámicos →</a>
+      </div>
+    </div>
+    <div class="gg-tool">
+      <div class="gg-tool-top"><div class="gg-tool-symbol">µm</div><span class="gg-status">Metrología</span></div>
+      <h3>Metrología y Fabricación</h3>
+      <p>Ajustes y tolerancias conectados con fabricación, capacidad de proceso, control de calidad, montaje y condición operacional.</p>
+      <div class="gg-tags"><span>ISO 286</span><span>Ajustes</span><span>IT</span><span>Cp/Cpk</span><span>Montaje</span><span>Control</span></div>
+      <div class="gg-tool-links">
+        <a href="/ajustes-tolerancias-iso">Ajustes y Tolerancias ISO →</a>
       </div>
     </div>
     <div class="gg-tool">
