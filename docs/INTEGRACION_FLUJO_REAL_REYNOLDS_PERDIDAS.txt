@@ -1,0 +1,59 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE DE INTEGRACIÓN · FLUJO REAL · REYNOLDS Y PÉRDIDAS
+
+ARCHIVOS INCLUIDOS
+- streamlit_app.py
+- pages/fluidos_reales_reynolds_perdidas.py
+- modules/fluid_real_data.py
+- modules/fluid_real_engine.py
+- modules/fluid_real_plotter.py
+
+REQUISITOS DEL PORTAL
+El portal debe conservar:
+- modules/ui_brand.py
+- assets/logo_header_unificado.png
+- las demás páginas y módulos ya existentes de MechLab
+
+INSTALACIÓN
+1. Descomprimir el ZIP.
+2. Copiar todo el contenido directamente a la raíz de Portal_Publicacion_V1.
+3. Aceptar reemplazo de:
+   - streamlit_app.py
+4. Los siguientes archivos son nuevos:
+   - pages/fluidos_reales_reynolds_perdidas.py
+   - modules/fluid_real_data.py
+   - modules/fluid_real_engine.py
+   - modules/fluid_real_plotter.py
+5. Ejecutar el portal con:
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+NAVEGACIÓN RESULTANTE
+Mecánica de Fluidos
+- Continuidad y Bernoulli
+- Flujo real en tuberías
+
+URL
+/fluidos-reales-reynolds-perdidas
+
+ALCANCE INTEGRADO
+- flujo real en tuberías circulares
+- número de Reynolds
+- régimen laminar, transición y turbulento
+- rugosidad absoluta y relativa
+- factor de fricción Darcy
+- Colebrook, Haaland y Swamee–Jain
+- pérdidas distribuidas y localizadas
+- HGL y EGL relativas
+- lectura física del sistema
+- impacto de pérdidas en el requerimiento de bomba
+
+LANDING
+- Este parche SÍ incluye pages/inicio.py actualizado.
+- La tarjeta de Mecánica de Fluidos ahora muestra:
+  - Continuidad y Bernoulli
+  - Reynolds y pérdidas en tuberías
+- Se amplían las etiquetas a Continuidad, Bernoulli, Reynolds, Moody, Darcy y Bombas.
+
+ARCHIVOS QUE SE REEMPLAZAN
+- streamlit_app.py
+- pages/inicio.py

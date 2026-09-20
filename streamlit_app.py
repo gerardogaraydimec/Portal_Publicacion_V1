@@ -64,6 +64,13 @@ fluidos_continuidad_bernoulli = st.Page(
     url_path="fluidos-continuidad-bernoulli",
 )
 
+fluidos_reales_reynolds_perdidas = st.Page(
+    "pages/fluidos_reales_reynolds_perdidas.py",
+    title="Flujo real en tuberías",
+    icon="🌊",
+    url_path="fluidos-reales-reynolds-perdidas",
+)
+
 von_mises_lab = st.Page(
     "pages/von_mises_lab.py",
     title="Von Mises Lab",
@@ -76,7 +83,7 @@ pg = st.navigation(
         "Portal": [inicio],
         "Resistencia de Materiales": [mohr2d, mohr3d, vigas_cortante_momento, biblioteca_perfiles],
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
-        "Mecánica de Fluidos": [fluidos_continuidad_bernoulli],
+        "Mecánica de Fluidos": [fluidos_continuidad_bernoulli, fluidos_reales_reynolds_perdidas],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
         "Elementos de Máquinas": [von_mises_lab],
     },

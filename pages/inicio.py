@@ -694,10 +694,11 @@ tools_html = """
     <div class="gg-tool">
       <div class="gg-tool-top"><div class="gg-tool-symbol">Q</div><span class="gg-status">Fluidos</span></div>
       <h3>Mecánica de Fluidos</h3>
-      <p>Conservación de masa y energía, presión, velocidad, cotas y lectura física de sistemas de flujo interno.</p>
-      <div class="gg-tags"><span>Continuidad</span><span>Bernoulli</span><span>HGL</span><span>EGL</span><span>Bombas</span></div>
+      <p>Del flujo ideal al flujo real: continuidad, energía, régimen, fricción y pérdidas en sistemas de tuberías.</p>
+      <div class="gg-tags"><span>Continuidad</span><span>Bernoulli</span><span>Reynolds</span><span>Moody</span><span>Darcy</span><span>Bombas</span></div>
       <div class="gg-tool-links">
         <a href="/fluidos-continuidad-bernoulli">Continuidad y Bernoulli →</a>
+        <a href="/fluidos-reales-reynolds-perdidas">Reynolds y pérdidas en tuberías →</a>
       </div>
     </div>
     <div class="gg-tool">

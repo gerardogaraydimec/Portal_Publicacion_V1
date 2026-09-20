@@ -1,0 +1,6 @@
+Agregar dentro de la tarjeta de Mecánica de Fluidos en pages/inicio.py:
+
+<a href="/fluidos-reales-reynolds-perdidas">Reynolds y pérdidas en tuberías →</a>
+
+Y si quieres sumar tags, puedes agregar por ejemplo:
+<span>Reynolds</span><span>Moody</span><span>Pérdidas</span><span>Darcy</span>
