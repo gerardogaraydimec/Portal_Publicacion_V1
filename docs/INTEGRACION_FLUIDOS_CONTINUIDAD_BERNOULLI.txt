@@ -1,0 +1,47 @@
+PD-2026-0011 · GG DIMEC MechLab
+PARCHE DE INTEGRACIÓN · MECÁNICA DE FLUIDOS
+
+ARCHIVOS
+- streamlit_app.py
+- pages/inicio.py
+- pages/fluidos_continuidad_bernoulli.py
+- modules/fluid_cases.py
+- modules/fluid_engine.py
+- modules/fluid_plotter.py
+
+NAVEGACIÓN
+Mecánica de Fluidos
+- Continuidad y Bernoulli
+
+URL
+/fluidos-continuidad-bernoulli
+
+LANDING
+- Nueva tarjeta Mecánica de Fluidos.
+- Dashboard incorpora Fluidos y energía.
+- La grilla se adapta a las cinco áreas actuales.
+
+CONTENIDO
+- Continuidad.
+- Bernoulli ideal.
+- Cortes de sección 1 y 2 mejorados.
+- Datum común para z1 y z2.
+- HGL y EGL.
+- Reducción, expansión, ascenso, descenso, boquilla y Venturi.
+- Explicaciones paso a paso.
+- Aplicaciones industriales.
+- Puente a bombas centrado en cómo analizar el sistema:
+  caudal, cotas, presiones, velocidades, pérdidas y energía requerida.
+- Potencia hidráulica y potencia de eje.
+
+INSTALACIÓN
+1. Descomprimir.
+2. Copiar el contenido en la raíz de Portal_Publicacion_V1.
+3. Aceptar reemplazo de streamlit_app.py y pages/inicio.py.
+4. Ejecutar:
+   .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+NO REEMPLAZA
+- modules/ui_brand.py
+- assets/logo_header_unificado.png
+- módulos existentes de MechLab

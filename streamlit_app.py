@@ -57,6 +57,13 @@ biblioteca_perfiles = st.Page(
     url_path="perfiles-estructurales",
 )
 
+fluidos_continuidad_bernoulli = st.Page(
+    "pages/fluidos_continuidad_bernoulli.py",
+    title="Continuidad y Bernoulli",
+    icon="💧",
+    url_path="fluidos-continuidad-bernoulli",
+)
+
 von_mises_lab = st.Page(
     "pages/von_mises_lab.py",
     title="Von Mises Lab",
@@ -69,6 +76,7 @@ pg = st.navigation(
         "Portal": [inicio],
         "Resistencia de Materiales": [mohr2d, mohr3d, vigas_cortante_momento, biblioteca_perfiles],
         "Vibraciones y Dinámica": [vibraciones1gdl, vibracion_forzada1gdl],
+        "Mecánica de Fluidos": [fluidos_continuidad_bernoulli],
         "Termodinámica": [termodinamica_agua, ciclos_termodinamicos],
         "Elementos de Máquinas": [von_mises_lab],
     },

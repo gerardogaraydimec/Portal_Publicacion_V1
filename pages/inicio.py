@@ -298,7 +298,7 @@ html{scroll-behavior:smooth;}
 
 .gg-dashboard{
   display:grid;
-  grid-template-columns:1.25fr repeat(4,.75fr);
+  grid-template-columns:1.20fr repeat(5,.70fr);
   gap:10px;
   align-items:center;
   border-radius:20px;
@@ -314,7 +314,7 @@ html{scroll-behavior:smooth;}
 
 .gg-tools{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
   gap:16px;
 }
 .gg-tool{
@@ -651,6 +651,7 @@ dashboard_html = """
     </div>
     <div class="gg-stat"><strong>σ</strong><span>Resistencia y esfuerzos</span></div>
     <div class="gg-stat"><strong>ω</strong><span>Vibraciones y dinámica</span></div>
+    <div class="gg-stat"><strong>Q</strong><span>Fluidos y energía</span></div>
     <div class="gg-stat"><strong>T–s</strong><span>Termodinámica</span></div>
     <div class="gg-stat"><strong>VM</strong><span>Diseño y falla</span></div>
   </div>
@@ -688,6 +689,15 @@ tools_html = """
       <div class="gg-tool-links">
         <a href="/vibraciones-1gdl">Vibraciones libres 1-GDL →</a>
         <a href="/vibracion-forzada-1gdl">Vibración forzada 1-GDL →</a>
+      </div>
+    </div>
+    <div class="gg-tool">
+      <div class="gg-tool-top"><div class="gg-tool-symbol">Q</div><span class="gg-status">Fluidos</span></div>
+      <h3>Mecánica de Fluidos</h3>
+      <p>Conservación de masa y energía, presión, velocidad, cotas y lectura física de sistemas de flujo interno.</p>
+      <div class="gg-tags"><span>Continuidad</span><span>Bernoulli</span><span>HGL</span><span>EGL</span><span>Bombas</span></div>
+      <div class="gg-tool-links">
+        <a href="/fluidos-continuidad-bernoulli">Continuidad y Bernoulli →</a>
       </div>
     </div>
     <div class="gg-tool">
