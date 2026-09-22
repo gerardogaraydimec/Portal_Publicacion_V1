@@ -1,0 +1,46 @@
+PD-2026-0011 · GG DIMEC MechLab
+INTEGRACIÓN · VIGAS · CORTANTE, MOMENTO Y DEFLEXIÓN
+
+NOMBRE VISIBLE EN MECHLAB
+Familia: Resistencia y Estructuras
+Herramienta: Vigas · Cortante, Momento y Deflexión
+URL conservada: /vigas-cortante-momento
+
+NOMBRE DE SEGUIMIENTO DEL DESARROLLO
+PD-2026-0011_Parche_MechLab_Vigas_Cortante_Momento_Deflexion_V2_0
+
+IMPORTANTE
+No se renombra la URL ni el archivo de página original. Esto evita romper enlaces y mantiene continuidad del módulo existente:
+  pages/vigas_cortante_momento.py
+
+ARCHIVOS DEL PARCHE
+  streamlit_app.py
+  pages/inicio.py
+  pages/vigas_cortante_momento.py
+  modules/beam_cases.py                  (sin cambio funcional)
+  modules/beam_engine.py                 (sin cambio funcional)
+  modules/beam_plotter.py                (sin cambio funcional)
+  modules/beam_deflection.py             (nuevo)
+  modules/beam_deflection_plotter.py     (nuevo)
+  tests/test_beam_deflection.py          (nuevo)
+
+QUÉ INCORPORA ESTA ETAPA
+- Se mantienen los 16 casos clásicos existentes.
+- Se mantienen cargas, reacciones, V(x), M(x), discontinuidades y extremos.
+- Se agregan material y propiedades geométricas para flexión.
+- Se agregan secciones rectangular, circular maciza, tubular circular y propiedades ingresadas.
+- Se calcula la curva elástica mediante teoría de Euler-Bernoulli.
+- Se muestran pendiente theta(x) y deflexión v(x).
+- Se valida numéricamente contra soluciones clásicas cuando existe benchmark implementado.
+- Se actualiza la navegación y el landing sin cambiar la ruta existente.
+
+FLUJO PEDAGÓGICO
+Carga -> Reacciones -> V(x) -> M(x) -> E,I -> Curvatura -> Pendiente -> Deflexión
+
+SIGUIENTE ETAPA PLANIFICADA
+Sobre esta misma base se puede incorporar la comparación Euler-Bernoulli / Timoshenko mediante rigidez de corte, sin crear una herramienta separada.
+
+VALIDACIÓN
+- py_compile: OK
+- pytest: 6 passed
+- no se agregan dependencias nuevas

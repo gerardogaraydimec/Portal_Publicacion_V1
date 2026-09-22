@@ -807,7 +807,7 @@ tools_html = """
       <div class="gg-tool-links">
         <a href="/mohr-2d">Círculo de Mohr 2D →</a>
         <a href="/mohr-3d">Círculo de Mohr 3D →</a>
-        <a href="/vigas-cortante-momento">Cortante y Momento · Vigas básicas →</a>
+        <a href="/vigas-cortante-momento">Vigas · Cortante, Momento y Deflexión →</a>
         <a href="/perfiles-estructurales">Biblioteca de Perfiles Estructurales →</a>
       </div>
     </div>

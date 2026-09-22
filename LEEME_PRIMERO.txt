@@ -1,0 +1,95 @@
+PD-2026-0011 — PARCHE COMPLETO VIGAS V2.0 + CORRECCIÓN DE EJECUCIÓN
+===================================================================
+
+QUÉ CORRIGE ESTE PARCHE
+-----------------------
+1. Mantiene el portal principal existente (NO reemplaza streamlit_app.py).
+2. Actualiza el módulo Vigas a V2.0 con deflexión Euler–Bernoulli.
+3. Agrega app.py como lanzador de compatibilidad.
+4. Agrega EJECUTAR_PORTAL.bat para abrir el portal sin escribir comandos.
+
+DÓNDE COPIARLO
+--------------
+Copia TODO el contenido de este parche directamente dentro de la raíz de:
+
+Portal_Publicacion_V1
+
+Es decir, en la misma carpeta donde ya están:
+- .venv/
+- assets/
+- docs/
+- modules/
+- pages/
+- streamlit_app.py
+- requirements.txt
+
+Cuando Windows pregunte si deseas combinar carpetas o reemplazar archivos,
+acepta COMBINAR y REEMPLAZAR los archivos coincidentes de pages/ y modules/.
+
+ESTE PARCHE NO REEMPLAZA
+------------------------
+- streamlit_app.py
+- pages/inicio.py
+- modules/ui_brand.py
+
+ARCHIVOS QUE AGREGA / ACTUALIZA
+-------------------------------
+Raíz:
+- app.py                       <- NUEVO, compatibilidad con el comando antiguo
+- EJECUTAR_PORTAL.bat          <- NUEVO, doble clic para ejecutar
+- EJECUTAR_PORTAL.ps1          <- NUEVO, alternativa PowerShell
+
+pages/:
+- vigas_cortante_momento.py    <- REEMPLAZAR
+
+modules/:
+- beam_cases.py                <- REEMPLAZAR
+- beam_engine.py               <- REEMPLAZAR
+- beam_plotter.py              <- REEMPLAZAR
+- beam_deflection.py           <- AGREGAR
+- beam_deflection_plotter.py   <- AGREGAR
+
+CÓMO EJECUTAR DESPUÉS DEL PARCHE
+--------------------------------
+OPCIÓN RECOMENDADA:
+Haz doble clic en:
+
+    EJECUTAR_PORTAL.bat
+
+OPCIÓN DESDE TERMINAL:
+
+    .\.venv\Scripts\python.exe -m streamlit run streamlit_app.py
+
+Y, gracias al nuevo app.py, también seguirá funcionando:
+
+    .\.venv\Scripts\python.exe -m streamlit run app.py
+
+IMPORTANTE
+----------
+NO vuelvas a ejecutar:
+
+    py -m venv .venv
+
+Tu entorno .venv ya existe. Recrearlo encima del mismo entorno mientras está activo
+puede provocar el error de venvlauncher.exe que viste en la terminal.
+
+COMPROBACIÓN DE VIGAS V2.0
+--------------------------
+Dentro del portal entra a la aplicación de Vigas existente.
+La página nueva debe mostrar:
+
+    Vigas · Cortante, Momento y Deflexión
+    PD-2026-0011 · Vigas V2.0 · Euler–Bernoulli
+
+Y debe incluir secciones/pestañas para:
+- Cómo usar
+- Esquema y diagramas
+- Sección y material
+- Deflexión
+- Ecuaciones
+- Interpretación
+
+NOTA SOBRE LA LETRA M EN VS CODE
+--------------------------------
+La letra M al lado de un archivo NO es un error.
+Significa Modified: Git detecta que el archivo cambió respecto del último commit.

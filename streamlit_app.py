@@ -45,7 +45,7 @@ ciclos_termodinamicos = st.Page(
 
 vigas_cortante_momento = st.Page(
     "pages/vigas_cortante_momento.py",
-    title="Cortante y Momento",
+    title="Vigas · Cortante, Momento y Deflexión",
     icon="📐",
     url_path="vigas-cortante-momento",
 )
