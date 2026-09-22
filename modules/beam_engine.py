@@ -25,7 +25,7 @@ def domain_end(case_id: str, p: dict) -> float:
     return float(p["L"])
 
 
-def _case_segments(case_id: str, p: dict) -> list[Segment]:
+def _case_segments_legacy(case_id: str, p: dict) -> list[Segment]:
     L = float(p["L"])
 
     # 1
@@ -193,6 +193,28 @@ def _case_segments(case_id: str, p: dict) -> list[Segment]:
         ]
 
     raise KeyError(case_id)
+
+
+def _case_segments(case_id: str, p: dict) -> list[Segment]:
+    """
+    Internal-force sign convention used in the course material:
+      dV/dx = w(x), with distributed load w positive downward
+      dM/dx = -V(x)
+
+    The original library moments are preserved. The shear field is therefore
+    the negative of the legacy implementation so that all 16 cases satisfy
+    dM/dx=-V consistently.
+    """
+    legacy = _case_segments_legacy(case_id, p)
+    return [
+        Segment(
+            seg.x0,
+            seg.x1,
+            lambda x, f=seg.v: -np.asarray(f(x), dtype=float),
+            seg.m,
+        )
+        for seg in legacy
+    ]
 
 
 def reactions(case_id: str, p: dict) -> list[dict]:
@@ -460,7 +482,7 @@ def equations(case_id: str, p: dict) -> dict:
     if case_id == "cantilever_end_load":
         return {
             "reactions": [r"R_A=F", r"M_A=FL"],
-            "shear": [r"V(x)=F,\qquad 0\le x<L"],
+            "shear": [r"V(x)=-F,\qquad 0\le x<L"],
             "moment": [r"M(x)=F(x-L),\qquad 0\le x\le L"],
         }
 
@@ -468,7 +490,7 @@ def equations(case_id: str, p: dict) -> dict:
         return {
             "reactions": [r"R_A=F", r"M_A=Fa"],
             "shear": [
-                r"V(x)=F,\qquad 0\le x<a",
+                r"V(x)=-F,\qquad 0\le x<a",
                 r"V(x)=0,\qquad a<x\le L",
             ],
             "moment": [
@@ -480,7 +502,7 @@ def equations(case_id: str, p: dict) -> dict:
     if case_id == "cantilever_udl":
         return {
             "reactions": [r"R_A=wL", r"M_A=\frac{wL^2}{2}"],
-            "shear": [r"V(x)=w(L-x)"],
+            "shear": [r"V(x)=-w(L-x)"],
             "moment": [r"M(x)=-\frac{w}{2}(L-x)^2"],
         }
 
@@ -495,8 +517,8 @@ def equations(case_id: str, p: dict) -> dict:
         return {
             "reactions": [r"R_A=R_B=\frac{F}{2}"],
             "shear": [
-                r"V(x)=\frac{F}{2},\qquad 0<x<\frac{L}{2}",
-                r"V(x)=-\frac{F}{2},\qquad \frac{L}{2}<x<L",
+                r"V(x)=-\frac{F}{2},\qquad 0<x<\frac{L}{2}",
+                r"V(x)=+\frac{F}{2},\qquad \frac{L}{2}<x<L",
             ],
             "moment": [
                 r"M(x)=\frac{F}{2}x,\qquad 0\le x\le\frac{L}{2}",
@@ -508,8 +530,8 @@ def equations(case_id: str, p: dict) -> dict:
         return {
             "reactions": [r"b=L-a", r"R_A=\frac{Fb}{L}", r"R_B=\frac{Fa}{L}"],
             "shear": [
-                r"V(x)=R_A,\qquad 0<x<a",
-                r"V(x)=-R_B,\qquad a<x<L",
+                r"V(x)=-R_A,\qquad 0<x<a",
+                r"V(x)=+R_B,\qquad a<x<L",
             ],
             "moment": [
                 r"M(x)=\frac{Fb}{L}x,\qquad 0\le x\le a",
@@ -520,14 +542,14 @@ def equations(case_id: str, p: dict) -> dict:
     if case_id == "simple_udl":
         return {
             "reactions": [r"R_A=R_B=\frac{wL}{2}"],
-            "shear": [r"V(x)=\frac{wL}{2}-wx"],
+            "shear": [r"V(x)=wx-\frac{wL}{2}"],
             "moment": [r"M(x)=\frac{wx}{2}(L-x)"],
         }
 
     if case_id == "simple_point_moment":
         return {
             "reactions": [r"R_A=+\frac{M_0}{L}", r"R_B=-\frac{M_0}{L}"],
-            "shear": [r"V(x)=\frac{M_0}{L}"],
+            "shear": [r"V(x)=-\frac{M_0}{L}"],
             "moment": [
                 r"M(x)=\frac{M_0}{L}x,\qquad 0\le x<a",
                 r"M(x)=\frac{M_0}{L}(x-L),\qquad a<x\le L",
@@ -538,9 +560,9 @@ def equations(case_id: str, p: dict) -> dict:
         return {
             "reactions": [r"R_A=R_B=F"],
             "shear": [
-                r"V(x)=F,\qquad 0<x<a",
+                r"V(x)=-F,\qquad 0<x<a",
                 r"V(x)=0,\qquad a<x<L-a",
-                r"V(x)=-F,\qquad L-a<x<L",
+                r"V(x)=+F,\qquad L-a<x<L",
             ],
             "moment": [
                 r"M(x)=Fx,\qquad 0\le x\le a",
@@ -556,8 +578,8 @@ def equations(case_id: str, p: dict) -> dict:
                 r"R_B=\frac{F(L+a)}{L}",
             ],
             "shear": [
-                r"V(x)=-\frac{Fa}{L},\qquad 0<x<L",
-                r"V(x)=F,\qquad L<x<L+a",
+                r"V(x)=+\frac{Fa}{L},\qquad 0<x<L",
+                r"V(x)=-F,\qquad L<x<L+a",
             ],
             "moment": [
                 r"M(x)=-\frac{Fa}{L}x,\qquad 0\le x\le L",
@@ -573,8 +595,8 @@ def equations(case_id: str, p: dict) -> dict:
                 r"M_A=\frac{3FL}{16}",
             ],
             "shear": [
-                r"V(x)=\frac{11F}{16},\qquad 0<x<\frac{L}{2}",
-                r"V(x)=-\frac{5F}{16},\qquad \frac{L}{2}<x<L",
+                r"V(x)=-\frac{11F}{16},\qquad 0<x<\frac{L}{2}",
+                r"V(x)=+\frac{5F}{16},\qquad \frac{L}{2}<x<L",
             ],
             "moment": [
                 r"M(x)=\frac{F}{16}(11x-3L),\qquad 0\le x\le\frac{L}{2}",
@@ -591,8 +613,8 @@ def equations(case_id: str, p: dict) -> dict:
                 r"M_A=\frac{Fb}{2L^2}(L^2-b^2)",
             ],
             "shear": [
-                r"V(x)=R_A,\qquad 0<x<a",
-                r"V(x)=-R_B,\qquad a<x<L",
+                r"V(x)=-R_A,\qquad 0<x<a",
+                r"V(x)=+R_B,\qquad a<x<L",
             ],
             "moment": [
                 r"M(x)=R_Ax-M_A,\qquad 0\le x\le a",
@@ -607,7 +629,7 @@ def equations(case_id: str, p: dict) -> dict:
                 r"R_B=\frac{3wL}{8}",
                 r"M_A=\frac{wL^2}{8}",
             ],
-            "shear": [r"V(x)=\frac{5wL}{8}-wx"],
+            "shear": [r"V(x)=wx-\frac{5wL}{8}"],
             "moment": [r"M(x)=-\frac{w}{8}(4x^2-5Lx+L^2)"],
         }
 
@@ -618,8 +640,8 @@ def equations(case_id: str, p: dict) -> dict:
                 r"M_A=M_B=\frac{FL}{8}",
             ],
             "shear": [
-                r"V(x)=\frac{F}{2},\qquad 0<x<\frac{L}{2}",
-                r"V(x)=-\frac{F}{2},\qquad \frac{L}{2}<x<L",
+                r"V(x)=-\frac{F}{2},\qquad 0<x<\frac{L}{2}",
+                r"V(x)=+\frac{F}{2},\qquad \frac{L}{2}<x<L",
             ],
             "moment": [
                 r"M(x)=\frac{F}{8}(4x-L),\qquad 0\le x\le\frac{L}{2}",
@@ -637,8 +659,8 @@ def equations(case_id: str, p: dict) -> dict:
                 r"M_B=\frac{Fa^2b}{L^2}",
             ],
             "shear": [
-                r"V(x)=R_A,\qquad 0<x<a",
-                r"V(x)=-R_B,\qquad a<x<L",
+                r"V(x)=-R_A,\qquad 0<x<a",
+                r"V(x)=+R_B,\qquad a<x<L",
             ],
             "moment": [
                 r"M(x)=R_Ax-M_A,\qquad 0\le x\le a",
@@ -652,7 +674,7 @@ def equations(case_id: str, p: dict) -> dict:
                 r"R_A=R_B=\frac{wL}{2}",
                 r"M_A=M_B=\frac{wL^2}{12}",
             ],
-            "shear": [r"V(x)=\frac{w}{2}(L-2x)"],
+            "shear": [r"V(x)=\frac{w}{2}(2x-L)"],
             "moment": [r"M(x)=\frac{w}{12}(6Lx-6x^2-L^2)"],
         }
 

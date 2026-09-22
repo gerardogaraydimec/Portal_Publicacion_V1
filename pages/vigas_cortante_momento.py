@@ -14,6 +14,8 @@ from modules.beam_deflection import (
     slenderness_hint,
 )
 from modules.beam_deflection_plotter import make_deflection_figure, make_section_figure
+from modules.beam_stress import section_stress_response
+from modules.beam_stress_plotter import make_stress_distribution_figure
 
 st.markdown(
     """
@@ -100,12 +102,11 @@ st.markdown('<div style="height:0.20rem"></div>', unsafe_allow_html=True)
 
 render_app_header(
     title="Vigas · Cortante, Momento y Deflexión",
-    subtitle="Cargas · reacciones · V(x) · M(x) · propiedades de sección · pendiente θ(x) · curva elástica v(x).",
+    subtitle="Cargas · reacciones · V(x) · M(x) · σx(y) · τxy(y) · curvatura κ(x) · pendiente θ(x) · deflexión v(x).",
     section="RESISTENCIA Y ESTRUCTURAS",
     logo_width=188,
 )
 
-st.caption("PD-2026-0011 · Vigas V2.0 · Euler–Bernoulli")
 
 all_case_ids = [cid for ids in FAMILIES.values() for cid in ids]
 
@@ -217,12 +218,12 @@ with st.sidebar:
             ))
 
     st.divider()
-    st.subheader("Propiedades para deflexión")
+    st.subheader("Material y sección")
 
     material = st.selectbox(
         "Material",
         ["Acero · E=200 GPa", "Aluminio · E=69 GPa", "Madera · E=12 GPa", "Personalizado"],
-        help="En esta etapa la deflexión se calcula con teoría de Euler–Bernoulli, por lo que la propiedad elástica requerida es E.",
+        help="E se utiliza para la rigidez a flexión EI y para la deformación de la viga.",
     )
     material_E = {
         "Acero · E=200 GPa": 200.0,
@@ -251,6 +252,7 @@ with st.sidebar:
     else:
         section_params["area_mm2"] = float(st.number_input("Área A [mm²]", min_value=1.0, value=20000.0, step=100.0))
         section_params["inertia_mm4"] = float(st.number_input("Segundo momento de área I [mm⁴]", min_value=1.0, value=6.6667e7, step=1.0e6, format="%.3e"))
+        section_params["c_mm"] = float(st.number_input("Distancia a fibra extrema c [mm]", min_value=0.1, value=100.0, step=5.0, help="Se requiere para calcular σ=−My/I cuando la geometría no está dibujada."))
 
     st.divider()
     st.caption(
@@ -285,6 +287,7 @@ tabs = st.tabs([
     "📘 Cómo usar",
     "📊 Esquema y diagramas",
     "📐 Sección y material",
+    "🧱 Tensiones en la sección",
     "〰️ Deflexión",
     "∑ Ecuaciones",
     "🧠 Interpretación",
@@ -299,56 +302,59 @@ with tabs[0]:
     with c1:
         st.subheader("Qué hace esta herramienta")
         st.write(
-            "Este módulo reúne la lectura clásica de vigas en una sola cadena: **cargas → reacciones → cortante → momento → pendiente → deflexión**. "
-            "Selecciona una configuración, modifica las cargas y la sección, y observa cómo cambian tanto los esfuerzos internos como la curva elástica."
+            "El módulo sigue la secuencia completa de análisis de vigas: "
+            "**cargas → reacciones → V(x) → M(x) → tensiones en la sección → curvatura → pendiente → deflexión**. "
+            "La idea es conectar el equilibrio global con lo que ocurre dentro de una sección transversal y, finalmente, con la deformada."
         )
 
         st.markdown("#### Flujo recomendado")
         st.markdown(
             """
-1. **Selecciona el tipo de viga y el caso elemental.**
-2. **Modifica** longitud, carga y posición cuando corresponda.
-3. Define **material y sección transversal** para obtener `E` e `I`.
-4. En **Esquema y diagramas**, mueve la posición de análisis `x`.
-5. En **Deflexión**, observa `θ(x)` y `v(x)` sobre el mismo eje longitudinal.
-6. Revisa **Ecuaciones** e **Interpretación** para conectar `V(x)`, `M(x)` y la curva elástica.
+1. Selecciona **apoyos, caso de carga y dimensiones**.
+2. Define **material y sección transversal**.
+3. En **Esquema y diagramas**, mueve la posición `x` y observa reacciones, `V(x)` y `M(x)`.
+4. En **Tensiones en la sección**, conecta `M(x)` con `σx(y)` y `V(x)` con `τxy(y)`.
+5. En **Deflexión**, observa `κ(x)`, `θ(x)` y `v(x)`.
+6. Usa **Ecuaciones** para revisar la cadena diferencial completa y las expresiones del caso seleccionado.
 """
         )
 
-        st.markdown("#### Alcance de la biblioteca")
-        st.write(
-            "La biblioteca mantiene **16 configuraciones clásicas**: voladizos, vigas simplemente apoyadas, "
-            "vigas empotradas con apoyo simple y vigas empotradas en ambos extremos. "
-            "La deflexión se incorpora sobre esos mismos casos sin cambiar la lógica original de cargas y reacciones."
+        st.markdown("#### Regla de los cortes")
+        st.info(
+            "Cuando cambia una carga o aparece una fuerza/momento concentrado, el análisis debe plantearse por tramos. "
+            "Conviene imaginar cortes **antes, en torno y después** de la discontinuidad para identificar correctamente V(x) y M(x).",
+            icon="✂️",
         )
 
         if "Hiperestática" in summary["classification"]:
             st.warning(
-                "En los casos hiperestáticos, las reacciones mostradas corresponden a las soluciones clásicas "
-                "de viga prismática bajo comportamiento lineal elástico y pequeñas deformaciones.",
+                "En los casos hiperestáticos, las reacciones mostradas corresponden a soluciones clásicas de viga prismática, "
+                "material lineal elástico y pequeñas deformaciones.",
                 icon="📌",
             )
 
     with c2:
-        st.subheader("Convención y lectura")
-        st.latex(r"V(x)=\frac{dM(x)}{dx}")
-        st.latex(r"\Delta M=\int V(x)\,dx")
+        st.subheader("Convención de signos usada")
+        st.latex(r"w>0\;\text{hacia abajo}")
+        st.latex(r"\frac{dV}{dx}=w(x)")
+        st.latex(r"\frac{dM}{dx}=-V(x)")
+        st.latex(r"\frac{d^2M}{dx^2}=-w(x)")
         st.markdown(
             """
 <div class="gg-note">
-<b>Idea clave:</b><br>
-• Una <b>carga puntual</b> produce un salto en V.<br>
-• Una <b>carga distribuida uniforme</b> hace que V sea lineal y M parabólico.<br>
+<b>Lectura rápida:</b><br>
+• Una <b>fuerza puntual</b> produce un salto en V.<br>
+• Una <b>carga distribuida</b> cambia la pendiente de V.<br>
 • Un <b>momento concentrado</b> produce un salto directo en M.<br>
 • Si V=0 en un tramo, M permanece constante.<br>
-• Un cambio de signo de M indica un <b>punto de contraflexión</b>.
+• Donde V cambia de signo puede aparecer un extremo de M.<br>
+• Un cambio de signo de M identifica una posible <b>contraflexión</b>.
 </div>
 """,
             unsafe_allow_html=True,
         )
         st.caption(
-            "La coordenada x se mide desde el extremo izquierdo. "
-            "En el caso con voladizo exterior, L corresponde a la distancia entre apoyos y la longitud total es L+a."
+            "La coordenada x se mide desde el extremo izquierdo. La convención se mantiene igual en diagramas, ecuaciones y tensiones."
         )
 
 # ---------------------------------------------------------------------
@@ -377,6 +383,11 @@ with tabs[1]:
     )
 
     state = point_state(case_id, p, x_probe)
+
+    st.info(
+        "La línea naranja representa el corte imaginario. Al moverla puedes comparar directamente la posición x con V(x), M(x) y, en la pestaña siguiente, con las tensiones de esa sección.",
+        icon="✂️",
+    )
 
     st.markdown("#### Reacciones")
     reactions = summary["reactions"]
@@ -451,7 +462,7 @@ with tabs[1]:
 # Tab 3: section and material
 # ---------------------------------------------------------------------
 with tabs[2]:
-    st.subheader("La sección transversal controla la rigidez a flexión")
+    st.subheader("Geometría, eje neutro y rigidez a flexión")
     c1, c2 = st.columns([0.92, 1.08], gap="large")
 
     with c1:
@@ -469,18 +480,23 @@ with tabs[2]:
         b.metric("Segundo momento I", f"{section_props.inertia_mm4:,.3e} mm⁴")
         c.metric("Radio de giro rᵍ", f"{section_props.radius_gyration_mm:.2f} mm")
 
-        st.markdown("#### Material")
-        st.latex(rf"E = {young_gpa:g}\,\mathrm{{GPa}}")
+        st.markdown("#### Eje neutro")
+        st.write(
+            "Para las secciones simétricas incluidas aquí, el eje neutro pasa por el centroide y corresponde a **y=0**. "
+            "En flexión simple, allí el esfuerzo normal σx es nulo."
+        )
+        st.latex(r"\int_A y\,dA=0")
+
         st.markdown("#### Rigidez a flexión")
         ei_knm2 = young_gpa * 1e9 * section_props.inertia_mm4 * 1e-12 / 1e3
+        st.latex(rf"E = {young_gpa:g}\,\mathrm{{GPa}}")
         st.latex(rf"EI = {ei_knm2:,.3f}\,\mathrm{{kN\,m^2}}")
 
     if section_type == "Rectangular":
         st.latex(r"A=bh")
         st.latex(r"I=\frac{bh^3}{12}")
         st.info(
-            "En una sección rectangular, aumentar la altura h tiene un efecto cúbico sobre I. "
-            "Por eso pequeños cambios de altura pueden modificar fuertemente la deflexión.",
+            "En una sección rectangular, la altura h entra al cubo en I. Por eso aumentar h suele ser mucho más efectivo que aumentar b para reducir deflexión y tensión de flexión.",
             icon="📌",
         )
     elif section_type == "Circular maciza":
@@ -492,21 +508,99 @@ with tabs[2]:
         st.caption("Con Dᵢ = Dₒ − 2t.")
     else:
         st.write(
-            "Esta opción permite reutilizar propiedades obtenidas desde una biblioteca de perfiles o desde otra fuente, "
-            "sin obligar a representar aquí toda la geometría de la sección."
+            "Con A, I y c ingresados se puede calcular rigidez y esfuerzo normal por flexión. "
+            "Para obtener la distribución de corte τ=VQ/(It) se necesita además la geometría local de la sección."
         )
 
     slender = slenderness_hint(p["L"], section_props.radius_gyration_mm)
     st.markdown("#### Indicador geométrico")
     st.latex(rf"\frac{{L}}{{r_g}} = {slender:.1f}")
     st.caption(
-        "Se muestra como indicador geométrico descriptivo. No se utiliza aquí como criterio normativo ni como límite automático de validez."
+        "Es un indicador geométrico descriptivo; no se usa como criterio normativo ni como límite automático de validez."
     )
 
 # ---------------------------------------------------------------------
-# Tab 4: deflection
+# Tab 4: section stresses
 # ---------------------------------------------------------------------
 with tabs[3]:
+    st.subheader("De V(x) y M(x) a las tensiones de la sección")
+
+    # At an exact discontinuity, the internal force may have a left and a right value.
+    v_jump = state["V_left"] is not None and abs(state["V_left"] - state["V_right"]) > 1e-7
+    m_jump = state["M_left"] is not None and abs(state["M_left"] - state["M_right"]) > 1e-7
+
+    side = "Derecha x⁺"
+    if v_jump or m_jump:
+        side = st.radio(
+            "La sección coincide con una discontinuidad. Elige el lado del corte:",
+            ["Izquierda x⁻", "Derecha x⁺"],
+            horizontal=True,
+            key=f"stress_side_{case_id}",
+        )
+
+    if side == "Izquierda x⁻":
+        shear_for_stress = state["V_left"] if state["V_left"] is not None else state["V"]
+        moment_for_stress = state["M_left"] if state["M_left"] is not None else state["M"]
+    else:
+        shear_for_stress = state["V_right"] if state["V_right"] is not None else state["V"]
+        moment_for_stress = state["M_right"] if state["M_right"] is not None else state["M"]
+
+    stress = section_stress_response(
+        section_type,
+        section_params,
+        inertia_mm4=section_props.inertia_mm4,
+        moment_knm=moment_for_stress,
+        shear_kn=shear_for_stress,
+    )
+
+    a, b, c, d = st.columns(4)
+    a.metric("x", f"{x_probe:.3f} m")
+    b.metric("V usado", f"{shear_for_stress:.3f} kN")
+    c.metric("M usado", f"{moment_for_stress:.3f} kN·m")
+    d.metric("|σ|max", f"{stress.sigma_max_abs_mpa:.3f} MPa")
+
+    st.plotly_chart(
+        make_stress_distribution_figure(stress),
+        use_container_width=True,
+        config={"displaylogo": False},
+        key=f"stress_{case_id}_{section_type}",
+    )
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("σ superior", f"{stress.sigma_top_mpa:.3f} MPa")
+    c2.metric("σ inferior", f"{stress.sigma_bottom_mpa:.3f} MPa")
+    if stress.shear_available:
+        c3.metric("|τ|max", f"{stress.tau_max_abs_mpa:.3f} MPa")
+        c4.metric("y de |τ|max", f"{stress.tau_max_y_mm:.2f} mm")
+    else:
+        c3.metric("|τ|max", "—")
+        c4.metric("Flujo q", "—")
+
+    left, right = st.columns(2, gap="large")
+    with left:
+        st.markdown("#### Flexión normal")
+        st.latex(r"\sigma_x(x,y)=-\frac{M(x)}{I_z}y")
+        st.write(
+            "La distribución es lineal: el eje neutro tiene σx=0 y las fibras extremas concentran el mayor valor absoluto. "
+            "El signo indica tracción o compresión según la convención adoptada."
+        )
+    with right:
+        st.markdown("#### Corte en la sección")
+        st.latex(r"\tau_{xy}(x,y)=\frac{V(x)Q(y)}{I_z\,t(y)}")
+        st.latex(r"q(y)=\tau_{xy}\,t(y)=\frac{VQ}{I_z}")
+        st.write(stress.note)
+        if stress.q_max_abs_n_per_mm is not None:
+            st.caption(f"Máximo |q| ≈ {stress.q_max_abs_n_per_mm:.3f} N/mm (numéricamente igual a kN/m).")
+
+    if section_type == "Rectangular":
+        st.markdown("#### Caso rectangular")
+        st.latex(r"\tau_{xy}(y)=\frac{3V}{2A}\left(1-\frac{4y^2}{h^2}\right)")
+        st.caption("La distribución es parabólica, nula en las superficies superior/inferior y máxima en el eje neutro.")
+
+# ---------------------------------------------------------------------
+# Tab 5: deflection
+# ---------------------------------------------------------------------
+with tabs[4]:
     st.subheader("Pendiente y curva elástica · Euler–Bernoulli")
 
     probe_def = response_at_x(deflection_result, x_probe)
@@ -568,43 +662,63 @@ En esta etapa se utiliza <b>Euler–Bernoulli</b>: la deformación por corte no 
     )
 
 # ---------------------------------------------------------------------
-# Tab 5: equations
+# Tab 6: equations
 # ---------------------------------------------------------------------
-with tabs[4]:
+with tabs[5]:
     eq = summary["equations"]
 
-    st.subheader("Reacciones")
+    st.subheader("Cadena diferencial usada en el módulo")
+    e1, e2, e3, e4 = st.columns(4)
+    with e1:
+        st.latex(r"\frac{dV}{dx}=w(x)")
+        st.caption("w positivo hacia abajo.")
+    with e2:
+        st.latex(r"\frac{dM}{dx}=-V(x)")
+        st.caption("V controla la pendiente de M.")
+    with e3:
+        st.latex(r"\frac{d\theta}{dx}=\frac{M}{EI}")
+        st.caption("M/EI es la curvatura.")
+    with e4:
+        st.latex(r"\theta\approx\frac{dv}{dx}")
+        st.caption("Pequeñas pendientes.")
+
+    st.latex(r"\frac{d^2M}{dx^2}=-w(x)")
+    st.latex(r"EI\frac{d^2v}{dx^2}=M(x)")
+    st.latex(r"\frac{d^4v}{dx^4}=-\frac{w(x)}{EI}")
+
+    st.subheader("Reacciones del caso seleccionado")
     for formula in eq["reactions"]:
         st.latex(formula)
 
-    st.subheader("Fuerza cortante")
+    st.subheader("Fuerza cortante V(x)")
     for formula in eq["shear"]:
         st.latex(formula)
 
-    st.subheader("Momento flector")
+    st.subheader("Momento flector M(x)")
     for formula in eq["moment"]:
         st.latex(formula)
 
-    st.subheader("Curvatura, pendiente y deflexión")
-    st.latex(r"\kappa(x)=\frac{1}{R(x)}=\frac{M(x)}{EI}")
-    st.latex(r"\frac{d\theta}{dx}=\frac{M(x)}{EI}")
-    st.latex(r"\theta(x)\approx\frac{dv}{dx}")
-    st.latex(r"EI\frac{d^2v}{dx^2}=M(x)")
+    st.subheader("Tensiones en la sección")
+    st.latex(r"\sigma_x=-\frac{M}{I_z}y")
+    st.latex(r"\tau_{xy}=\frac{VQ}{I_z t}")
+    st.latex(r"q=\tau t=\frac{VQ}{I_z}")
 
     st.markdown(
         """
 <div class="gg-note">
-<b>Cómo se enlazan los diagramas</b><br>
-La convención de signos del módulo se mantiene en toda la herramienta. El diagrama M(x) alimenta directamente la ecuación de curvatura; luego las condiciones de apoyo permiten obtener θ(x) y v(x). Las convenciones de signo pueden variar entre textos, por lo que deben interpretarse siempre de forma consistente dentro de un mismo desarrollo.
+<b>Lectura integrada:</b><br>
+Las cargas externas y los apoyos fijan las reacciones. Los cortes entregan V(x) y M(x). 
+Luego, M determina la distribución de esfuerzo normal y la curvatura, mientras V determina la distribución de corte. 
+La integración de la curvatura con las condiciones cinemáticas de los apoyos entrega θ(x) y v(x).
 </div>
 """,
         unsafe_allow_html=True,
     )
 
 # ---------------------------------------------------------------------
-# Tab 6: interpretation
+# Tab 7: interpretation
 # ---------------------------------------------------------------------
-with tabs[5]:
+with tabs[6]:
     st.subheader("Qué deberías observar")
     a, b, c = st.columns(3)
     a.markdown(f"**Tipo de estructura**\n\n{summary['classification']}")
@@ -623,42 +737,41 @@ with tabs[5]:
         st.markdown("#### Puntos internos donde M(x)=0")
         st.write(" · ".join([f"x ≈ **{z:.3f} m**" for z in internal_zeros]))
         if "Hiperestática" in summary["classification"]:
-            st.caption(
-                "Cuando el momento cambia de signo en esos puntos, corresponden a puntos de contraflexión del caso ideal."
-            )
+            st.caption("Si M cambia de signo, esos puntos corresponden a contraflexión del modelo ideal.")
 
-    st.markdown("#### Qué cambia al incorporar la deflexión")
+    st.markdown("#### Conexión entre diagramas y sección")
     st.markdown(
         f"""
 - La carga y los apoyos determinan **V(x)** y **M(x)**.
-- El momento no basta para conocer cuánto se desplaza la viga: también importa la rigidez **EI**.
+- En la sección elegida, **M(x)** genera `σx(y)` y **V(x)** genera `τxy(y)`.
 - Con la sección actual, `I = {section_props.inertia_mm4:,.3e} mm⁴` y `E = {young_gpa:g} GPa`.
+- La rigidez **EI** controla la curvatura y, por integración, la deformada.
 - El máximo desplazamiento calculado es **{deflection_result.max_abs_deflection_m*1e3:.4f} mm** en `x ≈ {deflection_result.max_abs_deflection_x_m:.3f} m`.
-- Dos vigas con el mismo diagrama M(x) pueden deformarse de manera muy distinta si cambia **E**, **I** o ambos.
 """
     )
 
     st.markdown("#### Preguntas para estudiar")
     st.markdown(
         """
-- ¿Dónde cambia de valor el cortante y qué carga o reacción provoca ese cambio?
-- ¿Dónde aparece el máximo de momento y cómo se relaciona con V(x)?
-- ¿Dónde la pendiente θ(x) vale cero? ¿Coincide con un extremo de v(x)?
-- ¿Cómo cambia la deflexión si duplicas E manteniendo todo lo demás?
-- Para una sección rectangular, ¿qué ocurre al duplicar h? ¿Y al duplicar b?
-- ¿Por qué un modelo basado solo en flexión podría subestimar la deflexión de una viga corta o profunda?
+- ¿Qué ocurre con V al atravesar una fuerza puntual?
+- ¿Cómo cambia M cuando V es constante? ¿Y cuando V es lineal?
+- ¿Dónde se ubica el eje neutro y por qué σx es cero allí?
+- ¿Por qué |σx| es máximo en las fibras extremas?
+- En una sección rectangular, ¿por qué τ es máximo cerca del eje neutro y cero en las superficies libres?
+- ¿Qué representa Q en la expresión τ=VQ/(It)?
+- ¿Dónde la pendiente θ(x) vale cero y cómo se relaciona con un extremo de v(x)?
+- ¿Cómo cambia la deflexión al aumentar E o I?
 """
     )
 
-    st.markdown("#### Puente hacia el modelo de Timoshenko")
+    st.markdown("#### Próximas ampliaciones")
     st.write(
-        "Euler–Bernoulli supone que la rotación de la sección coincide con la pendiente de la línea media. "
-        "La extensión natural será separar ambas cantidades e incorporar la deformación por corte mediante la rigidez de corte de la sección. "
-        "Así la comparación se apoyará en los mismos V(x), M(x), material y geometría que ya están definidos aquí."
+        "La base queda preparada para incorporar secciones compuestas, teorema de ejes paralelos, perfiles de pared delgada, flujo de corte avanzado y centro de cortadura. "
+        "Después de consolidar esa lectura, la comparación Euler–Bernoulli / Timoshenko permitirá añadir explícitamente la deformación por corte."
     )
 
 st.divider()
 st.caption(
     "GG DIMEC · MechLab · Resistencia y Estructuras · "
-    "Vigas: cargas, cortante, momento y deflexión mediante teoría de Euler–Bernoulli."
+    "Vigas: cargas, corte, flexión, tensiones y deflexión."
 )
