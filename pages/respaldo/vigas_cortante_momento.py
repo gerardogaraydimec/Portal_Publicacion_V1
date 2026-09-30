@@ -16,7 +16,6 @@ from modules.beam_deflection import (
 from modules.beam_deflection_plotter import make_deflection_figure, make_section_figure
 from modules.beam_stress import section_stress_response
 from modules.beam_stress_plotter import make_stress_distribution_figure
-from modules.beam_visual3d import build_beam_visual_payload, render_beam_3d
 
 st.markdown(
     """
@@ -287,7 +286,6 @@ st.markdown(
 tabs = st.tabs([
     "📘 Cómo usar",
     "📊 Esquema y diagramas",
-    "🧩 Viga 3D",
     "📐 Sección y material",
     "🧱 Tensiones en la sección",
     "〰️ Deflexión",
@@ -461,53 +459,9 @@ with tabs[1]:
     )
 
 # ---------------------------------------------------------------------
-# Tab 3: 3D visual laboratory
+# Tab 3: section and material
 # ---------------------------------------------------------------------
 with tabs[2]:
-    st.subheader("Laboratorio visual 3D")
-    st.write(
-        "La geometría deformada se amplifica para hacer visible el comportamiento. "
-        "El plano de corte sigue la misma posición **x** usada en los diagramas y conecta directamente "
-        "**M(x) → σx(y)** y **V(x) → τxy(y)**."
-    )
-
-    # For a discontinuity, the visual laboratory uses the right-hand state by default.
-    v3d = state["V_right"] if state.get("V_right") is not None else state["V"]
-    m3d = state["M_right"] if state.get("M_right") is not None else state["M"]
-    stress3d = section_stress_response(
-        section_type,
-        section_params,
-        inertia_mm4=section_props.inertia_mm4,
-        moment_knm=m3d,
-        shear_kn=v3d,
-    )
-    visual_payload = build_beam_visual_payload(
-        case_id=case_id,
-        p=p,
-        case_title=summary["title"],
-        deflection_result=deflection_result,
-        x_probe=x_probe,
-        state=state,
-        section_type=section_type,
-        section_params=section_params,
-        stress_result=stress3d,
-        young_gpa=young_gpa,
-        inertia_mm4=section_props.inertia_mm4,
-    )
-    render_beam_3d(visual_payload, height=735)
-
-    a3, b3, c3 = st.columns(3)
-    a3.metric("Deflexión máxima", f"{deflection_result.max_abs_deflection_m*1e3:.3f} mm")
-    b3.metric("Posición de |v|max", f"{deflection_result.max_abs_deflection_x_m:.3f} m")
-    c3.metric("Amplificación automática", f"{visual_payload['auto_amplification']:.1f}×")
-    st.caption(
-        "El factor de amplificación afecta solo al dibujo 3D. No modifica V, M, σ, τ, θ ni v calculados."
-    )
-
-# ---------------------------------------------------------------------
-# Tab 4: section and material
-# ---------------------------------------------------------------------
-with tabs[3]:
     st.subheader("Geometría, eje neutro y rigidez a flexión")
     c1, c2 = st.columns([0.92, 1.08], gap="large")
 
@@ -568,7 +522,7 @@ with tabs[3]:
 # ---------------------------------------------------------------------
 # Tab 4: section stresses
 # ---------------------------------------------------------------------
-with tabs[4]:
+with tabs[3]:
     st.subheader("De V(x) y M(x) a las tensiones de la sección")
 
     # At an exact discontinuity, the internal force may have a left and a right value.
@@ -646,7 +600,7 @@ with tabs[4]:
 # ---------------------------------------------------------------------
 # Tab 5: deflection
 # ---------------------------------------------------------------------
-with tabs[5]:
+with tabs[4]:
     st.subheader("Pendiente y curva elástica · Euler–Bernoulli")
 
     probe_def = response_at_x(deflection_result, x_probe)
@@ -708,9 +662,9 @@ En esta etapa se utiliza <b>Euler–Bernoulli</b>: la deformación por corte no 
     )
 
 # ---------------------------------------------------------------------
-# Tab 7: equations
+# Tab 6: equations
 # ---------------------------------------------------------------------
-with tabs[6]:
+with tabs[5]:
     eq = summary["equations"]
 
     st.subheader("Cadena diferencial usada en el módulo")
@@ -762,9 +716,9 @@ La integración de la curvatura con las condiciones cinemáticas de los apoyos e
     )
 
 # ---------------------------------------------------------------------
-# Tab 8: interpretation
+# Tab 7: interpretation
 # ---------------------------------------------------------------------
-with tabs[7]:
+with tabs[6]:
     st.subheader("Qué deberías observar")
     a, b, c = st.columns(3)
     a.markdown(f"**Tipo de estructura**\n\n{summary['classification']}")
