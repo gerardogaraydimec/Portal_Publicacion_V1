@@ -15,10 +15,18 @@ def render_beam_3d(payload: dict, height: int = 760) -> None:
       <div class="gg-sub">El modelo 3D respeta apoyos, posición de cargas y signo de la deformada. La deformación y la sección pueden amplificarse solo para hacerlas visibles.</div>
     </div>
     <div class="gg-controls">
-      <label>Color
+      <label>Color de la viga
         <select id="gg-color-mode">
           <option value="moment">Momento M(x)</option>
           <option value="neutral">Material neutro</option>
+        </select>
+      </label>
+      <label>Lectura del corte 3D
+        <select id="gg-stress-mode">
+          <option value="both">σx + τxy</option>
+          <option value="sigma">Tensión normal σx</option>
+          <option value="tau">Tensión de corte τxy</option>
+          <option value="neutral">Sección neutra</option>
         </select>
       </label>
       <label>Amplificación de v(x)
@@ -52,7 +60,8 @@ def render_beam_3d(payload: dict, height: int = 760) -> None:
         <span><i class="sw neg"></i>M negativo</span>
         <span><i class="sw zero"></i>M≈0</span>
         <span><i class="sw pos"></i>M positivo</span>
-        <span><i class="sw cut"></i>sección x</span>
+        <span class="gg-legend-sep"></span>
+        <span id="gg-cut-legend"><i class="sw cut"></i>Corte: σx por color + τxy por flechas</span>
       </div>
     </section>
 
@@ -81,16 +90,17 @@ def render_beam_3d(payload: dict, height: int = 760) -> None:
           <div><span>|σ|max</span><b id="gg-smax"></b></div>
           <div><span>|τ|max</span><b id="gg-tmax"></b></div>
         </div>
+        <div id="gg-stress-readout" class="gg-mini gg-stress-readout"></div>
       </div>
 
-      <div class="gg-card gg-note"><b>Lectura física</b><br><span>La línea punteada es el eje sin deformar. La carga termina sobre la viga, la sección cobre sigue la tangente local de la deformada y el corte conecta M→σ y V→τ.</span></div>
+      <div class="gg-card gg-note"><b>Lectura física</b><br><span>La línea punteada es el eje sin deformar. En el corte, el color muestra σx cuando corresponde; las flechas muestran τxy y su sentido. La línea clara identifica el eje neutro.</span></div>
     </aside>
   </div>
 </div>
 
 <style>
 #gg-beam3d{--cu:#c8752d;--or:#f28e1c;--ink:#202126;--mut:#6d7078;--iv:#fbf7f0;--line:#ded7cc;--soft:#f2eadf;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
-#gg-beam3d *{box-sizing:border-box}.gg-toolbar{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:12px}.gg-kicker{font-size:11px;letter-spacing:.16em;font-weight:800;color:var(--cu)}.gg-title{font-size:24px;font-weight:850;line-height:1.1}.gg-sub{font-size:13px;color:var(--mut);max-width:800px;margin-top:5px}.gg-controls{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.gg-controls label{font-size:11px;color:var(--mut);font-weight:700}.gg-controls select,.gg-controls button{display:block;margin-top:4px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;font-size:12px;color:var(--ink)}.gg-controls>button{background:var(--ink);color:#fff;border-color:var(--ink);cursor:pointer}.gg-view-controls{display:flex;align-items:end;gap:5px;flex-wrap:wrap}.gg-view-controls>span{width:100%;font-size:11px;color:var(--mut);font-weight:700}.gg-view-controls .gg-view-btn{margin-top:0;padding:8px 10px;background:#fff;color:var(--ink);cursor:pointer}.gg-view-controls .gg-view-btn.is-active{background:var(--cu);border-color:var(--cu);color:#fff}.gg-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.72fr);gap:12px}.gg-scene-card,.gg-card{border:1px solid var(--line);border-radius:16px;background:var(--iv);overflow:hidden}.gg-scene-card{position:relative;min-height:520px;background:linear-gradient(180deg,#2c2d31 0%,#202126 72%)}#gg-three{height:475px;width:100%}#gg-fallback{display:none;width:100%;height:475px}.gg-status{position:absolute;z-index:4;top:12px;left:12px;background:rgba(251,247,240,.94);border:1px solid rgba(222,215,204,.8);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--ink)}.gg-help{position:absolute;z-index:4;right:12px;top:12px;background:rgba(32,33,38,.82);border:1px solid rgba(251,247,240,.18);border-radius:999px;padding:6px 10px;font-size:10px;color:#ded7cc;pointer-events:none}.gg-legend{height:44px;background:#202126;color:#c8c9cc;display:flex;align-items:center;gap:18px;padding:0 15px;font-size:11px;flex-wrap:wrap}.gg-legend span{display:flex;align-items:center;gap:6px}.sw{width:20px;height:5px;border-radius:999px;display:inline-block}.sw.neg{background:#4a4b51}.sw.zero{background:#d8c8b2}.sw.pos{background:#f28e1c}.sw.cut{background:#f28e1c;width:3px;height:18px}.gg-side{display:flex;flex-direction:column;gap:12px}.gg-card{padding:14px}.gg-card-title{font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:850;color:var(--cu);margin-bottom:8px}.gg-big{font-size:31px;font-weight:850;line-height:1}.gg-pairs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.gg-pairs>div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px}.gg-pairs span,.gg-model-row span{display:block;font-size:10px;color:var(--mut);margin-bottom:3px}.gg-pairs b{font-size:13px}.gg-model-row{padding:7px 0;border-bottom:1px solid #e8e0d6}.gg-model-row:last-of-type{border-bottom:0}.gg-model-row b{font-size:12px;font-weight:750}.gg-mini{font-size:10px;color:var(--mut);margin-top:8px;line-height:1.35}.gg-note{font-size:11px;line-height:1.45;background:#f4eadc}.gg-note b{color:var(--cu)}#gg-stress{width:100%;height:205px;display:block}
+#gg-beam3d *{box-sizing:border-box}.gg-toolbar{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:12px}.gg-kicker{font-size:11px;letter-spacing:.16em;font-weight:800;color:var(--cu)}.gg-title{font-size:24px;font-weight:850;line-height:1.1}.gg-sub{font-size:13px;color:var(--mut);max-width:800px;margin-top:5px}.gg-controls{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.gg-controls label{font-size:11px;color:var(--mut);font-weight:700}.gg-controls select,.gg-controls button{display:block;margin-top:4px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;font-size:12px;color:var(--ink)}.gg-controls>button{background:var(--ink);color:#fff;border-color:var(--ink);cursor:pointer}.gg-view-controls{display:flex;align-items:end;gap:5px;flex-wrap:wrap}.gg-view-controls>span{width:100%;font-size:11px;color:var(--mut);font-weight:700}.gg-view-controls .gg-view-btn{margin-top:0;padding:8px 10px;background:#fff;color:var(--ink);cursor:pointer}.gg-view-controls .gg-view-btn.is-active{background:var(--cu);border-color:var(--cu);color:#fff}.gg-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.72fr);gap:12px}.gg-scene-card,.gg-card{border:1px solid var(--line);border-radius:16px;background:var(--iv);overflow:hidden}.gg-scene-card{position:relative;min-height:520px;background:linear-gradient(180deg,#2c2d31 0%,#202126 72%)}#gg-three{height:475px;width:100%}#gg-fallback{display:none;width:100%;height:475px}.gg-status{position:absolute;z-index:4;top:12px;left:12px;background:rgba(251,247,240,.94);border:1px solid rgba(222,215,204,.8);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--ink)}.gg-help{position:absolute;z-index:4;right:12px;top:12px;background:rgba(32,33,38,.82);border:1px solid rgba(251,247,240,.18);border-radius:999px;padding:6px 10px;font-size:10px;color:#ded7cc;pointer-events:none}.gg-legend{min-height:44px;background:#202126;color:#c8c9cc;display:flex;align-items:center;gap:14px;padding:8px 15px;font-size:11px;flex-wrap:wrap}.gg-legend span{display:flex;align-items:center;gap:6px}.gg-legend-sep{width:1px;height:20px;background:#55565c;display:inline-block}.sw{width:20px;height:5px;border-radius:999px;display:inline-block}.sw.neg{background:#4a4b51}.sw.zero{background:#d8c8b2}.sw.pos{background:#f28e1c}.sw.cut{background:linear-gradient(90deg,#34353a 0%,#e9dece 50%,#f28e1c 100%);width:28px;height:7px}.gg-stress-readout{padding-top:9px;border-top:1px solid #e8e0d6;margin-top:10px}.gg-side{display:flex;flex-direction:column;gap:12px}.gg-card{padding:14px}.gg-card-title{font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:850;color:var(--cu);margin-bottom:8px}.gg-big{font-size:31px;font-weight:850;line-height:1}.gg-pairs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.gg-pairs>div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px}.gg-pairs span,.gg-model-row span{display:block;font-size:10px;color:var(--mut);margin-bottom:3px}.gg-pairs b{font-size:13px}.gg-model-row{padding:7px 0;border-bottom:1px solid #e8e0d6}.gg-model-row:last-of-type{border-bottom:0}.gg-model-row b{font-size:12px;font-weight:750}.gg-mini{font-size:10px;color:var(--mut);margin-top:8px;line-height:1.35}.gg-note{font-size:11px;line-height:1.45;background:#f4eadc}.gg-note b{color:var(--cu)}#gg-stress{width:100%;height:205px;display:block}
 @media(max-width:950px){.gg-grid{grid-template-columns:1fr}.gg-toolbar{align-items:flex-start;flex-direction:column}.gg-side{display:grid;grid-template-columns:1fr 1fr}.gg-side .gg-note{grid-column:1/-1}}
 @media(max-width:620px){#gg-three,#gg-fallback{height:385px}.gg-title{font-size:20px}.gg-side{display:grid;grid-template-columns:1fr}.gg-controls{width:100%}.gg-help{display:none}.gg-view-controls{width:100%}.gg-view-controls .gg-view-btn{flex:1 1 auto}}
 </style>
@@ -103,13 +113,34 @@ const threeHost=root.querySelector('#gg-three');
 const fallback=root.querySelector('#gg-fallback');
 const stressCanvas=root.querySelector('#gg-stress');
 const colorMode=root.querySelector('#gg-color-mode');
+const stressMode=root.querySelector('#gg-stress-mode');
 const ampSelect=root.querySelector('#gg-amp');
+const cutLegend=root.querySelector('#gg-cut-legend');
+const stressReadout=root.querySelector('#gg-stress-readout');
 
 root.querySelector('#gg-x').textContent=DATA.x_probe.toFixed(3);
 root.querySelector('#gg-v').textContent=DATA.probe.V.toFixed(3)+' kN';
 root.querySelector('#gg-m').textContent=DATA.probe.M.toFixed(3)+' kN·m';
 root.querySelector('#gg-smax').textContent=DATA.stress.sigma_max.toFixed(2)+' MPa';
 root.querySelector('#gg-tmax').textContent=DATA.stress.tau_max==null?'—':DATA.stress.tau_max.toFixed(2)+' MPa';
+if(!DATA.stress.shear_available){
+  const tauOpt=stressMode.querySelector('option[value="tau"]');if(tauOpt)tauOpt.disabled=true;
+}
+function updateStressUI(){
+  const mode=stressMode.value;
+  if(mode==='sigma'){cutLegend.innerHTML='<i class="sw cut" style="background:linear-gradient(90deg,#34353a 0%,#eadfce 50%,#f28e1c 100%)"></i>Corte: σx · grafito=compresión · marfil≈0 · naranja=tracción';}
+  else if(mode==='tau'){cutLegend.innerHTML='<i class="sw cut" style="background:linear-gradient(90deg,#eadfce 0%,#c8752d 100%)"></i>Corte: |τxy| por intensidad · flechas indican el sentido';}
+  else if(mode==='neutral'){cutLegend.innerHTML='<i class="sw cut" style="background:#f28e1c"></i>Corte geométrico · sin mapa de tensiones';}
+  else{cutLegend.innerHTML='<i class="sw cut" style="background:linear-gradient(90deg,#34353a 0%,#eadfce 50%,#f28e1c 100%)"></i>Corte: σx por color + τxy por flechas';}
+  const top=DATA.stress.sigma_top,bot=DATA.stress.sigma_bottom;
+  const topTxt=(top>=0?'tracción ':'compresión ')+Math.abs(top).toFixed(2)+' MPa';
+  const botTxt=(bot>=0?'tracción ':'compresión ')+Math.abs(bot).toFixed(2)+' MPa';
+  let txt=`Fibra superior: <b>${topTxt}</b> · fibra inferior: <b>${botTxt}</b>.`;
+  if(DATA.stress.shear_available && DATA.stress.tau_max!=null) txt+=` |τ|max=${DATA.stress.tau_max.toFixed(2)} MPa cerca de y=${(DATA.stress.tau_max_y_mm??0).toFixed(1)} mm.`;
+  else txt+=' La geometría disponible no permite evaluar τ=VQ/(It).';
+  stressReadout.innerHTML=txt;
+}
+updateStressUI();
 
 function supportText(){
   const names={fixed:'empotramiento',pin:'pasador',roller:'rodillo'};
@@ -178,6 +209,64 @@ function drawFallback(){
 let scene,camera,renderer,controls,THREE,OrbitControls,beamGroup,modelGroup;
 let currentView='front';
 function momentColor(v,mmax){if(colorMode.value==='neutral')return new THREE.Color('#d8c8b2');const r=mmax?Math.max(-1,Math.min(1,v/mmax)):0;if(r>=0)return new THREE.Color().lerpColors(new THREE.Color('#d8c8b2'),new THREE.Color('#f28e1c'),r);return new THREE.Color().lerpColors(new THREE.Color('#d8c8b2'),new THREE.Color('#38393e'),-r)}
+function clamp01(v){return Math.max(0,Math.min(1,v))}
+function stressAt(arr,yMm){return interp(DATA.stress.y_mm,arr,yMm)}
+function sigmaColor(v){
+  const max=Math.max(DATA.stress.sigma_max||0,1e-12),r=clamp01(Math.abs(v)/max);
+  const zero=new THREE.Color('#eadfce');
+  return v>=0?new THREE.Color().lerpColors(zero,new THREE.Color('#f28e1c'),r):new THREE.Color().lerpColors(zero,new THREE.Color('#34353a'),r);
+}
+function tauColor(v){
+  const max=Math.max(DATA.stress.tau_max||0,1e-12),r=clamp01(Math.abs(v)/max);
+  return new THREE.Color().lerpColors(new THREE.Color('#eadfce'),new THREE.Color('#c8752d'),r);
+}
+function sectionYToMm(yLocal,sd){
+  const half=Math.max(sd.h/2,1e-12);return (yLocal/half)*(DATA.stress.c_mm||1);
+}
+function materialSpans(sd,yLocal){
+  if(sd.kind==='rect'||sd.kind==='custom') return [[-sd.b/2,sd.b/2]];
+  if(sd.kind==='solid_circle'){
+    const r=sd.d/2,w=Math.sqrt(Math.max(r*r-yLocal*yLocal,0));return w>1e-9?[[-w,w]]:[];
+  }
+  const ro=sd.do/2,ri=sd.di/2,wo=Math.sqrt(Math.max(ro*ro-yLocal*yLocal,0));
+  if(wo<=1e-9)return [];
+  if(Math.abs(yLocal)>=ri||ri<=1e-9)return [[-wo,wo]];
+  const wi=Math.sqrt(Math.max(ri*ri-yLocal*yLocal,0));return [[-wo,-wi],[wi,wo]].filter(a=>a[1]-a[0]>1e-9);
+}
+function addStressBands(group,sd,th,mode){
+  if(mode==='neutral')return;
+  const n=30,half=sd.h/2,dy=sd.h/n;
+  for(let i=0;i<n;i++){
+    const yc=-half+(i+.5)*dy,ymm=sectionYToMm(yc,sd),sig=stressAt(DATA.stress.sigma_mpa,ymm),tau=DATA.stress.shear_available?stressAt(DATA.stress.tau_mpa,ymm):0;
+    const col=mode==='tau'?tauColor(tau):sigmaColor(sig);
+    const mat=new THREE.MeshBasicMaterial({color:col,side:THREE.DoubleSide,transparent:true,opacity:.97});
+    for(const sp of materialSpans(sd,yc)){
+      const zw=sp[1]-sp[0],zc=(sp[0]+sp[1])/2;if(zw<=1e-9)continue;
+      const band=new THREE.Mesh(new THREE.BoxGeometry(th*1.55,dy*1.04,zw),mat);band.position.set(th*.34,yc,zc);group.add(band);
+    }
+  }
+}
+function addNeutralAxis(group,sd,th){
+  const zspan=(sd.kind==='rect'||sd.kind==='custom')?sd.b:(sd.kind==='solid_circle'?sd.d:sd.do);
+  const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(th*.95,0,-zspan*.58),new THREE.Vector3(th*.95,0,zspan*.58)]);
+  const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:'#fff7e9'}));group.add(line);
+}
+function representativeZ(sd,yLocal){
+  const spans=materialSpans(sd,yLocal);if(!spans.length)return null;
+  let best=spans[0];for(const sp of spans)if(sp[1]-sp[0]>best[1]-best[0])best=sp;
+  return (best[0]+best[1])/2;
+}
+function addShearArrows(group,sd,th){
+  if(!DATA.stress.shear_available||!DATA.stress.tau_max||DATA.stress.tau_max<1e-10)return;
+  const levels=[-.78,-.52,-.26,0,.26,.52,.78],maxLen=sd.h*.24,minLen=sd.h*.055;
+  for(const yn of levels){
+    const yl=yn*sd.h/2,ymm=sectionYToMm(yl,sd),tau=stressAt(DATA.stress.tau_mpa,ymm);if(Math.abs(tau)<1e-10)continue;
+    const z=representativeZ(sd,yl);if(z==null)continue;
+    const ratio=clamp01(Math.abs(tau)/(DATA.stress.tau_max||1)),len=minLen+(maxLen-minLen)*ratio,sgn=tau>=0?1:-1;
+    const dir=new THREE.Vector3(0,sgn,0),origin=new THREE.Vector3(th*2.05,yl-sgn*len*.5,z);
+    const arrow=new THREE.ArrowHelper(dir,origin,len,0xf28e1c,Math.min(len*.30,sd.h*.075),Math.min(len*.16,sd.h*.04));group.add(arrow);
+  }
+}
 
 function addModel(obj){modelGroup.add(obj);return obj}
 function setActiveView(name){
@@ -244,13 +333,25 @@ function addMoment(ld,amp,sd){
 }
 
 function addCut(x,amp,sd){
-  const y=defY(x,amp),tan=tangentAt(x,amp),dir=new THREE.Vector3(1,tan.y,0).normalize(),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1,0,0),dir),th=Math.max(DATA.length*.005,sd.h*.08),mat=new THREE.MeshStandardMaterial({color:'#f28e1c',transparent:true,opacity:.58,side:THREE.DoubleSide,roughness:.55});
-  let cut;
-  if(sd.kind==='rect'||sd.kind==='custom') cut=new THREE.Mesh(new THREE.BoxGeometry(th,sd.h*1.12,sd.b*1.12),mat);
-  else if(sd.kind==='solid_circle'){cut=new THREE.Mesh(new THREE.CylinderGeometry(sd.d*.56,sd.d*.56,th,32,1,false),mat);orientY(cut,new THREE.Vector3(1,0,0))}
-  else{const grp=new THREE.Group();const outer=new THREE.Mesh(new THREE.CylinderGeometry(sd.do*.56,sd.do*.56,th,32,1,true),mat);orientY(outer,new THREE.Vector3(1,0,0));grp.add(outer);if(sd.di>0){const inner=new THREE.Mesh(new THREE.CylinderGeometry(sd.di*.48,sd.di*.48,th*1.02,32,1,true),new THREE.MeshStandardMaterial({color:'#202126',side:THREE.BackSide}));orientY(inner,new THREE.Vector3(1,0,0));grp.add(inner)}cut=grp}
-  cut.quaternion.premultiply(q);cut.position.set(x,y,0);addModel(cut);
-  // short normal marker instead of a giant plane
+  const y=defY(x,amp),tan=tangentAt(x,amp),dir=new THREE.Vector3(1,tan.y,0).normalize(),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1,0,0),dir),th=Math.max(DATA.length*.005,sd.h*.08);
+  const group=new THREE.Group();
+  const shellMat=new THREE.MeshStandardMaterial({color:'#f28e1c',transparent:true,opacity:.16,side:THREE.DoubleSide,roughness:.55,depthWrite:false});
+  let shell;
+  if(sd.kind==='rect'||sd.kind==='custom') shell=new THREE.Mesh(new THREE.BoxGeometry(th,sd.h*1.12,sd.b*1.12),shellMat);
+  else if(sd.kind==='solid_circle'){
+    shell=new THREE.Mesh(new THREE.CylinderGeometry(sd.d*.56,sd.d*.56,th,40,1,false),shellMat);orientY(shell,new THREE.Vector3(1,0,0));
+  }else{
+    const grp=new THREE.Group();
+    const outer=new THREE.Mesh(new THREE.CylinderGeometry(sd.do*.56,sd.do*.56,th,40,1,true),shellMat);orientY(outer,new THREE.Vector3(1,0,0));grp.add(outer);
+    if(sd.di>0){const inner=new THREE.Mesh(new THREE.CylinderGeometry(sd.di*.48,sd.di*.48,th*1.02,40,1,true),new THREE.MeshStandardMaterial({color:'#202126',side:THREE.BackSide,transparent:true,opacity:.55}));orientY(inner,new THREE.Vector3(1,0,0));grp.add(inner)}
+    shell=grp;
+  }
+  group.add(shell);
+  const mode=stressMode.value;
+  addStressBands(group,sd,th,mode);
+  addNeutralAxis(group,sd,th);
+  if(mode==='tau'||mode==='both') addShearArrows(group,sd,th);
+  group.quaternion.copy(q);group.position.set(x,y,0);addModel(group);
   const normal=new THREE.ArrowHelper(dir,new THREE.Vector3(x,y,0),Math.max(DATA.length*.075,sd.h*2.0),0xf28e1c,DATA.length*.018,DATA.length*.009);addModel(normal);
 }
 
@@ -291,8 +392,8 @@ function fitView(name='front'){
     const dv=(size.y*.5)/Math.tan(fov*.5),dh=(size.x*.5)/(Math.tan(fov*.5)*aspect);
     distance=Math.max(dv,dh,size.z*2.5,DATA.length*.35)*1.18;
   }else if(name==='section'){
-    const sectionSpan=Math.max(size.y,size.z,DATA.length*.12);
-    distance=Math.max(sectionSpan/Math.tan(fov*.5),DATA.length*.24)*1.28;
+    const sd=dims(),sectionSpan=Math.max(sd.h*2.35,sd.b*2.35,DATA.length*.075);
+    distance=Math.max(sectionSpan/Math.tan(fov*.5),DATA.length*.12)*1.18;
   }else{
     distance=Math.max(sphere.radius/Math.sin(fov*.5),DATA.length*.45)*1.18;
   }
@@ -311,11 +412,13 @@ async function start3D(){
     function resize(){const w=threeHost.clientWidth,h=threeHost.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}resize();fitView('front');let resizeTimer=null;new ResizeObserver(()=>{resize();clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(currentView==='front')fitView('front')},80)}).observe(threeHost);
     status.textContent='Vista frontal · lista para explorar';
     function loop(){controls.update();renderer.render(scene,camera);requestAnimationFrame(loop)}loop();
-    colorMode.addEventListener('change',()=>{buildScene();fitCurrent()});ampSelect.addEventListener('change',()=>{buildScene();fitCurrent()});
+    colorMode.addEventListener('change',()=>{buildScene();fitCurrent()});
+    ampSelect.addEventListener('change',()=>{buildScene();fitCurrent()});
+    stressMode.addEventListener('change',()=>{updateStressUI();buildScene();if(currentView==='section')fitView('section');else fitCurrent()});
     root.querySelector('#gg-front').addEventListener('click',()=>fitView('front'));root.querySelector('#gg-iso').addEventListener('click',()=>fitView('iso'));root.querySelector('#gg-section-view').addEventListener('click',()=>fitView('section'));root.querySelector('#gg-fit').addEventListener('click',fitCurrent);root.querySelector('#gg-reset').addEventListener('click',resetCamera);
-  }catch(e){console.warn(e);drawFallback();colorMode.addEventListener('change',drawFallback);ampSelect.addEventListener('change',drawFallback);for(const id of ['#gg-front','#gg-iso','#gg-section-view','#gg-fit','#gg-reset'])root.querySelector(id).addEventListener('click',drawFallback)}
+  }catch(e){console.warn(e);drawFallback();colorMode.addEventListener('change',drawFallback);ampSelect.addEventListener('change',drawFallback);stressMode.addEventListener('change',()=>{updateStressUI();drawFallback()});for(const id of ['#gg-front','#gg-iso','#gg-section-view','#gg-fit','#gg-reset'])root.querySelector(id).addEventListener('click',drawFallback)}
 }
 start3D();
 </script>
 '''.replace('__DATA__', data)
-    components.html(html, height=height, scrolling=False)
+    components.html(html, height=max(height, 810), scrolling=False)
