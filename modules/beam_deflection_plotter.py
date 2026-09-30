@@ -114,6 +114,19 @@ def make_section_figure(section_type: str, params: dict):
                       line=dict(color=BLACK, width=1.8), fillcolor="white")
         fig.add_annotation(x=0, y=2.2, text=f"Dₒ = {do:g} mm · t = {t:g} mm", showarrow=False, font=dict(size=12, color=GRAY))
 
+    elif section_type in ("Perfil I / H", "Canal C"):
+        h=float(params["h_mm"]); bf=float(params["bf_mm"]); tw=float(params["tw_mm"]); tf=float(params["tf_mm"])
+        sc=3.2/max(h,bf); H=h*sc; B=bf*sc; TW=tw*sc; TF=tf*sc
+        fill="rgba(242,142,28,.09)"
+        # top and bottom flanges
+        for yy in (H/2-TF/2, -H/2+TF/2):
+            fig.add_shape(type="rect", x0=-B/2,x1=B/2,y0=yy-TF/2,y1=yy+TF/2, line=dict(color=BLACK,width=2.2),fillcolor=fill)
+        if section_type=="Perfil I / H":
+            fig.add_shape(type="rect", x0=-TW/2,x1=TW/2,y0=-H/2+TF,y1=H/2-TF,line=dict(color=BLACK,width=2.2),fillcolor=fill)
+        else:
+            fig.add_shape(type="rect", x0=-B/2,x1=-B/2+TW,y0=-H/2+TF,y1=H/2-TF,line=dict(color=BLACK,width=2.2),fillcolor=fill)
+        fig.add_annotation(x=0,y=H/2+.4,text=f"h={h:g} · bf={bf:g} · tw={tw:g} · tf={tf:g} mm",showarrow=False,font=dict(size=11,color=GRAY))
+
     else:
         fig.add_shape(type="rect", x0=-1.7, x1=1.7, y0=-1.2, y1=1.2,
                       line=dict(color=BLACK, width=2, dash="dash"), fillcolor="white")

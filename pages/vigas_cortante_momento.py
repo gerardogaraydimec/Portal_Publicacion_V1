@@ -239,7 +239,8 @@ with st.sidebar:
 
     section_type = st.selectbox(
         "Sección transversal",
-        ["Rectangular", "Circular maciza", "Tubular circular", "Propiedades ingresadas"],
+        ["Rectangular", "Circular maciza", "Tubular circular", "Perfil I / H", "Canal C", "Propiedades ingresadas"],
+        help="Los perfiles I/H y C se dibujan con su geometría real y sus propiedades se calculan desde h, bf, tw y tf."
     )
     section_params = {}
     if section_type == "Rectangular":
@@ -250,9 +251,14 @@ with st.sidebar:
     elif section_type == "Tubular circular":
         section_params["do_mm"] = float(st.number_input("Diámetro exterior Dₒ [mm]", min_value=2.0, value=120.0, step=5.0))
         section_params["t_mm"] = float(st.number_input("Espesor t [mm]", min_value=0.5, value=8.0, step=0.5))
+    elif section_type in ("Perfil I / H", "Canal C"):
+        section_params["h_mm"] = float(st.number_input("Altura total h [mm]", min_value=20.0, value=300.0, step=10.0))
+        section_params["bf_mm"] = float(st.number_input("Ancho de ala bf [mm]", min_value=10.0, value=150.0, step=5.0))
+        section_params["tw_mm"] = float(st.number_input("Espesor de alma tw [mm]", min_value=1.0, value=8.0, step=1.0))
+        section_params["tf_mm"] = float(st.number_input("Espesor de ala tf [mm]", min_value=1.0, value=12.0, step=1.0))
     else:
         section_params["area_mm2"] = float(st.number_input("Área A [mm²]", min_value=1.0, value=20000.0, step=100.0))
-        section_params["inertia_mm4"] = float(st.number_input("Segundo momento de área I [mm⁴]", min_value=1.0, value=6.6667e7, step=1.0e6, format="%.3e"))
+        section_params["inertia_mm4"] = float(st.number_input("Segundo momento de área Iz [mm⁴]", min_value=1.0, value=6.6667e7, step=1.0e6, format="%.3e"))
         section_params["c_mm"] = float(st.number_input("Distancia a fibra extrema c [mm]", min_value=0.1, value=100.0, step=5.0, help="Se requiere para calcular σ=−My/I cuando la geometría no está dibujada."))
 
     st.divider()

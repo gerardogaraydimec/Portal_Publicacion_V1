@@ -64,68 +64,41 @@ def _loads(case_id: str, p: dict) -> list[dict[str, Any]]:
 
 
 def _section_payload(section_type: str, section_params: dict, length_m: float) -> dict[str, Any]:
-    """
-    Store the real section dimensions and a *uniform* display scale.
-    The display scale is used only to keep slender beams visible in 3D; it
-    preserves section proportions and never changes stress/deflection values.
-    """
+    """Store real section dimensions plus a uniform display scale."""
     L = max(float(length_m), 1e-9)
 
     if section_type == "Rectangular":
         b_m = float(section_params["b_mm"]) / 1000.0
         h_m = float(section_params["h_mm"]) / 1000.0
-        max_dim = max(b_m, h_m, 1e-12)
-        visual_scale = max(1.0, min(30.0, 0.045 * L / max_dim))
-        return {
-            "kind": "rect",
-            "b_mm": float(section_params["b_mm"]),
-            "h_mm": float(section_params["h_mm"]),
-            "b_m": b_m,
-            "h_m": h_m,
-            "visual_scale": visual_scale,
-            "geometry_known": True,
-            "label": "Rectangular",
-        }
+        visual_scale = max(1.0, min(30.0, 0.045 * L / max(b_m, h_m, 1e-12)))
+        return {"kind":"rect","b_mm":float(section_params["b_mm"]),"h_mm":float(section_params["h_mm"]),
+                "b_m":b_m,"h_m":h_m,"visual_scale":visual_scale,"geometry_known":True,"label":"Rectangular"}
 
     if section_type == "Circular maciza":
         d_m = float(section_params["d_mm"]) / 1000.0
         visual_scale = max(1.0, min(30.0, 0.045 * L / max(d_m, 1e-12)))
-        return {
-            "kind": "solid_circle",
-            "d_mm": float(section_params["d_mm"]),
-            "d_m": d_m,
-            "visual_scale": visual_scale,
-            "geometry_known": True,
-            "label": "Circular maciza",
-        }
+        return {"kind":"solid_circle","d_mm":float(section_params["d_mm"]),"d_m":d_m,
+                "visual_scale":visual_scale,"geometry_known":True,"label":"Circular maciza"}
 
     if section_type == "Tubular circular":
-        do_m = float(section_params["do_mm"]) / 1000.0
-        t_m = float(section_params["t_mm"]) / 1000.0
-        di_m = max(do_m - 2.0 * t_m, 0.0)
-        visual_scale = max(1.0, min(30.0, 0.045 * L / max(do_m, 1e-12)))
-        return {
-            "kind": "tube",
-            "do_mm": float(section_params["do_mm"]),
-            "t_mm": float(section_params["t_mm"]),
-            "do_m": do_m,
-            "di_m": di_m,
-            "t_m": t_m,
-            "visual_scale": visual_scale,
-            "geometry_known": True,
-            "label": "Tubular circular",
-        }
+        do_m=float(section_params["do_mm"])/1000.0; t_m=float(section_params["t_mm"])/1000.0
+        di_m=max(do_m-2*t_m,0.0)
+        visual_scale=max(1.0,min(30.0,0.045*L/max(do_m,1e-12)))
+        return {"kind":"tube","do_mm":float(section_params["do_mm"]),"t_mm":float(section_params["t_mm"]),
+                "do_m":do_m,"di_m":di_m,"t_m":t_m,"visual_scale":visual_scale,"geometry_known":True,"label":"Tubular circular"}
 
-    # With A and I only, the actual section shape is unknown. The 3D view must
-    # not imply a geometry that was never supplied.
-    return {
-        "kind": "custom",
-        "visual_scale": 1.0,
-        "geometry_known": False,
-        "label": "Geometría no definida (solo A e I)",
-        "c_mm": float(section_params.get("c_mm", 100.0)),
-    }
+    if section_type in ("Perfil I / H", "Canal C"):
+        h=float(section_params["h_mm"])/1000.0; bf=float(section_params["bf_mm"])/1000.0
+        tw=float(section_params["tw_mm"])/1000.0; tf=float(section_params["tf_mm"])/1000.0
+        visual_scale=max(1.0,min(30.0,0.045*L/max(h,bf,1e-12)))
+        return {"kind":"i_profile" if section_type=="Perfil I / H" else "channel",
+                "h_m":h,"bf_m":bf,"tw_m":tw,"tf_m":tf,
+                "h_mm":float(section_params["h_mm"]),"bf_mm":float(section_params["bf_mm"]),
+                "tw_mm":float(section_params["tw_mm"]),"tf_mm":float(section_params["tf_mm"]),
+                "visual_scale":visual_scale,"geometry_known":True,"label":section_type}
 
+    return {"kind":"custom","visual_scale":1.0,"geometry_known":False,
+            "label":"Geometría no definida (propiedades equivalentes)","c_mm":float(section_params.get("c_mm",100.0))}
 
 def build_beam_visual_payload(
     *,

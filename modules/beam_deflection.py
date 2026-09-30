@@ -5,6 +5,7 @@ import math
 import numpy as np
 
 from .beam_engine import sample_segments, domain_end
+from .resmat_sections import section_data
 
 
 @dataclass(frozen=True)
@@ -29,47 +30,15 @@ class DeflectionResult:
 
 
 def section_properties(section_type: str, params: dict) -> SectionProperties:
-    """Return basic geometric properties for Euler-Bernoulli bending."""
-    if section_type == "Rectangular":
-        b = float(params["b_mm"])
-        h = float(params["h_mm"])
-        if b <= 0 or h <= 0:
-            raise ValueError("b y h deben ser mayores que cero.")
-        area = b * h
-        inertia = b * h**3 / 12.0
-        desc = f"Rectangular · b={b:g} mm · h={h:g} mm"
+    """Return section properties used by the beam solver.
 
-    elif section_type == "Circular maciza":
-        d = float(params["d_mm"])
-        if d <= 0:
-            raise ValueError("d debe ser mayor que cero.")
-        area = math.pi * d**2 / 4.0
-        inertia = math.pi * d**4 / 64.0
-        desc = f"Circular maciza · d={d:g} mm"
-
-    elif section_type == "Tubular circular":
-        do = float(params["do_mm"])
-        t = float(params["t_mm"])
-        di = do - 2.0 * t
-        if do <= 0 or t <= 0 or di <= 0:
-            raise ValueError("Debe cumplirse Dₒ>0, t>0 y Dᵢ=Dₒ−2t>0.")
-        area = math.pi * (do**2 - di**2) / 4.0
-        inertia = math.pi * (do**4 - di**4) / 64.0
-        desc = f"Tubular circular · Dₒ={do:g} mm · t={t:g} mm"
-
-    elif section_type == "Propiedades ingresadas":
-        area = float(params["area_mm2"])
-        inertia = float(params["inertia_mm4"])
-        if area <= 0 or inertia <= 0:
-            raise ValueError("A e I deben ser mayores que cero.")
-        desc = "Propiedades ingresadas por usuario"
-
-    else:
-        raise KeyError(section_type)
-
-    rg = math.sqrt(inertia / area)
-    return SectionProperties(area, inertia, rg, desc)
-
+    For I/H and C profiles, bending is taken about the horizontal centroidal z axis.
+    """
+    data = section_data(section_type, params)
+    return SectionProperties(
+        data.area_mm2, data.iz_mm4, data.rz_mm,
+        f"{data.name} · A={data.area_mm2:.1f} mm² · Iz={data.iz_mm4:.3e} mm⁴"
+    )
 
 def _merge_moment_samples(case_id: str, beam_params: dict, n_per_segment: int = 1200):
     """Create a monotonic x-M array, keeping the right-hand value at exact jumps."""

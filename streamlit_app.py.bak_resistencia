@@ -106,28 +106,10 @@ von_mises_lab = st.Page(
     url_path="von-mises",
 )
 
-# --- Resistencia de Materiales · ampliación MechLab ---
-columnas_compresion = st.Page(
-    "pages/columnas_compresion.py",
-    title="Columnas · Compresión y Pandeo",
-    icon="🏗️",
-    url_path="columnas-compresion",
-)
-torsion_resistencia = st.Page(
-    "pages/torsion.py",
-    title="Torsión · Ejes y Perfiles",
-    icon="🌀",
-    url_path="torsion",
-)
-# --- fin ampliación ---
-
-
 pg = st.navigation(
     {
         "Portal": [inicio],
         "Resistencia y Estructuras": [
-            columnas_compresion,
-            torsion_resistencia,
             mohr2d,
             mohr3d,
             vigas_cortante_momento,

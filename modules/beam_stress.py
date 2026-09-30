@@ -30,6 +30,8 @@ def extreme_fiber_distance_mm(section_type: str, params: dict) -> float:
         return float(params["d_mm"]) / 2.0
     if section_type == "Tubular circular":
         return float(params["do_mm"]) / 2.0
+    if section_type in ("Perfil I / H", "Canal C"):
+        return float(params["h_mm"]) / 2.0
     if section_type == "Propiedades ingresadas":
         c = float(params.get("c_mm", 0.0))
         if c <= 0:
@@ -58,6 +60,13 @@ def _section_width_mm(section_type: str, params: dict, y: np.ndarray) -> np.ndar
         outer = np.sqrt(np.maximum(ro * ro - y * y, 0.0))
         inner = np.sqrt(np.maximum(ri * ri - y * y, 0.0))
         return 2.0 * np.maximum(outer - inner, 0.0)
+
+    if section_type in ("Perfil I / H", "Canal C"):
+        h = float(params["h_mm"]); bf = float(params["bf_mm"])
+        tw = float(params["tw_mm"]); tf = float(params["tf_mm"])
+        in_flange = np.abs(y) >= (h/2.0 - tf - 1e-12)
+        inside = np.abs(y) <= h/2.0 + 1e-12
+        return np.where(inside, np.where(in_flange, bf, tw), 0.0)
 
     if section_type == "Propiedades ingresadas":
         return None
@@ -129,7 +138,8 @@ def section_stress_response(
         shear_available = True
         note = (
             "La distribución de corte se calcula con τ=VQ/(It). "
-            "En los bordes libres Q tiende a cero; en secciones simétricas el máximo suele aparecer cerca del eje neutro."
+            "En perfiles I/H y C se representa el valor medio a través del espesor horizontal t(y); "
+            "la distribución local en las alas de perfiles abiertos requiere un análisis de flujo de corte más detallado."
         )
     else:
         shear_available = False

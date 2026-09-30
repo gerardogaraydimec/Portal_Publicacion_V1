@@ -225,6 +225,14 @@ function sectionYToMm(yLocal,sd){
 }
 function materialSpans(sd,yLocal){
   if(sd.kind==='rect'||sd.kind==='custom') return [[-sd.b/2,sd.b/2]];
+  if(sd.kind==='i_profile'){
+    const flange=Math.abs(yLocal)>=sd.h/2-sd.tf;
+    return flange?[[-sd.b/2,sd.b/2]]:[[-sd.tw/2,sd.tw/2]];
+  }
+  if(sd.kind==='channel'){
+    const flange=Math.abs(yLocal)>=sd.h/2-sd.tf;
+    return flange?[[-sd.b/2,sd.b/2]]:[[-sd.b/2,-sd.b/2+sd.tw]];
+  }
   if(sd.kind==='solid_circle'){
     const r=sd.d/2,w=Math.sqrt(Math.max(r*r-yLocal*yLocal,0));return w>1e-9?[[-w,w]]:[];
   }
@@ -247,7 +255,7 @@ function addStressBands(group,sd,th,mode){
   }
 }
 function addNeutralAxis(group,sd,th){
-  const zspan=(sd.kind==='rect'||sd.kind==='custom')?sd.b:(sd.kind==='solid_circle'?sd.d:sd.do);
+  const zspan=(sd.kind==='rect'||sd.kind==='custom'||sd.kind==='i_profile'||sd.kind==='channel')?sd.b:(sd.kind==='solid_circle'?sd.d:sd.do);
   const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(th*.95,0,-zspan*.58),new THREE.Vector3(th*.95,0,zspan*.58)]);
   const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:'#fff7e9'}));group.add(line);
 }
@@ -281,6 +289,7 @@ function dims(){
   if(s.kind==='rect') return {kind:'rect',h:s.h_m*vs,b:s.b_m*vs};
   if(s.kind==='solid_circle') return {kind:'solid_circle',d:s.d_m*vs,h:s.d_m*vs,b:s.d_m*vs};
   if(s.kind==='tube') return {kind:'tube',do:s.do_m*vs,di:s.di_m*vs,h:s.do_m*vs,b:s.do_m*vs};
+  if(s.kind==='i_profile'||s.kind==='channel') return {kind:s.kind,h:s.h_m*vs,b:s.bf_m*vs,tw:s.tw_m*vs,tf:s.tf_m*vs};
   const q=DATA.length*.045;return {kind:'custom',h:q,b:q};
 }
 function orientX(obj,dir){obj.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0),dir.clone().normalize())}
@@ -292,6 +301,12 @@ function beamSegment(a,b,color,sd){
   let mesh;
   if(sd.kind==='rect'||sd.kind==='custom'){
     mesh=new THREE.Mesh(new THREE.BoxGeometry(len,sd.h,sd.b),mat);orientX(mesh,dir);
+  }else if(sd.kind==='i_profile'||sd.kind==='channel'){
+    const grp=new THREE.Group(),hw=Math.max(sd.h-2*sd.tf,1e-9);
+    const web=new THREE.Mesh(new THREE.BoxGeometry(len,hw,sd.tw),mat);
+    web.position.z=sd.kind==='channel'?(-sd.b/2+sd.tw/2):0;grp.add(web);
+    for(const yy of [sd.h/2-sd.tf/2,-sd.h/2+sd.tf/2]){const fl=new THREE.Mesh(new THREE.BoxGeometry(len,sd.tf,sd.b),mat);fl.position.y=yy;grp.add(fl)}
+    orientX(grp,dir);mesh=grp;
   }else if(sd.kind==='solid_circle'){
     mesh=new THREE.Mesh(new THREE.CylinderGeometry(sd.d/2,sd.d/2,len,24,1,false),mat);orientY(mesh,dir);
   }else{
@@ -338,7 +353,12 @@ function addCut(x,amp,sd){
   const shellMat=new THREE.MeshStandardMaterial({color:'#f28e1c',transparent:true,opacity:.16,side:THREE.DoubleSide,roughness:.55,depthWrite:false});
   let shell;
   if(sd.kind==='rect'||sd.kind==='custom') shell=new THREE.Mesh(new THREE.BoxGeometry(th,sd.h*1.12,sd.b*1.12),shellMat);
-  else if(sd.kind==='solid_circle'){
+  else if(sd.kind==='i_profile'||sd.kind==='channel'){
+    const grp=new THREE.Group(),hw=Math.max(sd.h-2*sd.tf,1e-9);
+    const web=new THREE.Mesh(new THREE.BoxGeometry(th,hw*1.03,sd.tw*1.08),shellMat);web.position.z=sd.kind==='channel'?(-sd.b/2+sd.tw/2):0;grp.add(web);
+    for(const yy of [sd.h/2-sd.tf/2,-sd.h/2+sd.tf/2]){const fl=new THREE.Mesh(new THREE.BoxGeometry(th,sd.tf*1.06,sd.b*1.04),shellMat);fl.position.y=yy;grp.add(fl)}
+    shell=grp;
+  } else if(sd.kind==='solid_circle'){
     shell=new THREE.Mesh(new THREE.CylinderGeometry(sd.d*.56,sd.d*.56,th,40,1,false),shellMat);orientY(shell,new THREE.Vector3(1,0,0));
   }else{
     const grp=new THREE.Group();
