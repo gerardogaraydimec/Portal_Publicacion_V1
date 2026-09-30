@@ -1,0 +1,5 @@
+Directorio para Three.js local (opcional).
+Desde la raiz ejecuta PREPARAR_THREE_LOCAL.py para descargar three.module.js
+y LICENSE.three.txt. El modulo detecta automaticamente si existe la copia.
+Sin ella intenta CDN; sin red conserva los renderizadores incorporados.
+No copies carpetas node_modules ni un entorno .venv aqui.

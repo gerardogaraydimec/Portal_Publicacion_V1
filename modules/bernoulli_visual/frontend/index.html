@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laboratorio de Bernoulli | MechLab</title>
+<link rel="stylesheet" href="styles.css?v=gg31">
+</head>
+<body>
+<main id="lab" aria-label="Laboratorio interactivo de continuidad y Bernoulli">
+  <header class="lab-head">
+    <div><span class="eyebrow">GG DIMEC / MECHLAB</span><h1>La energ&iacute;a cambia de forma.</h1><p id="case-title">Preparando el laboratorio...</p></div>
+    <span class="model-tag"><i></i> FLUJO IDEAL &middot; SIN P&Eacute;RDIDAS</span>
+  </header>
+  <div class="toolbar">
+    <div class="button-group" aria-label="Variable de color"><span class="toolbar-label">COLOR</span><button id="velocity" class="active" aria-pressed="true">Velocidad</button><button id="pressure" aria-pressed="false">Presi&oacute;n</button></div>
+    <div class="button-group"><button id="play" aria-label="Pausar animaci&oacute;n">Pausar</button><button id="cut" class="active" aria-pressed="true">Corte abierto</button><button id="view">Vista lateral</button><button id="reset" title="Restablecer c&aacute;mara">Restablecer</button></div>
+  </div>
+  <div class="workspace">
+    <section class="scene-wrap" id="scene-wrap" aria-label="Conducto y flujo tridimensional. Arrastra para girar; usa la rueda para acercar.">
+      <div id="canvas-host"></div>
+      <div class="stage-label"><span class="live-dot"></span><span id="renderer-label">Preparando vista</span></div>
+      <div class="flow-badge"><span>CAUDAL CONSTANTE</span><strong id="flow">&mdash;</strong><small>Direcci&oacute;n adoptada: 1 &rarr; 2</small></div>
+      <button class="station-label" id="label1" title="Leer secci&oacute;n 1">1</button><button class="station-label copper" id="label2" title="Leer secci&oacute;n 2">2</button>
+      <div class="legend"><span id="legend-title">VELOCIDAD [m/s]</span><div id="legend-gradient"></div><div><span id="legend-min">0</span><span id="legend-max">0</span></div><small>Escala del caso actual</small></div>
+      <div class="gesture">Arrastra para girar &nbsp;&middot;&nbsp; Rueda para acercar</div>
+      <div id="scene-note" class="scene-note" hidden></div>
+    </section>
+    <aside class="probe-panel">
+      <span class="eyebrow">EXPLORA UNA SECCI&Oacute;N</span>
+      <div class="probe-tabs"><button id="station1">Secci&oacute;n 1</button><button id="station2" class="active">Secci&oacute;n 2</button></div>
+      <h2 id="probe-title">Secci&oacute;n 2</h2>
+      <label class="probe-position" for="probe">Posici&oacute;n en el conducto <strong id="probe-pos">90 %</strong></label>
+      <input type="range" id="probe" min="0" max="320" value="288" aria-label="Secci&oacute;n de inspecci&oacute;n">
+      <div class="readings">
+        <div><span>Di&aacute;metro</span><strong id="diameter">&mdash;</strong><small>mm</small></div>
+        <div class="velocity-reading"><span>Velocidad media</span><strong id="speed">&mdash;</strong><small>m/s</small></div>
+        <div class="pressure-reading"><span>Presi&oacute;n manom&eacute;trica</span><strong id="pressure-value">&mdash;</strong><small>kPa</small></div>
+        <div><span>Cota desde el datum</span><strong id="elevation">&mdash;</strong><small>m</small></div>
+      </div>
+      <p class="probe-tip" id="probe-tip">La misma cantidad de fluido atraviesa cada secci&oacute;n por segundo.</p>
+      <label class="playback-label" for="playback">Reproducci&oacute;n <strong id="playback-value">1.0&times;</strong></label><input id="playback" type="range" min="0.1" max="2" step="0.1" value="1">
+      <small class="muted">Este control cambia el tiempo visual, no el caudal.</small>
+    </aside>
+  </div>
+  <section class="energy">
+    <div class="energy-heading"><div><span class="eyebrow">EL BALANCE SE MANTIENE</span><h2>Presi&oacute;n + movimiento + altura</h2></div><span id="balance" class="balance">H&#8321; = H&#8322;</span></div>
+    <div class="energy-grid" id="energy-grid"></div>
+    <p class="energy-foot">Alturas de energ&iacute;a en metros del fluido &middot; misma escala en ambas secciones &middot; los aportes negativos se muestran a la izquierda del cero.</p>
+  </section>
+  <footer><span id="assumptions">Modelo ideal unidimensional. Geometr&iacute;a esquem&aacute;tica, no CFD.</span><span id="time-note"></span></footer>
+</main>
+<script type="module" src="app.js?v=gg31"></script>
+</body>
+</html>
