@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from typing import Any
 import numpy as np
 
@@ -56,7 +55,7 @@ def _loads(case_id: str, p: dict) -> list[dict[str, Any]]:
         ])
     elif case_id == "simple_overhang_load":
         out.append({"kind": "point", "x": L + float(p["a"]), "value": float(p["F"]), "label": "F"})
-    elif case_id in {"cantilever_end_moment"}:
+    elif case_id == "cantilever_end_moment":
         out.append({"kind": "moment", "x": L, "value": float(p["M0"]), "label": "M₀"})
     elif case_id == "simple_point_moment":
         out.append({"kind": "moment", "x": float(p["a"]), "value": float(p["M0"]), "label": "M₀"})
@@ -64,27 +63,67 @@ def _loads(case_id: str, p: dict) -> list[dict[str, Any]]:
     return out
 
 
-def _section_payload(section_type: str, section_params: dict) -> dict[str, Any]:
+def _section_payload(section_type: str, section_params: dict, length_m: float) -> dict[str, Any]:
+    """
+    Store the real section dimensions and a *uniform* display scale.
+    The display scale is used only to keep slender beams visible in 3D; it
+    preserves section proportions and never changes stress/deflection values.
+    """
+    L = max(float(length_m), 1e-9)
+
     if section_type == "Rectangular":
+        b_m = float(section_params["b_mm"]) / 1000.0
+        h_m = float(section_params["h_mm"]) / 1000.0
+        max_dim = max(b_m, h_m, 1e-12)
+        visual_scale = max(1.0, min(30.0, 0.045 * L / max_dim))
         return {
             "kind": "rect",
-            "b": float(section_params["b_mm"]),
-            "h": float(section_params["h_mm"]),
+            "b_mm": float(section_params["b_mm"]),
+            "h_mm": float(section_params["h_mm"]),
+            "b_m": b_m,
+            "h_m": h_m,
+            "visual_scale": visual_scale,
+            "geometry_known": True,
             "label": "Rectangular",
         }
+
     if section_type == "Circular maciza":
-        return {"kind": "solid_circle", "d": float(section_params["d_mm"]), "label": "Circular maciza"}
+        d_m = float(section_params["d_mm"]) / 1000.0
+        visual_scale = max(1.0, min(30.0, 0.045 * L / max(d_m, 1e-12)))
+        return {
+            "kind": "solid_circle",
+            "d_mm": float(section_params["d_mm"]),
+            "d_m": d_m,
+            "visual_scale": visual_scale,
+            "geometry_known": True,
+            "label": "Circular maciza",
+        }
+
     if section_type == "Tubular circular":
+        do_m = float(section_params["do_mm"]) / 1000.0
+        t_m = float(section_params["t_mm"]) / 1000.0
+        di_m = max(do_m - 2.0 * t_m, 0.0)
+        visual_scale = max(1.0, min(30.0, 0.045 * L / max(do_m, 1e-12)))
         return {
             "kind": "tube",
-            "do": float(section_params["do_mm"]),
-            "t": float(section_params["t_mm"]),
+            "do_mm": float(section_params["do_mm"]),
+            "t_mm": float(section_params["t_mm"]),
+            "do_m": do_m,
+            "di_m": di_m,
+            "t_m": t_m,
+            "visual_scale": visual_scale,
+            "geometry_known": True,
             "label": "Tubular circular",
         }
+
+    # With A and I only, the actual section shape is unknown. The 3D view must
+    # not imply a geometry that was never supplied.
     return {
         "kind": "custom",
-        "c": float(section_params.get("c_mm", 100.0)),
-        "label": "Propiedades ingresadas",
+        "visual_scale": 1.0,
+        "geometry_known": False,
+        "label": "Geometría no definida (solo A e I)",
+        "c_mm": float(section_params.get("c_mm", 100.0)),
     }
 
 
@@ -109,7 +148,7 @@ def build_beam_visual_payload(
     )
     max_v = float(np.max(np.abs(v))) if len(v) else 0.0
     Lvis = max(float(x[-1] - x[0]), 1e-9)
-    auto_amp = 1.0 if max_v < 1e-12 else min(max(0.11 * Lvis / max_v, 1.0), 5000.0)
+    auto_amp = 1.0 if max_v < 1e-12 else min(max(0.10 * Lvis / max_v, 1.0), 5000.0)
 
     sy, ss, st = _downsample(
         stress_result.y_mm,
@@ -123,18 +162,22 @@ def build_beam_visual_payload(
     shear = float(v_right if v_right is not None else state.get("V", 0.0))
     moment = float(m_right if m_right is not None else state.get("M", 0.0))
 
+    length = float(x[-1]) if len(x) else float(p["L"])
+
     return {
         "case_id": case_id,
         "title": case_title,
-        "length": float(x[-1]) if len(x) else float(p["L"]),
+        "length": length,
         "x": [round(float(z), 8) for z in x],
+        # IMPORTANT: v is sent with its physical sign. The 3D scene uses +Y up,
+        # so a negative Euler-Bernoulli deflection is displayed downward.
         "deflection": [float(z) for z in v],
         "moment": [float(z) for z in m],
         "x_probe": float(x_probe),
         "probe": {"V": shear, "M": moment},
         "supports": _supports(case_id, p),
         "loads": _loads(case_id, p),
-        "section": _section_payload(section_type, section_params),
+        "section": _section_payload(section_type, section_params, length),
         "stress": {
             "y_mm": [float(z) for z in sy],
             "sigma_mpa": [float(z) for z in ss],
