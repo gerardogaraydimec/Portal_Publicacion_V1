@@ -1,1007 +1,214 @@
 from __future__ import annotations
-
-from pathlib import Path
-import base64
 import streamlit as st
 
-ROOT = Path(__file__).resolve().parent.parent
-ASSETS = ROOT / "assets"
+from modules.ui_brand import render_app_header
 
-VERSION = "CONTACTO Y COMUNIDAD V4"
+st.set_page_config(page_title='MechLab · Laboratorio de Ingeniería Mecánica', page_icon='⚙️', layout='wide')
 
-
-def data_uri(path: Path) -> str:
-    mime = "image/jpeg" if path.suffix.lower() in {".jpg", ".jpeg"} else "image/png"
-    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
-    return f"data:{mime};base64,{encoded}"
-
-
-hero_img = data_uri(ASSETS / "gerardo_hero.jpg")
-field_img = data_uri(ASSETS / "gerardo_terreno.jpg")
-industry_img = data_uri(ASSETS / "gerardo_industria.jpg")
-logo_img = data_uri(ASSETS / "logo_mechlab_landing.png")
-sim_img = data_uri(ASSETS / "brochure_simulacion.jpg")
-scan_img = data_uri(ASSETS / "brochure_escaneo.jpg")
-training_img = data_uri(ASSETS / "brochure_formacion.jpg")
-mail_icon = data_uri(ASSETS / "contact_mail.png")
-phone_icon = data_uri(ASSETS / "contact_phone.png")
-instagram_icon = data_uri(ASSETS / "contact_instagram.png")
-linkedin_icon = data_uri(ASSETS / "contact_linkedin.png")
-web_icon = data_uri(ASSETS / "contact_web.png")
-
-css = """
+CSS = r'''
 <style>
+.block-container{max-width:1480px;padding-top:1.0rem!important;padding-bottom:3rem!important}
 :root{
-  --gg-orange:#ff6900;
-  --gg-black:#090909;
-  --gg-charcoal:#171717;
-  --gg-paper:#f7f7f4;
-  --gg-muted:#686b70;
-  --gg-line:#e6e6e2;
+  --gg-orange:#f28e1c;
+  --gg-copper:#c8752d;
+  --gg-graphite:#202126;
+  --gg-ivory:#fbf7f0;
+  --gg-border:#e6ded2;
+  --gg-muted:#6d6a65;
 }
-.block-container{
-  max-width:1500px;
-  padding-top:.6rem;
-  padding-bottom:2.3rem;
-}
-.stApp{background:#ffffff;}
-html{scroll-behavior:smooth;}
-.gg-page{
-  width:100%;
-  color:var(--gg-charcoal);
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-.gg-page *{box-sizing:border-box;}
-.gg-page a{text-decoration:none!important;}
-
 .gg-hero{
-  min-height:610px;
-  display:grid;
-  grid-template-columns:1.06fr .94fr;
-  border-radius:24px;
-  overflow:hidden;
-  position:relative;
-  background:
-    radial-gradient(circle at 16% 16%,rgba(255,105,0,.17),transparent 29%),
-    linear-gradient(135deg,#050505,#111 62%,#1b1b1b);
-  box-shadow:0 18px 52px rgba(0,0,0,.15);
-}
-.gg-hero:before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-  background-size:34px 34px;
-  mask-image:linear-gradient(90deg,#000,transparent 76%);
-  pointer-events:none;
-}
-.gg-hero-copy{
-  padding:58px 58px 55px 60px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  position:relative;
-  z-index:2;
-}
-.gg-brand{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  margin-bottom:23px;
-}
-.gg-brand img{
-  width:86px;
-  height:auto;
-  border-radius:11px;
-  background:#fffaf5;
-}
-.gg-brand strong{
-  display:block;
-  color:#fff;
-  letter-spacing:.04em;
-  font-size:1.04rem;
-}
-.gg-brand small{
-  display:block;
-  color:#aeb1b5;
-  margin-top:3px;
-  font-size:.81rem;
-}
-.gg-kicker{
-  color:var(--gg-orange);
-  font-size:.79rem;
-  text-transform:uppercase;
-  letter-spacing:.10em;
-  font-weight:900;
-  margin-bottom:10px;
-}
-.gg-hero h1{
-  color:#fff;
-  font-size:clamp(2.8rem,4.8vw,5rem);
-  line-height:.98;
-  letter-spacing:-.045em;
-  margin:0 0 20px;
-}
-.gg-hero h1 span{color:var(--gg-orange);}
-.gg-hero-lead{
-  color:#dadada;
-  font-size:1.06rem;
-  line-height:1.58;
-  max-width:760px;
-  margin:0 0 14px;
-}
-.gg-hero-promise{
-  color:#fff;
-  border-left:4px solid var(--gg-orange);
-  padding-left:16px;
-  max-width:720px;
-  line-height:1.52;
-  font-weight:650;
-}
-.gg-actions{
-  display:flex;
-  gap:11px;
-  flex-wrap:wrap;
-  margin-top:22px;
-}
-.gg-btn{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border-radius:11px;
-  padding:13px 18px;
-  font-weight:850;
-  font-size:.92rem;
-  transition:.17s ease;
-}
-.gg-btn:hover{transform:translateY(-2px);}
-.gg-btn-primary{background:var(--gg-orange);color:#fff!important;}
-.gg-btn-dark{background:#171717;border:1px solid #373737;color:#fff!important;}
-.gg-audience{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:20px;
-}
-.gg-audience span{
-  color:#e8e8e8;
-  border:1px solid #343434;
-  background:#151515;
-  border-radius:999px;
-  padding:7px 10px;
-  font-size:.77rem;
-  font-weight:760;
-}
-.gg-hero-photo{
-  min-height:610px;
-  position:relative;
-  background:
-    linear-gradient(90deg,rgba(8,8,8,.45),rgba(8,8,8,.02)),
-    url("__HERO__") center 30%/cover no-repeat;
-}
-.gg-profile{
-  position:absolute;
-  left:25px;
-  right:25px;
-  bottom:25px;
-  color:#fff;
-  background:rgba(7,7,7,.82);
-  border:1px solid rgba(255,255,255,.14);
-  border-left:4px solid var(--gg-orange);
-  border-radius:14px;
-  padding:15px 17px;
-  backdrop-filter:blur(8px);
-  line-height:1.42;
-}
-.gg-profile strong{font-size:1rem;}
-
-.gg-contact-rail{
-  position:relative;
-  z-index:7;
-  display:grid;
-  grid-template-columns:1.35fr repeat(5,1fr);
-  gap:8px;
-  margin:-27px 24px 0;
-  padding:10px;
-  background:linear-gradient(135deg,#070707,#111 74%,#18100b);
-  border:1px solid #2b2b2b;
-  border-radius:18px;
-  box-shadow:0 16px 34px rgba(0,0,0,.18);
-  backdrop-filter:blur(10px);
-}
-.gg-contact-rail-intro{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:8px 12px;
-}
-.gg-contact-rail-intro b{font-size:.93rem;color:var(--gg-orange);}
-.gg-contact-rail-intro span{font-size:.76rem;color:#ffb27d;margin-top:2px;line-height:1.35;}
-.gg-quick-contact{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  min-width:0;
-  border-radius:12px;
-  padding:9px 10px;
-  color:var(--gg-orange)!important;
-  transition:.18s ease;
-  border:1px solid #2d2d2d;
-  background:#101010;
-}
-.gg-quick-contact:hover{
-  border-color:var(--gg-orange);
-  background:#171717;
-  transform:translateY(-1px);
-}
-.gg-quick-icon{
-  flex:0 0 34px;
-  width:34px;
-  height:34px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:10px;
-  color:var(--gg-orange);
-  background:#070707;
-}
-.gg-quick-icon img{width:20px;height:20px;display:block;object-fit:contain;}
-.gg-quick-contact:hover .gg-quick-icon{border-color:var(--gg-orange);}
-.gg-quick-copy{min-width:0;}
-.gg-quick-copy b{display:block;font-size:.76rem;line-height:1.05;color:var(--gg-orange);}
-.gg-quick-copy span{display:block;margin-top:3px;font-size:.69rem;color:#ffb27d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-.gg-value-strip{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:13px;
-  position:relative;
-  z-index:5;
-  margin:14px 18px 0;
-}
-.gg-value{
-  display:flex;
-  gap:13px;
-  min-height:118px;
-  padding:18px;
-  background:#fff;
-  border:1px solid var(--gg-line);
-  border-radius:17px;
-  box-shadow:0 14px 30px rgba(0,0,0,.07);
-}
-.gg-value-icon{
-  min-width:48px;
-  height:48px;
-  border-radius:13px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--gg-orange);
-  background:#111;
-  font-size:1.12rem;
-  font-weight:950;
-}
-.gg-value h3{
-  margin:1px 0 5px;
-  font-size:1rem;
-}
-.gg-value p{
-  margin:0;
-  color:var(--gg-muted);
-  font-size:.84rem;
-  line-height:1.43;
-}
-
-.gg-section{padding:62px 8px 10px;}
-.gg-section h2{
-  margin:0 0 13px;
-  font-size:clamp(2rem,3.3vw,3.2rem);
-  line-height:1.05;
-  letter-spacing:-.03em;
-}
-.gg-intro{
-  max-width:900px;
-  color:var(--gg-muted);
-  font-size:1rem;
-  line-height:1.6;
-  margin-bottom:27px;
-}
-
-.gg-route-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:15px;
-}
-.gg-route{
-  position:relative;
-  overflow:hidden;
-  padding:22px;
-  border:1px solid var(--gg-line);
-  border-radius:18px;
-  background:#fff;
-  box-shadow:0 9px 25px rgba(0,0,0,.045);
-}
-.gg-route:after{
-  content:"";
-  position:absolute;
-  width:115px;
-  height:115px;
-  right:-33px;
-  top:-38px;
-  border:1px solid rgba(255,105,0,.15);
-  border-radius:50%;
-}
-.gg-route-icon{
-  width:52px;
-  height:52px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:14px;
-  color:var(--gg-orange);
-  background:#111;
-  font-size:1.2rem;
-  font-weight:950;
-  margin-bottom:15px;
-}
-.gg-route h3{margin:0 0 7px;font-size:1.12rem;}
-.gg-route p{margin:0;color:var(--gg-muted);font-size:.88rem;line-height:1.5;}
-.gg-route a{
-  display:inline-block;
-  margin-top:13px;
-  color:#111!important;
-  font-weight:850;
-  font-size:.87rem;
-}
-.gg-route a:hover{color:var(--gg-orange)!important;}
-
-.gg-dashboard{
-  display:grid;
-  grid-template-columns:1.18fr repeat(6,.68fr);
-  gap:10px;
-  align-items:center;
+  background:linear-gradient(120deg,#fffaf3 0%,#f8f3eb 62%,#f3ebe0 100%);
+  border:1px solid var(--gg-border);
   border-radius:20px;
-  background:#0b0b0b;
-  color:#fff;
-  padding:24px;
+  padding:1.25rem 1.35rem;
+  margin:.25rem 0 1rem 0;
 }
-.gg-dashboard h3{margin:0 0 5px;color:#fff;font-size:1.17rem;}
-.gg-dashboard p{margin:0;color:#bcbcbc;font-size:.86rem;line-height:1.43;}
-.gg-stat{border-left:1px solid #303030;padding-left:15px;}
-.gg-stat strong{display:block;color:var(--gg-orange);font-size:1.25rem;}
-.gg-stat span{font-size:.77rem;color:#d8d8d8;}
-
-.gg-tools{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-}
-.gg-tool{
-  display:flex;
-  flex-direction:column;
-  min-height:316px;
-  padding:22px;
-  border:1px solid var(--gg-line);
-  border-radius:20px;
-  background:#fff;
-  box-shadow:0 10px 28px rgba(0,0,0,.05);
-  transition:.17s ease;
-}
-.gg-tool:hover{
-  transform:translateY(-3px);
-  box-shadow:0 15px 35px rgba(0,0,0,.075);
-}
-.gg-tool-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:16px;
-}
-.gg-tool-symbol{
-  width:56px;
-  height:56px;
-  border-radius:15px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--gg-orange);
-  background:#111;
-  font-size:1.18rem;
-  font-weight:950;
-}
-.gg-status{
-  padding:6px 9px;
-  border-radius:999px;
-  background:#f4f4f1;
-  color:#555;
-  font-size:.71rem;
-  font-weight:800;
-}
-.gg-tool h3{font-size:1.18rem;margin:0 0 7px;}
-.gg-tool p{color:var(--gg-muted);font-size:.88rem;line-height:1.5;margin:0 0 13px;}
-.gg-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
-.gg-tags span{
-  padding:6px 8px;
-  border-radius:999px;
-  background:#f5f5f2;
-  color:#555;
-  font-size:.72rem;
-  font-weight:700;
-}
-.gg-tool-links{margin-top:auto;}
-.gg-tool-links a{
-  display:block;
-  color:#111!important;
-  font-size:.87rem;
-  font-weight:850;
-  margin-top:8px;
-}
-.gg-tool-links a:hover{color:var(--gg-orange)!important;}
-
-.gg-flow{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-.gg-step{
-  padding:22px;
-  border:1px solid var(--gg-line);
-  border-radius:18px;
-  background:linear-gradient(180deg,#fff,#fafaf8);
-}
-.gg-step-number{
-  width:40px;
-  height:40px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:10px;
-  color:var(--gg-orange);
-  background:#111;
-  font-weight:950;
-  margin-bottom:13px;
-}
-.gg-step h3{font-size:1.06rem;margin:0 0 7px;}
-.gg-step p{color:var(--gg-muted);font-size:.88rem;line-height:1.5;margin:0;}
-
-.gg-vision{
-  display:grid;
-  grid-template-columns:.84fr 1.16fr;
-  overflow:hidden;
-  border-radius:22px;
-  background:#0b0b0b;
-}
-.gg-vision-photo{
-  min-height:515px;
-  background:url("__FIELD__") center center/cover no-repeat;
-}
-.gg-vision-copy{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:52px 54px;
-  background:
-    radial-gradient(circle at 90% 12%,rgba(255,105,0,.12),transparent 31%),
-    #0b0b0b;
-}
-.gg-vision-copy h2{color:#fff;}
-.gg-vision-copy p{color:#d0d0d0;font-size:.98rem;line-height:1.6;margin:0 0 13px;}
-.gg-quote{
-  color:#fff!important;
-  border-left:4px solid var(--gg-orange);
-  padding-left:16px;
-  font-weight:720;
-}
-.gg-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
-.gg-badges span{
-  color:#fff;
-  background:#171717;
-  border:1px solid #343434;
-  border-radius:999px;
-  padding:8px 10px;
-  font-size:.77rem;
-  font-weight:750;
-}
-
-.gg-about{
-  display:grid;
-  grid-template-columns:.82fr 1.18fr;
-  gap:25px;
-}
-.gg-about-photo{
-  min-height:430px;
-  display:flex;
-  align-items:flex-end;
-  padding:23px;
-  border-radius:20px;
-  color:#fff;
-  background:
-    linear-gradient(180deg,transparent 38%,rgba(0,0,0,.76)),
-    url("__INDUSTRY__") center 20%/cover no-repeat;
-}
-.gg-about-copy{
-  padding:32px 34px;
-  border:1px solid var(--gg-line);
-  border-radius:20px;
-  background:#fff;
-}
-.gg-role{color:var(--gg-orange);font-weight:850;margin-bottom:14px;}
-.gg-about-copy p{color:#565b60;line-height:1.58;margin:0 0 12px;}
-.gg-skills{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px;
-  margin-top:16px;
-}
-.gg-skills span{
-  padding:9px 11px;
-  border-radius:10px;
-  background:#f5f5f2;
-  font-size:.82rem;
-  font-weight:750;
-}
-
-.gg-gallery{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:15px;
-}
-.gg-gallery-card{
-  min-height:335px;
-  overflow:hidden;
-  position:relative;
-  border-radius:18px;
-  background:#111;
-}
-.gg-gallery-card img{width:100%;height:100%;object-fit:cover;display:block;}
-.gg-gallery-caption{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  padding:40px 18px 17px;
-  color:#fff;
-  font-weight:850;
-  background:linear-gradient(transparent,rgba(0,0,0,.9));
-}
-
-.gg-contact{
-  margin-top:60px;
-  padding:38px 40px 40px;
-  border-radius:24px;
-  color:#fff;
-  background:
-    radial-gradient(circle at 88% 12%,rgba(255,105,0,.19),transparent 29%),
-    linear-gradient(135deg,#070707,#111 68%,#181818);
-  border:1px solid #242424;
-  box-shadow:0 18px 46px rgba(0,0,0,.12);
-}
-.gg-contact-head{
-  display:grid;
-  grid-template-columns:1.15fr .85fr;
-  gap:32px;
-  align-items:end;
-}
-.gg-contact h2{color:#fff;margin:0 0 8px;}
-.gg-contact p{color:#c9c9c9;line-height:1.55;max-width:850px;margin-bottom:0;}
-.gg-contact-cta{
-  border-left:3px solid var(--gg-orange);
-  padding:5px 0 5px 15px;
-  color:#f1f1f1;
-  font-size:.88rem;
-  line-height:1.5;
-}
-.gg-contact-cta b{color:#fff;}
-.gg-socials{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-  margin-top:24px;
-}
-.gg-socials a{
-  min-height:88px;
-  padding:14px;
-  border:1px solid #303030;
-  border-radius:14px;
-  color:#fff!important;
-  background:#151515;
-  display:flex;
-  align-items:center;
-  gap:11px;
-  transition:.18s ease;
-  min-width:0;
-}
-.gg-socials a:hover{
-  border-color:var(--gg-orange);
-  background:#1b1b1b;
-  transform:translateY(-2px);
-}
-.gg-social-icon{
-  flex:0 0 42px;
-  width:42px;
-  height:42px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:11px;
-  color:var(--gg-orange);
-  background:#090909;
-  border:1px solid #292929;
-}
-.gg-social-icon img{width:24px;height:24px;display:block;object-fit:contain;}
-.gg-social-copy{min-width:0;}
-.gg-socials b{display:block;color:#fff;margin-bottom:4px;font-size:.82rem;}
-.gg-socials span{display:block;color:#aeb1b5;font-size:.72rem;line-height:1.3;overflow-wrap:anywhere;}
-
-.gg-footer{
-  display:flex;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-  padding:20px 5px 3px;
-  color:#777;
-  font-size:.79rem;
-}
-
-@media(max-width:1100px){
-  .gg-hero,.gg-vision,.gg-about{grid-template-columns:1fr;}
-  .gg-hero-photo{min-height:470px;}
-  .gg-value-strip,.gg-tools{grid-template-columns:repeat(2,1fr);}
-  .gg-route-grid,.gg-flow,.gg-gallery{grid-template-columns:1fr 1fr;}
-  .gg-dashboard{grid-template-columns:1fr 1fr;}
-  .gg-contact-rail{grid-template-columns:1.25fr repeat(2,1fr);margin:-18px 12px 0;}
-  .gg-contact-head{grid-template-columns:1fr;}
-  .gg-socials{grid-template-columns:1fr 1fr;}
-}
-@media(max-width:700px){
-  .gg-hero-copy{padding:40px 24px;}
-  .gg-value-strip{margin:14px 0 0;}
-  .gg-contact-rail{grid-template-columns:1fr;margin:12px 0 0;}
-  .gg-contact-rail-intro{padding:8px 10px 3px;}
-  .gg-value-strip,.gg-route-grid,.gg-tools,.gg-flow,.gg-gallery,.gg-dashboard,.gg-socials,.gg-skills{grid-template-columns:1fr;}
-  .gg-vision-copy,.gg-about-copy,.gg-contact{padding:28px 22px;}
-}
+.gg-hero-title{font-size:1.55rem;font-weight:800;color:var(--gg-graphite);line-height:1.12;margin-bottom:.35rem}
+.gg-hero-text{font-size:1.02rem;line-height:1.55;color:#4e4c48;max-width:1100px}
+.gg-route{display:grid;grid-template-columns:repeat(5,1fr);gap:.55rem;margin:.8rem 0 1.1rem 0}
+.gg-route-item{background:#fff;border:1px solid var(--gg-border);border-radius:13px;padding:.76rem .75rem;text-align:center;min-height:84px}
+.gg-route-n{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:50%;background:var(--gg-orange);color:white;font-weight:800;margin-bottom:.25rem}
+.gg-route-b{font-size:.91rem;font-weight:760;color:var(--gg-graphite)}
+.gg-route-s{font-size:.78rem;color:var(--gg-muted);line-height:1.28;margin-top:.12rem}
+.gg-section-title{font-size:1.34rem;font-weight:800;color:var(--gg-graphite);margin:.35rem 0 .6rem 0}
+.gg-area-card{background:white;border:1px solid var(--gg-border);border-radius:16px;padding:1rem 1.05rem;height:100%;box-shadow:0 1px 0 rgba(32,33,38,.025)}
+.gg-area-head{display:flex;gap:.65rem;align-items:flex-start;margin-bottom:.48rem}
+.gg-icon{font-size:1.55rem;line-height:1}
+.gg-area-name{font-size:1.06rem;font-weight:800;color:var(--gg-graphite);line-height:1.18}
+.gg-area-desc{font-size:.87rem;color:var(--gg-muted);line-height:1.38;margin-top:.16rem}
+.gg-module{padding:.22rem 0;font-size:.88rem;line-height:1.35;color:#42413e}
+.gg-module b{color:#26272b}
+.gg-pill{display:inline-block;background:#fff3e3;border:1px solid #f2d3aa;color:#a95c19;font-size:.70rem;font-weight:750;border-radius:999px;padding:.12rem .42rem;margin-left:.25rem;vertical-align:1px}
+.gg-pill-gray{background:#f2f2f2;border-color:#dddddd;color:#666}
+.gg-callout{border:1px solid #d9e6f7;border-left:4px solid #6a91c7;background:#f5f9ff;border-radius:12px;padding:.82rem 1rem;color:#3d4754;font-size:.91rem;line-height:1.45}
+.gg-warning{border:1px solid #eadcc9;border-left:4px solid var(--gg-copper);background:#fffaf4;border-radius:12px;padding:.82rem 1rem;color:#554b40;font-size:.90rem;line-height:1.45}
+.gg-stat{background:var(--gg-graphite);border-radius:14px;padding:.82rem .9rem;color:#f8f1e7;height:100%}
+.gg-stat-n{font-size:1.28rem;font-weight:800;color:#ffad45}
+.gg-stat-t{font-size:.80rem;color:#ddd7cf;line-height:1.3}
+.gg-list{margin:.25rem 0 0 0;padding-left:1.1rem;color:#484743;font-size:.89rem;line-height:1.52}
+.gg-footer{margin-top:1.4rem;border-top:1px solid var(--gg-border);padding-top:.8rem;color:#74716c;font-size:.80rem;line-height:1.45}
+@media(max-width:900px){.gg-route{grid-template-columns:1fr 1fr}.gg-route-item:last-child{grid-column:1/-1}}
 </style>
-"""
+'''
+st.markdown(CSS, unsafe_allow_html=True)
 
-css = (
-    css.replace("__HERO__", hero_img)
-       .replace("__FIELD__", field_img)
-       .replace("__INDUSTRY__", industry_img)
+render_app_header(
+    title='MechLab · Laboratorio de Ingeniería Mecánica',
+    subtitle='Explora fenómenos, construye modelos, calcula, compara y desarrolla criterio de ingeniería a partir del comportamiento de máquinas y sistemas mecánicos.',
+    section='PORTAL',
+    logo_width=188,
 )
-st.html(css)
 
-hero_html = f"""
-<div class="gg-page">
-<section class="gg-hero">
-  <div class="gg-hero-copy">
-    <div class="gg-brand">
-      <img src="{logo_img}" alt="GG DIMEC">
-      <div>
-        <strong>GG DIMEC SPA · MECHLAB</strong>
-        <small>Tecnología avanzada en soluciones reales · aprendizaje aplicado</small>
-      </div>
-    </div>
-    <div class="gg-kicker">Ingeniería visual aplicada</div>
-    <h1>Entiende la ingeniería.<br><span>Luego úsala mejor.</span></h1>
-    <p class="gg-hero-lead">
-      Herramientas interactivas para estudiar, enseñar y revisar conceptos de ingeniería mecánica
-      con apoyo visual, ecuaciones y lectura física del resultado.
-    </p>
-    <div class="gg-hero-promise">
-      MechLab conecta fundamentos, visualización y experiencia industrial para ayudarte a desarrollar
-      criterio técnico, no solo a obtener respuestas.
-    </div>
-    <div class="gg-actions">
-      <a class="gg-btn gg-btn-primary" href="#herramientas">Explorar herramientas ↓</a>
-      <a class="gg-btn gg-btn-dark" href="https://www.gerardogaraydimec.com/" target="_blank">Conocer GG DIMEC ↗</a>
-    </div>
-    <div class="gg-audience">
-      <span>Estudiantes</span><span>Docentes</span><span>Ingenieros</span><span>Industria</span>
-    </div>
+st.markdown('''
+<div class="gg-hero">
+  <div class="gg-hero-title">Un laboratorio digital para comprender antes de calcular</div>
+  <div class="gg-hero-text">
+    MechLab organiza herramientas de ingeniería mecánica alrededor de una idea común: partir del fenómeno físico,
+    representarlo con un modelo comprensible, resolverlo con ecuaciones y gráficos, y terminar interpretando qué significa
+    el resultado para una máquina, componente o sistema. El 3D se usa cuando ayuda a ver el fenómeno; no para decorar la interfaz.
   </div>
-  <div class="gg-hero-photo">
-    <div class="gg-profile">
-      <strong>Gerardo Garay Pereira</strong><br>
-      Ingeniero Civil Mecánico · Docente · Fundador de GG DIMEC SPA
-    </div>
-  </div>
-</section>
-
-<section class="gg-contact-rail" aria-label="Contacto rápido">
-  <div class="gg-contact-rail-intro">
-    <b>Conversemos de ingeniería</b>
-    <span>Contacto directo · comunidad · colaboración</span>
-  </div>
-  <a class="gg-quick-contact" href="mailto:gerardogaray.dimec@gmail.com">
-    <div class="gg-quick-icon"><img src="{mail_icon}" alt="Correo"></div><div class="gg-quick-copy"><b>Correo</b><span>gerardogaray.dimec@gmail.com</span></div>
-  </a>
-  <a class="gg-quick-contact" href="tel:+56957288516">
-    <div class="gg-quick-icon"><img src="{phone_icon}" alt="Teléfono"></div><div class="gg-quick-copy"><b>Teléfono</b><span>+56 9 5728 8516</span></div>
-  </a>
-  <a class="gg-quick-contact" href="https://www.instagram.com/gerardogaray.dimec/" target="_blank">
-    <div class="gg-quick-icon"><img src="{instagram_icon}" alt="Instagram"></div><div class="gg-quick-copy"><b>Instagram</b><span>@gerardogaray.dimec</span></div>
-  </a>
-  <a class="gg-quick-contact" href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank">
-    <div class="gg-quick-icon"><img src="{linkedin_icon}" alt="LinkedIn"></div><div class="gg-quick-copy"><b>LinkedIn</b><span>Gerardo Garay Pereira</span></div>
-  </a>
-  <a class="gg-quick-contact" href="https://www.gerardogaraydimec.com/" target="_blank">
-    <div class="gg-quick-icon"><img src="{web_icon}" alt="Sitio web"></div><div class="gg-quick-copy"><b>Sitio web</b><span>gerardogaraydimec.com</span></div>
-  </a>
-</section>
-
-<section class="gg-value-strip">
-  <div class="gg-value"><div class="gg-value-icon">σ</div><div><h3>Visualiza</h3><p>Convierte ecuaciones en estados, geometría y comportamiento observable.</p></div></div>
-  <div class="gg-value"><div class="gg-value-icon">∑</div><div><h3>Analiza</h3><p>Cambia variables y entiende por qué cambia la respuesta del modelo.</p></div></div>
-  <div class="gg-value"><div class="gg-value-icon">⚙</div><div><h3>Aplica</h3><p>Conecta fundamentos con problemas propios del diseño y la industria.</p></div></div>
-  <div class="gg-value"><div class="gg-value-icon">↗</div><div><h3>Crece</h3><p>Refuerza criterio técnico y construye una forma más sólida de pensar ingeniería.</p></div></div>
-</section>
-"""
-st.html(hero_html)
-
-routes_html = """
-<section class="gg-section gg-page">
-  <div class="gg-kicker">Elige tu ruta</div>
-  <h2>MechLab se adapta a cómo quieres aprender</h2>
-  <div class="gg-route-grid">
-    <div class="gg-route">
-      <div class="gg-route-icon">🎓</div>
-      <h3>Estoy estudiando</h3>
-      <p>Refuerza fundamentos, explora gráficos y comprende cómo responden las variables.</p>
-      <a href="#herramientas">Ir a herramientas →</a>
-    </div>
-    <div class="gg-route">
-      <div class="gg-route-icon">▣</div>
-      <h3>Estoy enseñando</h3>
-      <p>Apoya clases con recursos visuales que conectan modelo, ecuación e interpretación.</p>
-      <a href="#herramientas">Explorar módulos →</a>
-    </div>
-    <div class="gg-route">
-      <div class="gg-route-icon">🏭</div>
-      <h3>Estoy trabajando</h3>
-      <p>Revisa conceptos y conecta fundamentos con ingeniería aplicada y comunicación técnica.</p>
-      <a href="https://www.gerardogaraydimec.com/" target="_blank">Ver GG DIMEC →</a>
-    </div>
-  </div>
-</section>
-"""
-
-
-dashboard_html = """
-<section class="gg-section gg-page">
-  <div class="gg-dashboard">
-    <div>
-      <h3>Una misma lógica de ingeniería</h3>
-      <p>Familias reconocibles para encontrar herramientas según el problema que necesitas estudiar, diseñar, medir o verificar.</p>
-    </div>
-    <div class="gg-stat"><strong>σ</strong><span>Resistencia y estructuras</span></div>
-    <div class="gg-stat"><strong>⚙</strong><span>Máquinas y componentes</span></div>
-    <div class="gg-stat"><strong>ω</strong><span>Dinámica y vibraciones</span></div>
-    <div class="gg-stat"><strong>Q·E</strong><span>Fluidos y energía</span></div>
-    <div class="gg-stat"><strong>µm</strong><span>Metrología y calidad</span></div>
-    <div class="gg-stat"><strong>CAE</strong><span>Simulación y cálculo numérico</span></div>
-  </div>
-</section>
-"""
-st.html(dashboard_html)
-
-tools_html = """
-<div id="herramientas"></div>
-<section class="gg-section gg-page">
-  <div class="gg-kicker">Familias de herramientas</div>
-  <h2>Encuentra la herramienta por el tipo de problema que estás resolviendo</h2>
-  <div class="gg-intro">
-    MechLab no está organizado como una malla curricular. Las herramientas se agrupan en familias técnicas
-    reconocibles para estudiantes e ingenieros, manteniendo una narrativa común: comprender el comportamiento,
-    diseñar componentes, estudiar la respuesta dinámica, trabajar con fluidos y energía, verificar la conformidad
-    y modelar numéricamente los sistemas.
-  </div>
-  <div class="gg-tools">
-    <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">σ</div><span class="gg-status">¿Cómo resiste?</span></div>
-      <h3>Resistencia y Estructuras</h3>
-      <p>Cargas, esfuerzos, tensiones, diagramas y propiedades geométricas para comprender cómo responde un sólido o una estructura.</p>
-      <div class="gg-tags"><span>Esfuerzos</span><span>Vigas</span><span>Mohr</span><span>Perfiles</span></div>
-      <div class="gg-tool-links">
-        <a href="/mohr-2d">Círculo de Mohr 2D →</a>
-        <a href="/mohr-3d">Círculo de Mohr 3D →</a>
-        <a href="/vigas-cortante-momento">Vigas · Cortante, Momento y Deflexión →</a>
-        <a href="/perfiles-estructurales">Biblioteca de Perfiles Estructurales →</a>
-      </div>
-    </div>
-
-    <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">⚙</div><span class="gg-status">¿Cómo lo dimensiono?</span></div>
-      <h3>Máquinas y Componentes</h3>
-      <p>Herramientas para analizar, dimensionar y verificar componentes que forman parte de máquinas y sistemas mecánicos.</p>
-      <div class="gg-tags"><span>Diseño</span><span>Componentes</span><span>Falla</span><span>Seguridad</span></div>
-      <div class="gg-tool-links">
-        <a href="/von-mises">Von Mises Lab →</a>
-      </div>
-    </div>
-
-    <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">ω</div><span class="gg-status">¿Cómo responde?</span></div>
-      <h3>Dinámica y Vibraciones</h3>
-      <p>Movimiento, respuesta temporal, frecuencia natural, amortiguamiento, excitación y resonancia de sistemas mecánicos.</p>
-      <div class="gg-tags"><span>1-GDL</span><span>Respuesta</span><span>Frecuencia</span><span>Resonancia</span></div>
-      <div class="gg-tool-links">
-        <a href="/vibraciones-1gdl">Vibraciones libres 1-GDL →</a>
-        <a href="/vibracion-forzada-1gdl">Vibración forzada 1-GDL →</a>
-      </div>
-    </div>
-
-    <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">Q·E</div><span class="gg-status">¿Cómo fluye y transforma?</span></div>
-      <h3>Fluidos y Energía</h3>
-      <p>Flujo, presión, pérdidas, bombeo, propiedades termodinámicas y transformación de energía en sistemas reales.</p>
-      <div class="gg-tags"><span>Bernoulli</span><span>Reynolds</span><span>Bombas</span><span>Agua-vapor</span><span>Ciclos</span></div>
-      <div class="gg-tool-links">
-        <a href="/fluidos-continuidad-bernoulli">Continuidad y Bernoulli →</a>
-        <a href="/fluidos-reales-reynolds-perdidas">Reynolds y pérdidas en tuberías →</a>
-        <a href="/bombas-curvas-sistema">Bombas y Curvas de Sistema →</a>
-        <a href="/agua-vapor">Propiedades del agua y vapor →</a>
-        <a href="/ciclos-termodinamicos">Ciclos termodinámicos →</a>
-      </div>
-    </div>
-
-    <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">µm</div><span class="gg-status">¿Cómo verifico?</span></div>
-      <h3>Metrología y Calidad</h3>
-      <p>Especificación, tolerancias, medición, incertidumbre y conformidad para decidir si una pieza cumple lo que realmente necesita.</p>
-      <div class="gg-tags"><span>ISO 286</span><span>Incertidumbre</span><span>ISO GPS</span><span>Conformidad</span></div>
-      <div class="gg-tool-links">
-        <a href="/ajustes-tolerancias-iso">Ajustes y Tolerancias ISO →</a>
-        <a href="/medicion-incertidumbre">Medición e Incertidumbre →</a>
-        <a href="/tolerancias-geometricas-iso-gps">Tolerancias Geométricas ISO GPS →</a>
-      </div>
-    </div>
-
-    <div class="gg-tool">
-      <div class="gg-tool-top"><div class="gg-tool-symbol">CAE</div><span class="gg-status">¿Cómo lo modelo?</span></div>
-      <h3>Simulación y Cálculo Numérico</h3>
-      <p>Modelado computacional para estudiar el comportamiento de sistemas mediante discretización, simulación, interpretación y validación.</p>
-      <div class="gg-tags"><span>FEM</span><span>CFD</span><span>Térmico</span><span>Modal</span><span>Mallado</span><span>Convergencia</span></div>
-      <div class="gg-tool-links">
-        <span style="display:block;color:#777;font-size:.83rem;line-height:1.45;margin-top:8px;">Familia definida para reunir los laboratorios de simulación y análisis numérico de MechLab.</span>
-      </div>
-    </div>
-  </div>
-</section>
-"""
-st.html(tools_html)
-
-# Rutas por tipo de usuario, después de presentar la arquitectura de familias.
-st.html(routes_html)
-
-flow_html = """
-<section class="gg-section gg-page">
-  <div class="gg-kicker">Cómo trabajar</div>
-  <h2>Tres pasos. Mucho más criterio.</h2>
-  <div class="gg-flow">
-    <div class="gg-step"><div class="gg-step-number">1</div><h3>Define el problema</h3><p>Selecciona la herramienta y configura las condiciones que quieres estudiar.</p></div>
-    <div class="gg-step"><div class="gg-step-number">2</div><h3>Explora la respuesta</h3><p>Mueve variables, compara escenarios y observa gráficos, estados y ecuaciones.</p></div>
-    <div class="gg-step"><div class="gg-step-number">3</div><h3>Interpreta</h3><p>Entiende qué significa el resultado y cómo se conecta con ingeniería real.</p></div>
-  </div>
-</section>
-"""
-st.html(flow_html)
-
-vision_html = """
-<section class="gg-section gg-page">
-  <div class="gg-vision">
-    <div class="gg-vision-photo"></div>
-    <div class="gg-vision-copy">
-      <div class="gg-kicker">Mi visión</div>
-      <h2>Aprender con ingeniería real</h2>
-      <p>
-        GG DIMEC nació desde la ingeniería aplicada y el trabajo con problemas reales.
-        Esa misma lógica quiero llevar al aprendizaje: comprender, modelar, visualizar, cuestionar y mejorar.
-      </p>
-      <p class="gg-quote">
-        Quiero que MechLab ayude a estudiantes e ingenieros a aprender mejor y a desarrollar una forma
-        más clara, rigurosa y útil de pensar la ingeniería.
-      </p>
-      <div class="gg-badges">
-        <span>Industria real</span><span>Docencia</span><span>Simulación</span><span>Diseño mecánico</span><span>Aprendizaje continuo</span>
-      </div>
-    </div>
-  </div>
-</section>
-"""
-st.html(vision_html)
-
-about_html = """
-<section class="gg-section gg-page">
-  <div class="gg-kicker">Sobre mí</div>
-  <div class="gg-about">
-    <div class="gg-about-photo">
-      <div><b>Ingeniería en terreno</b><br>Experiencia técnica, industria y aprendizaje conectado con la realidad.</div>
-    </div>
-    <div class="gg-about-copy">
-      <h2>Gerardo Garay Pereira</h2>
-      <div class="gg-role">Ingeniero Civil Mecánico · Docente · Fundador de GG DIMEC SPA</div>
-      <p>
-        Trabajo en diseño mecánico, simulación, levantamiento 3D, análisis de equipos y formación técnica.
-        Me interesa traducir problemas complejos en soluciones claras y aplicables.
-      </p>
-      <p>
-        MechLab nace como una extensión de esa visión: compartir herramientas que ayuden a estudiar,
-        enseñar y seguir creciendo profesionalmente.
-      </p>
-      <div class="gg-skills">
-        <span>Diseño mecánico</span><span>Simulación FEM / CFD</span>
-        <span>Escaneo 3D</span><span>Ingeniería inversa</span>
-        <span>Docencia</span><span>Capacitación técnica</span>
-      </div>
-    </div>
-  </div>
-</section>
-"""
-st.html(about_html)
-
-gallery_html = f"""
-<section class="gg-section gg-page">
-  <div class="gg-kicker">Ingeniería aplicada</div>
-  <h2>De la industria a la enseñanza</h2>
-  <div class="gg-intro">
-    La experiencia de GG DIMEC alimenta MechLab: modelamiento, simulación,
-    digitalización 3D y transferencia de conocimiento.
-  </div>
-  <div class="gg-gallery">
-    <div class="gg-gallery-card"><img src="{sim_img}" alt="Simulación"><div class="gg-gallery-caption">Simulación estructural y dinámica</div></div>
-    <div class="gg-gallery-card"><img src="{scan_img}" alt="Escaneo 3D"><div class="gg-gallery-caption">Escaneo 3D e ingeniería inversa</div></div>
-    <div class="gg-gallery-card"><img src="{training_img}" alt="Capacitación"><div class="gg-gallery-caption">Capacitación y transferencia de conocimiento</div></div>
-  </div>
-</section>
-"""
-st.html(gallery_html)
-
-contact_html = f"""
-<div id="contacto"></div>
-<section class="gg-contact gg-page">
-  <div class="gg-contact-head">
-    <div>
-      <div class="gg-kicker">Contacto y comunidad</div>
-      <h2>La ingeniería también se construye conversando</h2>
-      <p>
-        Sigue el desarrollo de MechLab, revisa proyectos de GG DIMEC o conversemos directamente
-        sobre ingeniería, docencia, colaboración y nuevas herramientas.
-      </p>
-    </div>
-    <div class="gg-contact-cta">
-      <b>¿Tienes una idea, observación o desafío?</b><br>
-      Escríbeme. MechLab también crece desde las preguntas y necesidades reales de quienes lo usan.
-    </div>
-  </div>
-  <div class="gg-socials">
-    <a href="mailto:gerardogaray.dimec@gmail.com">
-      <div class="gg-social-icon"><img src="{mail_icon}" alt="Correo"></div>
-      <div class="gg-social-copy"><b>Correo</b><span>gerardogaray.dimec@gmail.com</span></div>
-    </a>
-    <a href="tel:+56957288516">
-      <div class="gg-social-icon"><img src="{phone_icon}" alt="Teléfono"></div>
-      <div class="gg-social-copy"><b>Teléfono</b><span>+56 9 5728 8516</span></div>
-    </a>
-    <a href="https://www.instagram.com/gerardogaray.dimec/" target="_blank">
-      <div class="gg-social-icon"><img src="{instagram_icon}" alt="Instagram"></div>
-      <div class="gg-social-copy"><b>Instagram</b><span>@gerardogaray.dimec</span></div>
-    </a>
-    <a href="https://www.linkedin.com/in/gerardo-garay-pereira/" target="_blank">
-      <div class="gg-social-icon"><img src="{linkedin_icon}" alt="LinkedIn"></div>
-      <div class="gg-social-copy"><b>LinkedIn</b><span>Gerardo Garay Pereira</span></div>
-    </a>
-    <a href="https://www.gerardogaraydimec.com/" target="_blank">
-      <div class="gg-social-icon"><img src="{web_icon}" alt="Sitio web"></div>
-      <div class="gg-social-copy"><b>Sitio web</b><span>www.gerardogaraydimec.com</span></div>
-    </a>
-  </div>
-</section>
-<div class="gg-footer gg-page">
-  <span>GG DIMEC SPA · Gerardo Garay Pereira · Chile</span>
-  <span>Tecnología Avanzada en Soluciones Reales. Tu confianza, nuestro mayor orgullo.</span>
 </div>
-"""
-st.html(contact_html)
+''', unsafe_allow_html=True)
+
+st.markdown('''
+<div class="gg-route">
+  <div class="gg-route-item"><div class="gg-route-n">1</div><div class="gg-route-b">Fenómeno</div><div class="gg-route-s">¿Qué está ocurriendo físicamente?</div></div>
+  <div class="gg-route-item"><div class="gg-route-n">2</div><div class="gg-route-b">Modelo</div><div class="gg-route-s">Idealizaciones, variables y supuestos.</div></div>
+  <div class="gg-route-item"><div class="gg-route-n">3</div><div class="gg-route-b">Cálculo</div><div class="gg-route-s">Ecuaciones, diagramas y resultados.</div></div>
+  <div class="gg-route-item"><div class="gg-route-n">4</div><div class="gg-route-b">Visualización</div><div class="gg-route-s">3D, animaciones y respuesta del sistema.</div></div>
+  <div class="gg-route-item"><div class="gg-route-n">5</div><div class="gg-route-b">Interpretación</div><div class="gg-route-s">Comparar, explicar y tomar decisiones.</div></div>
+</div>
+''', unsafe_allow_html=True)
+
+st.markdown('<div class="gg-section-title">Mapa actual de MechLab</div>', unsafe_allow_html=True)
+
+row1 = st.columns(3, gap='medium')
+with row1[0]:
+    st.markdown('''
+<div class="gg-area-card">
+ <div class="gg-area-head"><div class="gg-icon">🏗️</div><div><div class="gg-area-name">Resistencia y Estructuras</div><div class="gg-area-desc">De cargas internas y tensiones a estabilidad, torsión y comportamiento de secciones.</div></div></div>
+ <div class="gg-module"><b>Vigas</b> · V(x), M(x), tensiones, deflexión y corte 3D <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Columnas</b> · compresión, esbeltez y pandeo de Euler <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Torsión</b> · giro, esfuerzo cortante y comparación de secciones <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Mohr 2D / 3D</b> · transformación y estado de tensiones</div>
+ <div class="gg-module"><b>Von Mises</b> · lectura de estado equivalente</div>
+ <div class="gg-module"><b>Perfiles estructurales</b> · propiedades geométricas y secciones</div>
+</div>''', unsafe_allow_html=True)
+
+with row1[1]:
+    st.markdown('''
+<div class="gg-area-card">
+ <div class="gg-area-head"><div class="gg-icon">🌀</div><div><div class="gg-area-name">Dinámica y Vibraciones</div><div class="gg-area-desc">Del movimiento libre a resonancia, absorbedores y diagnóstico vibracional.</div></div></div>
+ <div class="gg-module"><b>1GDL libre</b> · x(t), v(t), a(t), energía y plano de fase <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>1GDL forzada</b> · fuerza armónica, desbalance y excitación de base <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>2GDL / TMD</b> · modos, antirresonancia y absorbedor dinámico <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Diagnóstico</b> · señal temporal, FFT, órdenes, waterfall y sensores <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Comparadores</b> · respuesta A/B para observar sensibilidad de parámetros</div>
+</div>''', unsafe_allow_html=True)
+
+with row1[2]:
+    st.markdown('''
+<div class="gg-area-card">
+ <div class="gg-area-head"><div class="gg-icon">🌊</div><div><div class="gg-area-name">Fluidos y Energía</div><div class="gg-area-desc">Conecta conservación de energía, régimen de flujo, pérdidas y operación hidráulica.</div></div></div>
+ <div class="gg-module"><b>Continuidad y Bernoulli</b> · presión, velocidad y energía <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Reynolds y pérdidas</b> · régimen, fricción, HGL/EGL y comparación <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Bombas y sistema</b> · curva H–Q, punto de operación, válvula y afinidad <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Propiedades del agua</b> · estados y propiedades termodinámicas</div>
+ <div class="gg-module"><b>Ciclos termodinámicos</b> · análisis energético de procesos y ciclos</div>
+</div>''', unsafe_allow_html=True)
+
+row2 = st.columns([1.0, 1.0, 1.0], gap='medium')
+with row2[0]:
+    st.markdown('''
+<div class="gg-area-card">
+ <div class="gg-area-head"><div class="gg-icon">📏</div><div><div class="gg-area-name">Metrología y Calidad</div><div class="gg-area-desc">Comprende especificación dimensional, geometría real y decisión de conformidad.</div></div></div>
+ <div class="gg-module"><b>ISO GPS</b> · datums, zonas geométricas y conformidad <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Ajustes y tolerancias ISO</b> · juego, transición e interferencia <span class="gg-pill">3D</span></div>
+ <div class="gg-module"><b>Medición e incertidumbre</b> · dispersión, resolución y decisión metrológica</div>
+</div>''', unsafe_allow_html=True)
+
+with row2[1]:
+    st.markdown('''
+<div class="gg-area-card">
+ <div class="gg-area-head"><div class="gg-icon">⚙️</div><div><div class="gg-area-name">Máquinas y Componentes</div><div class="gg-area-desc">La capa de aplicación: conecta las herramientas con componentes y sistemas mecánicos reales.</div></div></div>
+ <div class="gg-module"><b>Ejes, soportes, rotores y bombas</b> aparecen como casos físicos en los distintos laboratorios.</div>
+ <div class="gg-module"><b>Comparación de diseños</b> permite observar cómo geometría y parámetros cambian la respuesta.</div>
+ <div class="gg-module"><b>Lectura de máquinas</b> prioriza fenómeno → modelo → cálculo → interpretación.</div>
+ <div class="gg-module"><span class="gg-pill gg-pill-gray">en expansión</span> Esta área seguirá integrando aplicaciones de los módulos fundamentales.</div>
+</div>''', unsafe_allow_html=True)
+
+with row2[2]:
+    st.markdown('''
+<div class="gg-area-card">
+ <div class="gg-area-head"><div class="gg-icon">🧭</div><div><div class="gg-area-name">Cómo recorrer MechLab</div><div class="gg-area-desc">No es necesario estudiar los módulos en un único orden.</div></div></div>
+ <div class="gg-module"><b>Para aprender:</b> parte en “Cómo usar / Concepto”, modifica una variable y observa qué cambia.</div>
+ <div class="gg-module"><b>Para resolver:</b> define el modelo, revisa unidades y usa luego diagramas y ecuaciones.</div>
+ <div class="gg-module"><b>Para comparar:</b> usa A/B cuando esté disponible y cambia una variable cada vez.</div>
+ <div class="gg-module"><b>Para interpretar:</b> termina siempre en la pestaña de lectura o interpretación.</div>
+</div>''', unsafe_allow_html=True)
+
+st.markdown('<div class="gg-section-title">Qué significa el 3D en MechLab</div>', unsafe_allow_html=True)
+a,b = st.columns([1.05,1.0], gap='medium')
+with a:
+    st.markdown('''
+<div class="gg-callout"><b>El 3D es una herramienta de comprensión.</b><br>
+La animación puede amplificar desplazamientos, giros o deformaciones para volver visibles fenómenos que en escala real serían imperceptibles. Los valores numéricos continúan siendo los del modelo físico. Cuando una representación es didáctica —por ejemplo partículas de flujo, modos de pandeo o giro amplificado— la herramienta lo indica explícitamente.</div>
+''', unsafe_allow_html=True)
+with b:
+    st.markdown('''
+<div class="gg-warning"><b>Alcance.</b><br>
+MechLab no reemplaza CFD, FEA, software de rotodinámica, tablas normativas certificadas ni procedimientos de metrología industrial. Su propósito es construir comprensión, apoyar el estudio, explorar sensibilidad y desarrollar criterio antes de pasar a herramientas de mayor fidelidad.</div>
+''', unsafe_allow_html=True)
+
+st.markdown('<div class="gg-section-title">Una misma forma de trabajar en todo el portal</div>', unsafe_allow_html=True)
+s1,s2,s3,s4 = st.columns(4, gap='medium')
+with s1:
+    st.markdown('<div class="gg-stat"><div class="gg-stat-n">01</div><div class="gg-stat-t"><b>Configura</b><br>Define geometría, material, carga, fluido o condición de operación.</div></div>', unsafe_allow_html=True)
+with s2:
+    st.markdown('<div class="gg-stat"><div class="gg-stat-n">02</div><div class="gg-stat-t"><b>Observa</b><br>Usa el 3D y los gráficos para reconocer el fenómeno.</div></div>', unsafe_allow_html=True)
+with s3:
+    st.markdown('<div class="gg-stat"><div class="gg-stat-n">03</div><div class="gg-stat-t"><b>Comprueba</b><br>Revisa ecuaciones, magnitudes, unidades y supuestos.</div></div>', unsafe_allow_html=True)
+with s4:
+    st.markdown('<div class="gg-stat"><div class="gg-stat-n">04</div><div class="gg-stat-t"><b>Interpreta</b><br>Explica qué cambia, por qué cambia y qué significa para el sistema.</div></div>', unsafe_allow_html=True)
+
+with st.expander('📚 Ver rutas de estudio sugeridas', expanded=False):
+    x,y,z = st.columns(3)
+    with x:
+        st.markdown('''**Resistencia de materiales**
+- Tensiones y Mohr
+- Vigas
+- Columnas
+- Torsión
+- Von Mises
+- Perfiles y geometría''')
+    with y:
+        st.markdown('''**Dinámica de máquinas**
+- Vibración libre 1GDL
+- Vibración forzada
+- Desbalance / base
+- 2GDL y TMD
+- Diagnóstico FFT / órdenes''')
+    with z:
+        st.markdown('''**Fluidos y sistemas hidráulicos**
+- Continuidad y Bernoulli
+- Reynolds
+- Pérdidas
+- Bombas y curva del sistema
+- Energía y operación''')
+
+with st.expander('🧪 Buenas prácticas al usar los laboratorios', expanded=False):
+    st.markdown('''
+- Cambia **una variable a la vez** cuando estés estudiando sensibilidad.
+- Verifica siempre **unidades, signos y condiciones de borde** antes de interpretar resultados.
+- Usa la vista 3D para comprender geometría y fenómeno; usa los gráficos para leer magnitud y tendencia.
+- Si una deformación está amplificada visualmente, no la confundas con la escala física real.
+- En normas, tolerancias, diseño y diagnóstico, diferencia entre una **herramienta didáctica** y un procedimiento de aceptación industrial.
+- Cuando exista comparador A/B, formula primero una hipótesis y luego comprueba qué cambió.
+''')
+
+st.markdown('''
+<div class="gg-footer">
+<b>GG DIMEC · MechLab</b> — entorno de aprendizaje y exploración de ingeniería mecánica. Navega por las áreas desde el menú superior.
+Las herramientas evolucionan de forma incremental procurando mantener una misma lógica visual y conceptual en todo el portal.
+</div>
+''', unsafe_allow_html=True)
