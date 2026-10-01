@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from itertools import count
+
 import math
 from typing import Iterable
 
 import numpy as np
 import plotly.graph_objects as go
+
+_PLOTLY_SEQ = count(1)
 import streamlit as st
 
 ORANGE = "#f28e1c"
@@ -317,4 +321,9 @@ def render_machine_hydraulics_3d(data: dict, height: int = 640):
         annotations=[dict(text="Arrastra para rotar · rueda para zoom · líneas de color = asociación hidráulica espacial",x=.5,y=1.02,xref="paper",yref="paper",showarrow=False,font=dict(color="#aeb3bb",size=10))],
         uirevision=f"hyd3d-{machine}-{data.get('subsystem','')}-{data.get('state','')}-{data.get('visual_amp',1)}-{view}",
     )
-    st.plotly_chart(fig,use_container_width=True,config={"displaylogo":False,"scrollZoom":True},key=data.get("plotly_key","hyd3d"))
+    chart_key = data.get("plotly_key")
+    if not chart_key:
+        # Compatibilidad con una página V3 o V4 incompleta: evita que cuatro
+        # visores ocultos compartan la clave fija "hyd3d".
+        chart_key = f"hyd3d_auto_{next(_PLOTLY_SEQ)}"
+    st.plotly_chart(fig,use_container_width=True,config={"displaylogo":False,"scrollZoom":True},key=chart_key)
