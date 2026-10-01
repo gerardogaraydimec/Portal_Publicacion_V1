@@ -147,9 +147,9 @@ tabs = st.tabs(['📊 Vista compacta', '🧩 Pieza 3D', '📐 Zona de tolerancia
 with tabs[0]:
     a,b = st.columns([1.0,1.2])
     with a:
-        st.plotly_chart(result_gauge(res.ratio), use_container_width=True)
+        st.plotly_chart(result_gauge(res.ratio), use_container_width=True, key='iso_gps_gauge_compacta')
     with b:
-        st.plotly_chart(zone_plot(kind, tol, dev), use_container_width=True)
+        st.plotly_chart(zone_plot(kind, tol, dev), use_container_width=True, key='iso_gps_zone_compacta')
     st.markdown('### Lectura rápida')
     bullets = {
         'Posición': 'El centro/eje real debe quedar dentro del cilindro de tolerancia de diámetro t ubicado en la posición teórica verdadera.',
@@ -169,7 +169,7 @@ with tabs[1]:
 with tabs[2]:
     left, right = st.columns([1.2,1.0])
     with left:
-        st.plotly_chart(zone_plot(kind, tol, dev), use_container_width=True)
+        st.plotly_chart(zone_plot(kind, tol, dev), use_container_width=True, key='iso_gps_zone_detalle')
     with right:
         st.markdown('### Marco conceptual')
         st.markdown(f'**Tolerancia seleccionada:** {kind}')
