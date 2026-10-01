@@ -136,16 +136,6 @@ diagnostico_vibracional = st.Page(
 )
 # --- fin ampliación vibraciones ---
 
-# --- Hidráulica aplicada · GG DIMEC MechLab ---
-hidraulica_aplicada = st.Page(
-    "pages/hidraulica_aplicada.py",
-    title="Hidráulica aplicada · Maquinaria",
-    icon="🛠️",
-    url_path="hidraulica-aplicada",
-)
-# --- fin hidráulica aplicada ---
-
-
 
 
 pg = st.navigation(
@@ -160,7 +150,6 @@ pg = st.navigation(
             biblioteca_perfiles,
         ],
         "Máquinas y Componentes": [
-            hidraulica_aplicada,
             vibraciones_2gdl,
             diagnostico_vibracional,
             von_mises_lab,
