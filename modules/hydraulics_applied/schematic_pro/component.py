@@ -17,10 +17,13 @@ def render_hydraulic_schematic(data: dict, height: int = 650):
 </div>
 <style>
 html,body{margin:0;background:transparent;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#202126}.hydv4{height:__HEIGHT__px;border:1px solid #d9dcdf;border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 7px 20px #0000000d}.topbar{height:66px;box-sizing:border-box;padding:9px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e3e4e7;background:#fff;gap:14px}.topbar b{display:block;font-size:15px}.topbar span#subtitle{display:block;color:#697079;font-size:11px;margin-top:3px}.legend{display:flex;gap:9px;flex-wrap:wrap;font-size:10.5px;color:#555b63;justify-content:flex-end}.legend span{display:flex;align-items:center;gap:4px}.legend i{display:inline-block;width:18px;height:4px;border-radius:99px}.legend .p{background:#d84030}.legend .t{background:#2a63b8}.legend .s{background:#4e9b57}.legend .ls{background:#d6b72c}.legend .d{background:#e58b32}.stage{height:515px;background:linear-gradient(#fcfcfb,#f8f7f4)}.stage svg{width:100%;height:100%;display:block}.footer{height:68px;display:grid;grid-template-columns:1fr 1fr;background:#e1e3e6;gap:1px;border-top:1px solid #e1e3e6}.footer>div{background:#fff;padding:9px 14px;font-size:11.5px;line-height:1.35}.footer b{display:block;font-size:10px;letter-spacing:.055em;margin-bottom:3px}.footer span{color:#59606a}
-.base{fill:none;stroke:#b4b9c0;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}.flow{fill:none;stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:13 9;animation:dash .82s linear infinite}.pressure{stroke:#d84030}.return{stroke:#2a63b8}.suction{stroke:#4e9b57}.pilot{stroke:#d6b72c;stroke-width:2.7;stroke-dasharray:8 7}.drain{stroke:#e58b32;stroke-width:3;stroke-dasharray:4 7}.sym{fill:#fff;stroke:#25282d;stroke-width:2.6}.symActive{stroke:#f28e1c;stroke-width:4}.thin{fill:none;stroke:#25282d;stroke-width:2}.tagBox{fill:#202126}.tagTxt{fill:#fff;font-size:10px;font-weight:800}.name{font-size:10.5px;fill:#40454d;font-weight:680}.port{font-size:10px;fill:#202126;font-weight:850}.lane{font-size:9px;fill:#9a9fa7;font-weight:650;letter-spacing:.08em}.tp{fill:#fff;stroke:#f28e1c;stroke-width:2}.tpTxt{font-size:9px;fill:#a65b10;font-weight:850}.note{fill:#fffaf3;stroke:#ead5ba;stroke-width:1}.noteTitle{fill:#c97317;font-size:9px;font-weight:850;letter-spacing:.08em}.noteBody{fill:#5d626a;font-size:9px}.ghost{opacity:.30}.groupBox{fill:#fbfbfa;stroke:#cfd4da;stroke-width:1.25;stroke-dasharray:6 5}.groupTitle{font-size:9px;fill:#727981;font-weight:850;letter-spacing:.09em}.routeLabel{font-size:9px;fill:#5d646d;font-weight:760}@keyframes dash{to{stroke-dashoffset:-44}}
+.base{fill:none;stroke:#b9bec5;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}.flow{fill:none;stroke-width:4.0;stroke-linecap:round;stroke-linejoin:round}.posActive{fill:#fff2df;stroke:#f28e1c;stroke-width:3.4}.junction{fill:#25282d;stroke:none}.pressure{stroke:#d84030}.return{stroke:#2a63b8}.suction{stroke:#4e9b57}.pilot{stroke:#d6b72c;stroke-width:2.7;stroke-dasharray:8 7}.drain{stroke:#e58b32;stroke-width:3;stroke-dasharray:4 7}.sym{fill:#fff;stroke:#25282d;stroke-width:2.6}.symActive{stroke:#f28e1c;stroke-width:4}.thin{fill:none;stroke:#25282d;stroke-width:2}.tagBox{fill:#202126}.tagTxt{fill:#fff;font-size:10px;font-weight:800}.name{font-size:10.5px;fill:#40454d;font-weight:680}.port{font-size:10px;fill:#202126;font-weight:850}.lane{font-size:9px;fill:#9a9fa7;font-weight:650;letter-spacing:.08em}.tp{fill:#fff;stroke:#f28e1c;stroke-width:2}.tpTxt{font-size:9px;fill:#a65b10;font-weight:850}.note{fill:#fffaf3;stroke:#ead5ba;stroke-width:1}.noteTitle{fill:#c97317;font-size:9px;font-weight:850;letter-spacing:.08em}.noteBody{fill:#5d626a;font-size:9px}.ghost{opacity:.30}.groupBox{fill:#fbfbfa;stroke:#cfd4da;stroke-width:1.25;stroke-dasharray:6 5}.groupTitle{font-size:9px;fill:#727981;font-weight:850;letter-spacing:.09em}.routeLabel{font-size:9px;fill:#5d646d;font-weight:760}.pilot{stroke-dasharray:8 7}.drain{stroke-dasharray:4 7}
 </style>
 <script>
 const D=__DATA__,S=document.getElementById('svg'),NS='http://www.w3.org/2000/svg';
+const defs=document.createElementNS(NS,'defs');S.appendChild(defs);
+const markerColors={pressure:'#d84030',return:'#2a63b8',suction:'#4e9b57',pilot:'#d6b72c',drain:'#e58b32'};
+for(const [id,color] of Object.entries(markerColors)){const m=document.createElementNS(NS,'marker');m.setAttribute('id','arr_'+id);m.setAttribute('markerWidth','8');m.setAttribute('markerHeight','8');m.setAttribute('refX','7');m.setAttribute('refY','4');m.setAttribute('orient','auto');const q=document.createElementNS(NS,'path');q.setAttribute('d','M0,0 L8,4 L0,8 z');q.setAttribute('fill',color);m.appendChild(q);defs.appendChild(m)}
 document.getElementById('title').textContent=D.machine+' · '+D.subsystem;
 document.getElementById('subtitle').textContent='Estado: '+D.state+' · esquema funcional didáctico · NO OEM';
 document.getElementById('motion').textContent=D.motion||'';
@@ -36,7 +39,8 @@ function txt(x,y,t,cl='name',anc='middle',p=S){const n=el('text',{x,y,class:cl,'
 function poly(points,cl='sym',p=S){return el('polygon',{points,class:cl},p)}
 function gcomp(key){return el('g',{class:comps.has(key)?'active':''})}
 function activeClass(role,id){return active[role]&&active[role].has(id)?'flow '+role:null}
-function wire(id,role,pts){let d='M'+pts[0][0]+' '+pts[0][1];for(let i=1;i<pts.length;i++)d+=' L'+pts[i][0]+' '+pts[i][1];path(d,'base');const c=activeClass(role,id);if(c)path(d,c)}
+function wire(id,role,pts){let d='M'+pts[0][0]+' '+pts[0][1];for(let i=1;i<pts.length;i++)d+=' L'+pts[i][0]+' '+pts[i][1];path(d,'base');const c=activeClass(role,id);if(c){const q=path(d,c);q.setAttribute('marker-end','url(#arr_'+role+')')}}
+function node(x,y){circle(x,y,4,'junction')}
 function spring(x,y,h=48,p=S){let q=[];for(let i=0;i<8;i++)q.push((x+(i%2?7:-7))+','+(y+i*h/7));el('polyline',{points:q.join(' '),class:'thin'},p)}
 function springH(x,y,w=44,p=S){let q=[];for(let i=0;i<8;i++)q.push((x+i*w/7)+','+(y+(i%2?7:-7)));el('polyline',{points:q.join(' '),class:'thin'},p)}
 function arrowLine(x1,y1,x2,y2,p=S){line(x1,y1,x2,y2,'thin',p);const a=Math.atan2(y2-y1,x2-x1),L=9;const pts=[[x2,y2],[x2-L*Math.cos(a-.55),y2-L*Math.sin(a-.55)],[x2-L*Math.cos(a+.55),y2-L*Math.sin(a+.55)]];poly(pts.map(q=>q[0]+','+q[1]).join(' '),'tagBox',p)}
@@ -62,21 +66,37 @@ function hmu(x,y,code='U1'){circle(x,y,34,'sym');txt(x,y+4,'HMU','port');tag(x-1
 function priority(x,y,code='V1'){rect(x-34,y-27,68,54,'sym',3);txt(x,y+4,'PRIO','port');tag(x-15,y+37,code,'Prioridad')}
 function accum(x,y,code){rect(x-22,y-43,44,86,'sym',20);line(x-22,y,x+22,y,'thin');txt(x,y-14,'G','port');tag(x-15,y+54,code,'Acumulador')}
 function brake(x,y){rect(x-38,y-27,76,54,'sym',3);line(x-24,y+16,x+24,y-16,'thin');tag(x-15,y+37,'V2','Válvula freno')}
-function dcv43(x,y,key='Direccional 4/3',center='closed',code='V1'){const g=gcomp(key),w=58,h=64;for(let i=0;i<3;i++)rect(x+i*w,y,w,h,comps.has(key)?'sym symActive':'sym',0,g);
- // posición izquierda: P→A y B→T
+function valvePosIndex(){
+ const st=(D.state||'').toLowerCase();
+ if(['reposo','hold','float','neutro','standby'].some(v=>st.includes(v)))return 1;
+ if(['retroceso','lower','dump','derecha','retorno'].some(v=>st.includes(v)))return 2;
+ return 0;
+}
+function dcv43(x,y,key='Direccional 4/3',center='closed',code='V1'){
+ const g=gcomp(key),w=58,h=64,activeIdx=valvePosIndex();
+ for(let i=0;i<3;i++)rect(x+i*w,y,w,h,i===activeIdx?'posActive':(comps.has(key)?'sym symActive':'sym'),0,g);
+ // Posición izquierda: P→A y B→T
  arrowLine(x+16,y+h-12,x+16,y+14,g);arrowLine(x+42,y+14,x+42,y+h-12,g);
- // posición central
+ // Centro
  const cx=x+w;
- if(center==='float'){line(cx+16,y+15,cx+16,y+37,'thin',g);line(cx+42,y+15,cx+42,y+37,'thin',g);line(cx+16,y+37,cx+42,y+37,'thin',g);arrowLine(cx+42,y+37,cx+42,y+h-12,g);line(cx+8,y+h-17,cx+24,y+h-17,'thin',g)}
- else if(center==='tandem'){arrowLine(cx+16,y+h-13,cx+42,y+h-13,g);line(cx+8,y+17,cx+24,y+17,'thin',g);line(cx+34,y+17,cx+50,y+17,'thin',g)}
- else if(center==='open'){line(cx+16,y+16,cx+16,y+34,'thin',g);line(cx+42,y+16,cx+42,y+34,'thin',g);line(cx+16,y+34,cx+42,y+34,'thin',g);line(cx+16,y+34,cx+16,y+h-14,'thin',g);line(cx+42,y+34,cx+42,y+h-14,'thin',g);circle(cx+29,y+34,3,'tagBox',g)}
- else{for(const [xx,yy] of [[cx+16,y+17],[cx+42,y+17],[cx+16,y+h-17],[cx+42,y+h-17]])line(xx-8,yy,xx+8,yy,'thin',g)}
- // posición derecha: P→B y A→T
+ if(center==='float'){
+   const ym=y+35;line(cx+16,y+15,cx+16,ym,'thin',g);line(cx+42,y+15,cx+42,ym,'thin',g);line(cx+16,ym,cx+42,ym,'thin',g);arrowLine(cx+42,ym,cx+42,y+h-12,g);line(cx+8,y+h-17,cx+24,y+h-17,'thin',g)
+ } else if(center==='tandem'){
+   arrowLine(cx+16,y+h-13,cx+42,y+h-13,g);line(cx+8,y+17,cx+24,y+17,'thin',g);line(cx+34,y+17,cx+50,y+17,'thin',g)
+ } else if(center==='open'){
+   const ym=y+34;line(cx+16,y+16,cx+16,ym,'thin',g);line(cx+42,y+16,cx+42,ym,'thin',g);line(cx+16,ym,cx+42,ym,'thin',g);line(cx+16,ym,cx+16,y+h-14,'thin',g);line(cx+42,ym,cx+42,y+h-14,'thin',g);circle(cx+29,ym,3,'tagBox',g)
+ } else {
+   for(const [xx,yy] of [[cx+16,y+17],[cx+42,y+17],[cx+16,y+h-17],[cx+42,y+h-17]])line(xx-8,yy,xx+8,yy,'thin',g)
+ }
+ // Posición derecha: P→B y A→T
  arrowLine(x+2*w+16,y+h-12,x+2*w+42,y+14,g);arrowLine(x+2*w+16,y+14,x+2*w+42,y+h-12,g);
- const mid=x+1.5*w;port(mid-18,y-9,'A');port(mid+18,y-9,'B');port(mid-18,y+h+15,'P');port(mid+18,y+h+15,'T');
- // centrado por resortes: ayuda a identificar el reposo sin asumir el accionamiento real
- springH(x-42,y+h/2,36,g);springH(x+3*w+6,y+h/2,36,g);
- tag(mid-15,y+h+23,code,key);return g}
+ const mid=x+1.5*w;
+ port(mid-18,y-9,'A');port(mid+18,y-9,'B');port(mid-18,y+h+15,'P');port(mid+18,y+h+15,'T');
+ // Resortes de centrado. El constructor de válvulas muestra los accionamientos en detalle.
+ springH(x-38,y+h/2,34,g);springH(x+3*w+4,y+h/2,34,g);
+ if(mode!=='Técnico'){txt(x+w/2,y-7,'I','lane');txt(x+1.5*w,y-7,'N','lane');txt(x+2.5*w,y-7,'D','lane')}
+ tag(mid-15,y+h+23,code,key);return g
+}
 function cyl(x,y,key='Cilindro',code='A1',tel=false){const g=gcomp(key);if(tel){rect(x,y,125,56,'sym',4,g);rect(x+40,y+8,115,40,'sym',4,g);line(x+155,y+28,x+205,y+28,'thin',g);port(x-10,y+17,'A');port(x-10,y+47,'B')}else{rect(x,y,155,58,'sym',4,g);line(x+56,y,x+56,y+58,'thin',g);line(x+56,y+29,x+200,y+29,'thin',g);port(x+20,y-8,'A');port(x+124,y+74,'B')}tag(x+58,y+69,code,key);return g}
 function cylV(x,y,key='Cilindro vertical',code='A1'){rect(x,y,62,150,'sym',4);line(x,y+77,x+62,y+77,'thin');line(x+31,y+77,x+31,y-52,'thin');port(x-12,y+118,'A');port(x+74,y+42,'B');tag(x+15,y+162,code,key)}
 function note(x,y,w,title,body){rect(x,y,w,50,'note',8);txt(x+12,y+16,title,'noteTitle','start');txt(x+12,y+35,body,'noteBody','start')}

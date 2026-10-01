@@ -6,7 +6,7 @@ import streamlit as st
 from modules.ui_brand import render_app_header
 from modules.hydraulics_applied.hydraulic_engine import cylinder_performance
 from modules.hydraulics_applied.symbol_catalog_v3 import SYMBOLS, PORTS, families, symbols_in_family
-from modules.hydraulics_applied.symbol_studio import render_symbol, render_valve_builder
+from modules.hydraulics_applied.symbol_studio import render_symbol, render_valve_builder, valve_connection_table
 from modules.hydraulics_applied.system_cases import SYSTEM_CASES, system_state, course_comparison_rows, diagnostic_cases
 from modules.hydraulics_applied.schematic_pro import render_hydraulic_schematic
 from modules.hydraulics_applied.machine_reference import (
@@ -38,7 +38,7 @@ render_app_header(
     logo_width=188,
 )
 
-st.markdown('''<div class="gg-note"><b>Enfoque V4.6:</b> la prioridad es la <b>lectura hidráulica real</b>: símbolo → puerto → posición → trayectoria → actuador → medición. En maquinaria móvil se conserva una referencia visual estática para ubicar componentes, pero se elimina el 3D interactivo porque no agrega suficiente valor pedagógico frente al plano funcional.</div>''',unsafe_allow_html=True)
+st.markdown('''<div class="gg-note"><b>Enfoque V4.7:</b> la prioridad es la <b>lectura hidráulica real</b>: símbolo → puerto → posición → trayectoria → actuador → medición. En maquinaria móvil se conserva una referencia visual estática para ubicar componentes, pero se elimina el 3D interactivo porque no agrega suficiente valor pedagógico frente al plano funcional.</div>''',unsafe_allow_html=True)
 
 study_mode=st.sidebar.radio('Modo de estudio',['Guiado','Intermedio','Técnico'],index=0,help='Guiado muestra nombres y ayudas. Técnico reduce ayudas para obligar a leer puertos y símbolos.')
 st.sidebar.markdown('**Código funcional de líneas**')
@@ -161,7 +161,7 @@ with TABS[0]:
         with col: st.markdown(f'<div class="gg-card"><b style="font-size:1.15rem;color:#f28e1c">{p}</b><br><span style="font-size:.83rem">{desc}</span></div>',unsafe_allow_html=True)
 
 with TABS[1]:
-    s1,s2=st.tabs(['Biblioteca de símbolos','Constructor de válvulas'])
+    s1,s2,s3=st.tabs(['Biblioteca de símbolos','Constructor de válvulas','Cómo leer un plano'])
     with s1:
         st.subheader(f'Biblioteca técnica · {len(SYMBOLS)} símbolos/elementos')
         family=st.selectbox('Familia',families(),key='sym_family')
@@ -191,8 +191,36 @@ with TABS[1]:
             c.text_input('Centro',value='No aplica',disabled=True,key='vb_center_off')
             act_options=['Manual + resorte','Solenoide + resorte','Pilotaje hidráulico + resorte','Doble solenoide con detent']
         act=d.selectbox('Accionamiento',act_options,key='vb_act')
-        render_valve_builder(ways,positions,center,act,height=445)
-        st.markdown('''<div class="gg-orange"><b>Método de lectura:</b> 1) casillas = posiciones; 2) líneas externas = vías/puertos; 3) identifique reposo por resorte/accionamiento; 4) siga flechas y bloqueos; 5) prediga P, T, A y B; 6) recién entonces prediga movimiento.</div>''',unsafe_allow_html=True)
+        render_valve_builder(ways,positions,center,act,height=465)
+        st.markdown('#### Lectura por posición')
+        st.dataframe(pd.DataFrame(valve_connection_table(ways,positions,center,act)),use_container_width=True,hide_index=True)
+        st.markdown('''<div class="gg-orange"><b>Método de lectura:</b> 1) casillas = posiciones; 2) líneas externas = vías/puertos; 3) identifique reposo por resorte/accionamiento; 4) lea una sola casilla por vez; 5) siga P, T, A y B; 6) recién entonces prediga movimiento.</div>''',unsafe_allow_html=True)
+    with s3:
+        st.subheader('Cómo leer un plano hidráulico sin perderse en las líneas')
+        st.caption('El objetivo es seguir la función, no memorizar la forma completa del plano.')
+        c1,c2,c3=st.columns(3)
+        with c1:
+            st.markdown('<div class="gg-step"><div class="n">1</div><div class="t">Ubique la fuente</div><div class="d">Depósito → bomba → protección de presión. Empiece siempre por P.</div></div>',unsafe_allow_html=True)
+            st.markdown('<div class="gg-step"><div class="n">4</div><div class="t">Siga A y B</div><div class="d">A/B son líneas de trabajo. Determine qué cámara recibe presión y cuál descarga.</div></div>',unsafe_allow_html=True)
+        with c2:
+            st.markdown('<div class="gg-step"><div class="n">2</div><div class="t">Lea el mando</div><div class="d">Identifique vías, posiciones, centro y accionamiento. No mezcle casillas.</div></div>',unsafe_allow_html=True)
+            st.markdown('<div class="gg-step"><div class="n">5</div><div class="t">Separe señales</div><div class="d">X/LS/Y/L no son potencia principal. Trátelos como pilotaje, control o drenaje.</div></div>',unsafe_allow_html=True)
+        with c3:
+            st.markdown('<div class="gg-step"><div class="n">3</div><div class="t">Identifique protecciones</div><div class="d">Alivio, check, contrabalance, secuencia y controles de caudal cambian la ruta disponible.</div></div>',unsafe_allow_html=True)
+            st.markdown('<div class="gg-step"><div class="n">6</div><div class="t">Mida para verificar</div><div class="d">Convierta el plano en puntos de prueba: P, A, B, LS, drenaje y retorno.</div></div>',unsafe_allow_html=True)
+        st.markdown('### Convenciones visuales que debe distinguir')
+        rows=[
+            ['Línea continua','conducción principal / trabajo','seguir como trayectoria hidráulica'],
+            ['Línea discontinua','pilotaje, señal o drenaje según convención','no asumir que transporta caudal de potencia'],
+            ['Cruce sin punto','líneas que se cruzan sin conectarse','no existe unión hidráulica'],
+            ['Cruce con punto','unión / derivación','el nodo sí comunica las líneas'],
+            ['Flecha dentro de casilla','camino y sentido funcional en esa posición','leer solo la casilla seleccionada'],
+            ['Barra corta en puerto','puerto bloqueado','no existe paso en esa posición'],
+        ]
+        st.dataframe(pd.DataFrame(rows,columns=['Elemento','Qué representa','Cómo leerlo']),use_container_width=True,hide_index=True)
+        st.markdown('### Puertos de referencia')
+        _port_signage()
+        st.info('Regla práctica: primero describa el circuito en palabras —por ejemplo “P alimenta A y B retorna a T”— y solo después prediga qué hará el actuador.')
 
 with TABS[2]:
     st.subheader('Circuitos didácticos · plano → estado → lectura → medición')

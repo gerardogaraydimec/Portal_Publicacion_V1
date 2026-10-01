@@ -366,55 +366,79 @@ h2{{font-size:19px;margin:3px 0 0}}.family{{font-size:11px;text-transform:upperc
 
 
 
-def _h_spring(x1: int, y: int, direction: int = 1, length: int = 64) -> str:
+def _h_spring(x1: float, y: float, direction: int = 1, length: int = 52) -> str:
+    """Resorte horizontal legible para accionamientos de válvula."""
     pts=[]
-    steps=8
-    for i in range(steps+1):
+    steps=9
+    pts.append(f"{x1:.1f},{y:.1f}")
+    for i in range(1,steps):
         xx=x1 + direction*(i*length/steps)
-        yy=y + (10 if i%2 else -10)
+        yy=y + (8 if i%2 else -8)
         pts.append(f"{xx:.1f},{yy:.1f}")
+    pts.append(f"{x1+direction*length:.1f},{y:.1f}")
     return f'<polyline points="{" ".join(pts)}" fill="none" stroke="{INK}" stroke-width="2.5"/>'
 
 
-def _actuator_side(x: float, y: float, side: str, kind: str) -> str:
-    left = side == 'left'
-    d = -1 if left else 1
+def _solenoid_box(x: float, y: float, side: str) -> str:
+    left=side=='left'
+    bx=x-34 if left else x
+    diag = _line(bx+5,y+22,bx+29,y-22,w=2) if left else _line(bx+5,y-22,bx+29,y+22,w=2)
+    return _rect(bx,y-25,34,50,fill='white',stroke=INK,sw=2)+diag
+
+
+def _pilot_triangle(x: float, y: float, side: str) -> str:
+    if side=='left':
+        pts=f"{x-34},{y-20} {x-34},{y+20} {x},{y}"
+        lead=_line(x-72,y,x-34,y,dash='7 6',w=2)
+    else:
+        pts=f"{x+34},{y-20} {x+34},{y+20} {x},{y}"
+        lead=_line(x+34,y,x+72,y,dash='7 6',w=2)
+    return f'<polygon points="{pts}" fill="white" stroke="{INK}" stroke-width="2.2"/>'+lead
+
+
+def _manual_lever(x: float, y: float, side: str) -> str:
+    d=-1 if side=='left' else 1
+    px=x+d*34
+    return (_line(x,y,px,y,w=2.5)+_line(px,y,px+d*36,y-42,w=4)+
+            _circle(px+d*41,y-46,7,fill='white',stroke=INK,w=2))
+
+
+def _detent(x: float, y: float, side: str) -> str:
+    d=-1 if side=='left' else 1
+    p=x+d*10
+    q=x+d*44
+    return (_line(x,y,p,y,w=2.2)+
+            f'<path d="M{p} {y-20} L{q} {y} L{p} {y+20}" fill="none" stroke="{INK}" stroke-width="2.2"/>')
+
+
+def _builder_end(x: float, y: float, side: str, device: str, spring: bool=False, detent: bool=False) -> str:
+    d=-1 if side=='left' else 1
     out=''
-    lower=kind.lower()
-    if 'resorte' in lower or 'centrado' in lower:
-        sx=x + d*8
-        out += _h_spring(sx, y, d, 56)
-    if 'solenoide' in lower:
-        bx=x + d*86 - (28 if left else 0)
-        out += _rect(bx, y-25, 28, 50, fill='white', stroke=INK, sw=2)
-        if left: out += _line(bx+4,y+20,bx+24,y-20,w=2)
-        else: out += _line(bx+4,y-20,bx+24,y+20,w=2)
-    if 'pilotaje' in lower or 'pilotado' in lower:
-        cx=x + d*93
-        pts=(f"{cx+18},{y-18} {cx+18},{y+18} {cx-12},{y}" if left else f"{cx-18},{y-18} {cx-18},{y+18} {cx+12},{y}")
-        out += f'<polygon points="{pts}" fill="white" stroke="{INK}" stroke-width="2.2"/>'
-        out += _line(cx+d*20,y,cx+d*58,y,dash='7 6',w=2)
-    if 'manual' in lower or 'palanca' in lower:
-        px=x + d*72
-        out += _line(x+d*6,y,px,y,w=2.5)
-        out += _line(px,y,px+d*34,y-46,w=4)
-        out += _circle(px+d*38,y-50,7,fill='white',stroke=INK,w=2)
-    if 'detent' in lower:
-        px=x+d*72
-        out += _line(x+d*5,y,px,y,w=2.5)
-        if left:
-            path_d=f'M{px} {y-22} L{px-14} {y} L{px} {y+22} L{px-14} {y+44}'
-        else:
-            path_d=f'M{px} {y-22} L{px+14} {y} L{px} {y+22} L{px+14} {y+44}'
-        out += f'<path d="{path_d}" fill="none" stroke="{INK}" stroke-width="2.4"/>'
+    cursor=x
+    if spring:
+        out += _h_spring(cursor+d*4,y,d,46)
+        cursor += d*54
+    dev=device.lower()
+    if 'solenoide' in dev and 'pilot' in dev:
+        out += _solenoid_box(cursor+d*4,y,side)
+        cursor += d*42
+        out += _pilot_triangle(cursor,y,side)
+    elif 'solenoide' in dev:
+        out += _solenoid_box(cursor+d*4,y,side)
+    elif 'pilot' in dev:
+        out += _pilot_triangle(cursor,y,side)
+    elif 'manual' in dev or 'palanca' in dev:
+        out += _manual_lever(cursor,y,side)
+    if detent:
+        out += _detent(cursor+d*46,y,side)
     return out
 
 
 def _builder_valve_svg(ways: int, positions: int, center: str, actuation: str) -> str:
-    W,H=120,112
+    W,H=116,108
     total=W*positions
-    x0=(760-total)/2
-    y0=72
+    x0=(820-total)/2
+    y0=86
     body=''
     if positions==3:
         rest_idx=1
@@ -429,125 +453,161 @@ def _builder_valve_svg(ways: int, positions: int, center: str, actuation: str) -
     def arr(x1,y1,x2,y2):
         return _line(x1,y1,x2,y2,w=3,extra='marker-end="url(#arr)"')
     def cap(x,y):
-        return _line(x-11,y,x+11,y,w=3)
-
+        return _line(x-12,y,x+12,y,w=3)
     def fourway_cell(x,mode):
         if mode=='pa_bt':
-            return arr(x+34,y0+H-14,x+34,y0+16)+arr(x+86,y0+16,x+86,y0+H-14)
+            return arr(x+32,y0+H-15,x+32,y0+15)+arr(x+84,y0+15,x+84,y0+H-15)
         if mode=='pb_at':
-            return arr(x+34,y0+H-14,x+86,y0+16)+arr(x+34,y0+16,x+86,y0+H-14)
+            return arr(x+32,y0+H-15,x+84,y0+15)+arr(x+32,y0+15,x+84,y0+H-15)
         if mode=='closed':
-            return cap(x+34,y0+24)+cap(x+86,y0+24)+cap(x+34,y0+H-24)+cap(x+86,y0+H-24)
+            return ''.join(cap(xx,yy) for xx,yy in [(x+32,y0+22),(x+84,y0+22),(x+32,y0+H-22),(x+84,y0+H-22)])
         if mode=='open':
-            out=_line(x+34,y0+24,x+34,y0+56,w=3)+_line(x+86,y0+24,x+86,y0+56,w=3)+_line(x+34,y0+56,x+86,y0+56,w=3)+_line(x+34,y0+56,x+34,y0+H-24,w=3)+_line(x+86,y0+56,x+86,y0+H-24,w=3)
-            return out+_circle(x+60,y0+56,4,fill=INK,stroke=INK,w=1)
+            ym=y0+H/2
+            return (_line(x+32,y0+20,x+32,ym,w=3)+_line(x+84,y0+20,x+84,ym,w=3)+
+                    _line(x+32,ym,x+84,ym,w=3)+_line(x+32,ym,x+32,y0+H-20,w=3)+
+                    _line(x+84,ym,x+84,y0+H-20,w=3)+_circle(x+58,ym,4,fill=INK,stroke=INK,w=1))
         if mode=='tandem':
-            return arr(x+34,y0+H-18,x+86,y0+H-18)+cap(x+34,y0+25)+cap(x+86,y0+25)
-        jx=x+86; jy=y0+64
-        return (_line(x+34,y0+22,x+34,jy,w=3)+_line(x+86,y0+22,x+86,jy,w=3)+
-                _line(x+34,jy,jx,jy,w=3)+arr(jx,jy,jx,y0+H-14)+cap(x+34,y0+H-23))
+            return arr(x+32,y0+H-18,x+84,y0+H-18)+cap(x+32,y0+23)+cap(x+84,y0+23)
+        ym=y0+54
+        return (_line(x+32,y0+20,x+32,ym,w=3)+_line(x+84,y0+20,x+84,ym,w=3)+
+                _line(x+32,ym,x+84,ym,w=3)+arr(x+84,ym,x+84,y0+H-16)+cap(x+32,y0+H-22))
 
-    def threeway_cell(x,mode):
-        if mode=='closed_rest':
-            return _line(x+60,y0+22,x+60,y0+56,w=3)+arr(x+60,y0+56,x+92,y0+H-18)+cap(x+30,y0+H-24)
-        return arr(x+30,y0+H-18,x+60,y0+18)+cap(x+92,y0+H-24)
+    def threeway_cell(x,active):
+        if active:
+            return arr(x+32,y0+H-16,x+58,y0+18)+cap(x+86,y0+H-22)
+        return arr(x+58,y0+18,x+86,y0+H-16)+cap(x+32,y0+H-22)
 
-    def twoway_cell(x,open_state=False):
-        return arr(x+60,y0+H-18,x+60,y0+18) if open_state else cap(x+60,y0+24)+cap(x+60,y0+H-24)
+    def twoway_cell(x,open_state):
+        return arr(x+58,y0+H-16,x+58,y0+18) if open_state else cap(x+58,y0+22)+cap(x+58,y0+H-22)
 
     if ways==4:
         if positions==3:
             body+=fourway_cell(x0,'pa_bt')
-            mode={'Cerrado':'closed','Abierto':'open','Tándem':'tandem','Flotante':'float'}.get(center,'closed')
-            body+=fourway_cell(x0+W,mode)
+            body+=fourway_cell(x0+W,{'Cerrado':'closed','Abierto':'open','Tándem':'tandem','Flotante':'float'}.get(center,'closed'))
             body+=fourway_cell(x0+2*W,'pb_at')
             px=x0+W
         else:
             body+=fourway_cell(x0,'pa_bt')+fourway_cell(x0+W,'pb_at')
             px=x0+W
-        body+=_line(px+34,y0-36,px+34,y0)+_line(px+86,y0-36,px+86,y0)
-        body+=_line(px+34,y0+H,px+34,y0+H+36)+_line(px+86,y0+H,px+86,y0+H+36)
-        body+=_txt(px+34,y0-46,'A',18,800)+_txt(px+86,y0-46,'B',18,800)+_txt(px+34,y0+H+58,'P',18,800)+_txt(px+86,y0+H+58,'T',18,800)
+        for xx,label in ((px+32,'A'),(px+84,'B')):
+            body+=_line(xx,y0-34,xx,y0)+_txt(xx,y0-46,label,18,800)
+        for xx,label in ((px+32,'P'),(px+84,'T')):
+            body+=_line(xx,y0+H,xx,y0+H+34)+_txt(xx,y0+H+55,label,18,800)
     elif ways==3:
-        body+=threeway_cell(x0,'active')+threeway_cell(x0+W,'closed_rest')
+        body+=threeway_cell(x0,True)+threeway_cell(x0+W,False)
         px=x0+W
-        body+=_line(px+60,y0-36,px+60,y0)+_line(px+30,y0+H,px+30,y0+H+36)+_line(px+92,y0+H,px+92,y0+H+36)
-        body+=_txt(px+60,y0-46,'A',18,800)+_txt(px+30,y0+H+58,'P',18,800)+_txt(px+92,y0+H+58,'T',18,800)
+        body+=_line(px+58,y0-34,px+58,y0)+_txt(px+58,y0-46,'A',18,800)
+        body+=_line(px+32,y0+H,px+32,y0+H+34)+_txt(px+32,y0+H+55,'P',18,800)
+        body+=_line(px+86,y0+H,px+86,y0+H+34)+_txt(px+86,y0+H+55,'T',18,800)
     else:
         body+=twoway_cell(x0,True)+twoway_cell(x0+W,False)
         px=x0+W
-        body+=_line(px+60,y0-36,px+60,y0)+_line(px+60,y0+H,px+60,y0+H+36)
-        body+=_txt(px+60,y0-46,'2',18,800)+_txt(px+60,y0+H+58,'1',18,800)
+        body+=_line(px+58,y0-34,px+58,y0)+_txt(px+58,y0-46,'2',18,800)
+        body+=_line(px+58,y0+H,px+58,y0+H+34)+_txt(px+58,y0+H+55,'1',18,800)
 
     left_x=x0; right_x=x0+total; cy=y0+H/2; lower=actuation.lower()
     if positions==3:
         if 'doble solenoide' in lower:
-            body += _actuator_side(left_x,cy,'left','solenoide')+_actuator_side(right_x,cy,'right','solenoide')
-            body += _actuator_side(left_x,cy,'left','resorte')+_actuator_side(right_x,cy,'right','resorte')
+            body += _builder_end(left_x,cy,'left','solenoide',spring=True)
+            body += _builder_end(right_x,cy,'right','solenoide',spring=True)
         elif 'doble pilotaje' in lower:
-            body += _actuator_side(left_x,cy,'left','pilotaje')+_actuator_side(right_x,cy,'right','pilotaje')
-            body += _actuator_side(left_x,cy,'left','resorte')+_actuator_side(right_x,cy,'right','resorte')
+            body += _builder_end(left_x,cy,'left','pilotaje',spring=True)
+            body += _builder_end(right_x,cy,'right','pilotaje',spring=True)
         elif 'solenoide pilotado' in lower:
-            body += _actuator_side(left_x,cy,'left','solenoide pilotaje')+_actuator_side(right_x,cy,'right','solenoide pilotaje')
-            body += _actuator_side(left_x,cy,'left','resorte')+_actuator_side(right_x,cy,'right','resorte')
+            body += _builder_end(left_x,cy,'left','solenoide pilotado',spring=True)
+            body += _builder_end(right_x,cy,'right','solenoide pilotado',spring=True)
         else:
-            body += _actuator_side(left_x,cy,'left','manual')
-            body += _actuator_side(left_x,cy,'left','resorte')+_actuator_side(right_x,cy,'right','resorte')
+            body += _builder_end(left_x,cy,'left','palanca',spring=True)
+            body += _builder_end(right_x,cy,'right','',spring=True)
     else:
         if 'doble solenoide' in lower and 'detent' in lower:
-            body += _actuator_side(left_x,cy,'left','solenoide detent')+_actuator_side(right_x,cy,'right','solenoide detent')
+            body += _builder_end(left_x,cy,'left','solenoide',detent=True)
+            body += _builder_end(right_x,cy,'right','solenoide',detent=True)
         elif 'solenoide' in lower:
-            body += _actuator_side(left_x,cy,'left','solenoide')+_actuator_side(right_x,cy,'right','resorte')
+            body += _builder_end(left_x,cy,'left','solenoide')
+            body += _builder_end(right_x,cy,'right','',spring=True)
         elif 'pilotaje' in lower:
-            body += _actuator_side(left_x,cy,'left','pilotaje')+_actuator_side(right_x,cy,'right','resorte')
+            body += _builder_end(left_x,cy,'left','pilotaje')
+            body += _builder_end(right_x,cy,'right','',spring=True)
         else:
-            body += _actuator_side(left_x,cy,'left','manual')+_actuator_side(right_x,cy,'right','resorte')
+            body += _builder_end(left_x,cy,'left','manual')
+            body += _builder_end(right_x,cy,'right','',spring=True)
 
     if rest_idx is not None:
         rx=x0+rest_idx*W+W/2
-        body += _txt(rx,y0-66,'REPOSO',12,800,color=ORANGE)+_line(rx,y0-60,rx,y0-52,w=2,color=ORANGE)
+        body += _txt(rx,y0-61,'REPOSO',12,800,color=ORANGE)+_line(rx,y0-55,rx,y0-47,w=2,color=ORANGE)
     else:
-        body += _txt(380,y0-66,'SIN REPOSO FIJO · DETENT',12,800,color=ORANGE)
-    return _svg_wrap(body,width=760,height=300)
+        body += _txt(410,y0-61,'SIN REPOSO FIJO · DETENT',12,800,color=ORANGE)
+    return _svg_wrap(body,width=820,height=320)
 
-def render_valve_builder(ways: int, positions: int, center: str, actuation: str, height: int = 430):
+
+def valve_connection_table(ways: int, positions: int, center: str, actuation: str):
+    if ways==4 and positions==3:
+        mid={
+            'Cerrado':'P, T, A y B bloqueados',
+            'Abierto':'P, T, A y B comunicados',
+            'Tándem':'P → T; A y B bloqueados',
+            'Flotante':'A → T y B → T; P bloqueado',
+        }.get(center,'Centro no definido')
+        return [
+            {'Posición':'Izquierda','Conexiones':'P → A; B → T','Lectura':'una dirección del actuador'},
+            {'Posición':'Centro / reposo','Conexiones':mid,'Lectura':'condición de reposo'},
+            {'Posición':'Derecha','Conexiones':'P → B; A → T','Lectura':'dirección opuesta'},
+        ]
+    if ways==4:
+        return [
+            {'Posición':'1','Conexiones':'P → A; B → T','Lectura':'una dirección'},
+            {'Posición':'2','Conexiones':'P → B; A → T','Lectura':'dirección opuesta'},
+        ]
+    if ways==3:
+        return [
+            {'Posición':'Accionada','Conexiones':'P → A; T bloqueado','Lectura':'alimenta A'},
+            {'Posición':'Reposo','Conexiones':'A → T; P bloqueado','Lectura':'descarga A'},
+        ]
+    return [
+        {'Posición':'Accionada','Conexiones':'1 → 2','Lectura':'paso abierto'},
+        {'Posición':'Reposo','Conexiones':'1 y 2 bloqueados','Lectura':'normalmente cerrada'},
+    ]
+
+
+def render_valve_builder(ways: int, positions: int, center: str, actuation: str, height: int = 455):
     svg=_builder_valve_svg(ways,positions,center,actuation)
     if ways==4 and positions==3:
         rest={
             'Cerrado':'P, T, A y B bloqueados.',
-            'Abierto':'P, T, A y B quedan intercomunicados en la posición central.',
-            'Tándem':'P comunica con T; A y B permanecen bloqueados.',
-            'Flotante':'A y B comunican con T; P permanece bloqueado.',
+            'Abierto':'P, T, A y B comunicados en el centro.',
+            'Tándem':'P comunica con T; A y B bloqueados.',
+            'Flotante':'A y B comunican con T; P bloqueado.',
         }.get(center,'Centro no definido.')
     elif ways==4:
-        rest='En una válvula 4/2 con retorno por resorte, la casilla junto al resorte representa el reposo.'
+        rest='Con retorno por resorte, la casilla situada junto al resorte es el reposo.'
     elif ways==3:
-        rest='En esta 3/2 didáctica, el reposo junto al resorte deja P bloqueado y A comunicado con T.'
+        rest='3/2 NC didáctica: en reposo P bloqueado y A comunicado con T.'
     else:
-        rest='En esta 2/2 didáctica, el reposo junto al resorte deja el paso 1–2 cerrado.'
+        rest='2/2 NC didáctica: en reposo el paso 1–2 está bloqueado.'
     if positions==3:
-        ref='La casilla central es la posición de referencia cuando existe centrado por resortes.'
+        ref='La casilla central es el reposo cuando la válvula está centrada por resortes.'
     elif 'detent' in actuation.lower():
-        ref='Con detent no se asume una posición de reposo automática: la válvula permanece en la última posición seleccionada.'
+        ref='Con detent no se asume retorno automático: queda en la última posición seleccionada.'
     else:
-        ref='La casilla junto al resorte es el reposo; la casilla junto al accionamiento representa la posición accionada.'
+        ref='Busque el resorte: la casilla junto al resorte representa el reposo.'
     html_body=f'''\
 <div class="wrap">
  <div class="left">
-   <div class="caption"><b>Cómo leer el dibujo</b><span>1) identifique reposo · 2) lea puertos externos · 3) siga conexiones dentro de una sola casilla · 4) recién prediga el actuador.</span></div>
+   <div class="caption"><b>Lectura del símbolo</b><span>casillas = posiciones · líneas externas = puertos · flechas = comunicaciones · barra corta = puerto bloqueado</span></div>
    {svg}
  </div>
  <div class="right">
   <div class="tag">CONSTRUCTOR</div>
   <h3>{ways}/{positions} · {html.escape(center if positions==3 else 'sin centro')}</h3>
-  <p><b>Vías / puertos:</b> {ways}. <b>Posiciones:</b> {positions}.</p>
-  <p><b>Referencia:</b> {html.escape(ref)}</p>
-  <p><b>Condición de reposo:</b> {html.escape(rest)}</p>
-  <p><b>Accionamiento representado:</b> {html.escape(actuation)}.</p>
-  <div class="mini"><b>Convención del constructor</b><br>Las flechas muestran el camino del caudal en cada casilla. Las líneas cortas transversales representan puertos bloqueados. Los accionamientos se dibujan fuera del sobre de la válvula.</div>
+  <p><b>Vías:</b> {ways}. <b>Posiciones:</b> {positions}.</p>
+  <p><b>Reposo:</b> {html.escape(ref)}</p>
+  <p><b>Conexión de reposo:</b> {html.escape(rest)}</p>
+  <p><b>Accionamiento:</b> {html.escape(actuation)}.</p>
+  <div class="mini"><b>Regla</b><br>No lea varias casillas a la vez. Cada casilla representa una posición distinta del carrete. Primero determine cuál es el reposo y luego siga P, T, A y B dentro de esa sola casilla.</div>
  </div>
 </div>
 <style>
-html,body{{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:{INK};background:transparent}}.wrap{{height:{height-4}px;border:1px solid #ded9d0;border-radius:15px;background:#fbfaf7;display:grid;grid-template-columns:1.42fr .58fr;overflow:hidden}}.left{{position:relative;display:flex;align-items:flex-end;padding:44px 8px 8px;background:white}}.left svg{{width:100%;height:100%}}.caption{{position:absolute;left:18px;top:12px;right:18px;display:flex;gap:10px;align-items:baseline;font-size:11px;color:#666}}.caption b{{color:{INK};font-size:12px}}.right{{padding:22px 20px;border-left:1px solid #e5e0d8;background:#faf7f1}}.tag{{font-size:11px;letter-spacing:.12em;color:{ORANGE};font-weight:800}}h3{{margin:6px 0 12px;font-size:24px}}p{{font-size:13px;line-height:1.48;margin:8px 0}}.mini{{margin-top:14px;padding:10px 11px;background:#fff;border:1px solid #e3ddd4;border-left:4px solid {ORANGE};border-radius:9px;font-size:11.5px;line-height:1.45}}
+html,body{{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:{INK};background:transparent}}.wrap{{height:{height-4}px;border:1px solid #ded9d0;border-radius:15px;background:#fbfaf7;display:grid;grid-template-columns:1.5fr .5fr;overflow:hidden}}.left{{position:relative;display:flex;align-items:flex-end;padding:46px 8px 8px;background:white}}.left svg{{width:100%;height:100%}}.caption{{position:absolute;left:18px;top:12px;right:18px;display:flex;gap:10px;align-items:baseline;font-size:11px;color:#666}}.caption b{{color:{INK};font-size:12px}}.right{{padding:22px 20px;border-left:1px solid #e5e0d8;background:#faf7f1}}.tag{{font-size:11px;letter-spacing:.12em;color:{ORANGE};font-weight:800}}h3{{margin:6px 0 12px;font-size:24px}}p{{font-size:13px;line-height:1.48;margin:8px 0}}.mini{{margin-top:14px;padding:10px 11px;background:#fff;border:1px solid #e3ddd4;border-left:4px solid {ORANGE};border-radius:9px;font-size:11.5px;line-height:1.45}}
 </style>'''
     components.html(html_body,height=height,scrolling=False)
