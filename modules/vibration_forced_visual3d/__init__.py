@@ -1,0 +1,1 @@
+from .component import render_forced_vibration_3d
