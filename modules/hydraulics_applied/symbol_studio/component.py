@@ -301,6 +301,48 @@ def symbol_svg(key: str) -> str:
         return _svg_wrap(_accessory(key))
     if key in ("spring","manual","solenoid","hyd_pilot","detent"):
         return _svg_wrap(_actuation(key))
+    if key in ("pump_pressure_comp","pump_ls"):
+        b=_pump(variable=True)
+        b+=_rect(405,62,105,72,fill="#fff7ed",stroke=ORANGE,sw=2,rx=4)+_txt(457,91,"CTRL",13,800,color=ORANGE)
+        b+=_line(405,125,365,125,dash="7 6",w=2)
+        if key=="pump_ls": b+=_line(457,62,457,35,dash="7 6",w=2)+_txt(457,25,"LS",13,800,color=ORANGE)
+        else: b+=_txt(457,118,"P comp",11,700,color=ORANGE)
+        return _svg_wrap(b)
+    if key=="rotary_actuator":
+        b=_circle(320,125,58)+_line(285,170,355,170,w=4)+f'<path d="M270 125 A50 50 0 0 1 370 125" fill="none" stroke="{INK}" stroke-width="3" marker-end="url(#arr)"/>'+_txt(320,215,"giro limitado",14,500,color=MUTED)
+        return _svg_wrap(b)
+    if key=="cyl_telescopic_double":
+        b=_cylinder(telescope=True)+_line(170,155,125,155)+_txt(110,160,"B",15,700)
+        return _svg_wrap(b)
+    if key=="relief_pilot":
+        b=_pressure_valve("relief")+_line(320,66,320,35,dash="7 6",w=2)+_txt(320,24,"X",13,700)
+        return _svg_wrap(b)
+    if key=="brake_valve":
+        return _svg_wrap(_counterbalance()+_txt(320,35,"OVER-CENTER / BRAKE",13,800,color=ORANGE))
+    if key=="flow_divider":
+        b=_line(120,125,250,125)+_rect(250,70,140,110)+_line(320,125,320,86,extra='marker-end="url(#arr)"')+_line(320,125,285,165,extra='marker-end="url(#arr)"')+_line(320,125,355,165,extra='marker-end="url(#arr)"')+_line(285,180,285,215)+_line(355,180,355,215)+_txt(285,235,"A",14,700)+_txt(355,235,"B",14,700)
+        return _svg_wrap(b)
+    if key=="priority_valve":
+        b=_rect(225,65,190,120)+_line(150,125,225,125)+_line(415,95,490,95)+_line(415,155,490,155)+_txt(510,100,"CF",14,700)+_txt(510,160,"EF",14,700)+_line(255,155,385,95,extra='marker-end="url(#arr)"')+_line(320,65,320,35,dash="7 6",w=2)+_txt(320,25,"LS",13,700)
+        return _svg_wrap(b)
+    if key=="logic_cartridge":
+        b=_rect(235,55,170,140)+f'<polygon points="270,155 320,105 370,155" fill="white" stroke="{INK}" stroke-width="3"/>'+_line(320,105,320,70)+_line(170,155,270,155)+_line(370,155,470,155)+_line(320,55,320,30,dash="7 6",w=2)+_txt(320,20,"X",13,700)
+        return _svg_wrap(b)
+    if key=="diff_gauge":
+        b=_circle(320,115,58)+_line(320,115,355,82,w=4)+_line(280,173,280,220)+_line(360,173,360,220)+_txt(280,238,"P1",13,700)+_txt(360,238,"P2",13,700)+_txt(320,48,"Δp",18,800)
+        return _svg_wrap(b)
+    if key=="pressure_transducer":
+        b=_circle(300,125,52)+_line(300,177,300,220)+_line(352,125,430,125)+_txt(455,130,"4–20 mA",13,700)+_txt(300,132,"p",20,800)
+        return _svg_wrap(b)
+    if key=="level_gauge":
+        b=_tank(240,70,160,120,closed=False)+_rect(420,82,24,95,fill="white",stroke=INK,sw=2,rx=8)+_line(424,135,440,135,w=5,color=ORANGE)+_txt(432,205,"nivel",13,600,color=MUTED)
+        return _svg_wrap(b)
+    if key=="tachometer":
+        b=_circle(320,125,60)+_line(320,125,355,92,w=4)+_txt(320,55,"n",18,800)+_txt(320,210,"rpm",14,600,color=MUTED)
+        return _svg_wrap(b)
+    if key=="pressure_compensator":
+        b=_rect(245,70,150,110)+_line(270,155,370,95,extra='marker-end="url(#arr)"')+_line(320,70,320,35,dash="7 6",w=2)+_txt(320,24,"LS",13,700)+_txt(320,215,"mantiene Δp",14,600,color=MUTED)
+        return _svg_wrap(b)
     return _svg_wrap(_txt(320,125,"Símbolo no disponible",20,700))
 
 

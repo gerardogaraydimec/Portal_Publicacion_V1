@@ -3,6 +3,8 @@ from __future__ import annotations
 EXERCISES = [
     {
         "id":"slow_both",
+        "visual":("Sistema estacionario","Cilindro 4/3 básico","Avance"),
+        "focus":"P–A–B y caudal común",
         "title":"Cilindro lento en ambos sentidos",
         "level":"Básico",
         "case":"Un cilindro que normalmente completa su carrera en 8 s ahora tarda 15 s tanto en avance como en retroceso. La presión bajo carga es similar a la histórica.",
@@ -14,6 +16,8 @@ EXERCISES = [
     },
     {
         "id":"high_p_no_motion",
+        "visual":("Sistema estacionario","Cilindro 4/3 básico","Avance"),
+        "focus":"presión alta frente a resistencia",
         "title":"Presión alta, actuador detenido",
         "level":"Básico",
         "case":"Al accionar avance, el manómetro principal sube cerca del ajuste de alivio pero el cilindro no se mueve.",
@@ -25,6 +29,8 @@ EXERCISES = [
     },
     {
         "id":"counterbalance",
+        "visual":("Sistema estacionario","Carga vertical + contrabalance","Bajar controlado"),
+        "focus":"control de carga y pilotaje",
         "title":"Carga vertical que tiende a caer",
         "level":"Intermedio",
         "case":"Un cilindro vertical sostiene una carga. Al ordenar descenso, la carga puede arrastrar al actuador más rápido que el caudal de alimentación.",
@@ -36,6 +42,8 @@ EXERCISES = [
     },
     {
         "id":"pilot_check",
+        "visual":("Sistema estacionario","Carga vertical + contrabalance","Sostener"),
+        "focus":"carga atrapada y presión piloto",
         "title":"Cilindro bloqueado que no libera",
         "level":"Intermedio",
         "case":"Una retención pilotada mantiene un cilindro inmóvil correctamente, pero al ordenar el movimiento inverso la carga no libera.",
@@ -47,6 +55,8 @@ EXERCISES = [
     },
     {
         "id":"regen",
+        "visual":("Sistema estacionario","Avance regenerativo","Avance rápido"),
+        "focus":"Q bomba + Q regenerado",
         "title":"Regeneración: rápida pero con menos empuje",
         "level":"Intermedio",
         "case":"Durante avance rápido, el lado de vástago se conecta de forma que su caudal se suma al de bomba hacia la cámara plena.",
@@ -58,6 +68,8 @@ EXERCISES = [
     },
     {
         "id":"cavitation",
+        "visual":("Sistema estacionario","Cilindro 4/3 básico","Avance"),
+        "focus":"succión, respiradero y entrada de aire",
         "title":"Bomba ruidosa después de mantenimiento",
         "level":"Intermedio",
         "case":"Tras una intervención la bomba presenta ruido, el movimiento es irregular y aparece espuma en el tanque.",
@@ -69,6 +81,8 @@ EXERCISES = [
     },
     {
         "id":"ls_blocked",
+        "visual":("Cargador frontal","Levante de brazos LS","Raise"),
+        "focus":"P, LS y margen Δp",
         "title":"Implemento LS pierde respuesta",
         "level":"Avanzado",
         "case":"En un cargador con bomba load-sensing el implemento se mueve muy lento bajo carga. La bomba mantiene standby, pero la presión LS no sigue a la carga.",
@@ -80,6 +94,8 @@ EXERCISES = [
     },
     {
         "id":"hot_component",
+        "visual":("Sistema estacionario","Cilindro 4/3 básico","Reposo"),
+        "focus":"Δp·Q disipado como calor",
         "title":"Sistema se calienta sin trabajo útil",
         "level":"Avanzado",
         "case":"La máquina desarrolla temperatura alta. Una termografía muestra una válvula mucho más caliente que el resto del circuito.",
