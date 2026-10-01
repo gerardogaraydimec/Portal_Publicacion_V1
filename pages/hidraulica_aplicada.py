@@ -9,7 +9,11 @@ from modules.hydraulics_applied.symbol_catalog_v3 import SYMBOLS, PORTS, familie
 from modules.hydraulics_applied.symbol_studio import render_symbol, render_valve_builder
 from modules.hydraulics_applied.system_cases import SYSTEM_CASES, system_state, course_comparison_rows, diagnostic_cases
 from modules.hydraulics_applied.schematic_pro import render_hydraulic_schematic
-from modules.hydraulics_applied.machine_visual3d import render_machine_hydraulics_3d
+from modules.hydraulics_applied.machine_visual3d import (
+    render_machine_hydraulics_3d,
+    premium_available,
+    render_machine_premium,
+)
 from modules.hydraulics_applied.learning_cases import EXERCISES, LEARNING_PATH
 
 st.markdown('''
@@ -35,7 +39,7 @@ render_app_header(
     logo_width=188,
 )
 
-st.markdown('''<div class="gg-note"><b>Enfoque V4.1:</b> el esquema y el modelo físico representan la <b>misma condición operacional</b>. Los circuitos móviles son reconstrucciones didácticas funcionales —no planos OEM— y se han organizado para que el técnico pueda seguir fuente → control → actuador → retorno/pilotaje sin cruces innecesarios.</div>''',unsafe_allow_html=True)
+st.markdown('''<div class="gg-note"><b>Enfoque V4.3:</b> el esquema y el modelo físico representan la <b>misma condición operacional</b>. Los circuitos móviles son reconstrucciones didácticas funcionales —no planos OEM— y se han organizado para que el técnico pueda seguir fuente → control → actuador → retorno/pilotaje sin cruces innecesarios.</div>''',unsafe_allow_html=True)
 
 study_mode=st.sidebar.radio('Modo de estudio',['Guiado','Intermedio','Técnico'],index=0,help='Guiado muestra nombres y ayudas. Técnico reduce ayudas para obligar a leer puertos y símbolos.')
 st.sidebar.markdown('**Código funcional de líneas**')
@@ -79,17 +83,51 @@ def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False,show_3
     render_hydraulic_schematic(data,height=650)
 
     if show_3d:
-        st.markdown('### 2 · Modelo físico de la máquina')
-        control,scene=st.columns([.22,.78],gap='medium')
-        with control:
-            amp=st.slider('Amplificación visual',.6,1.8,1.0,.1,key=f'{prefix}_amp',help='Amplifica únicamente el movimiento representado; no altera los cálculos hidráulicos.')
-            view=st.radio('Vista inicial',['Isométrica','Frente','Lateral','Superior'],index=0,key=f'{prefix}_view')
-            show_paths=st.toggle('Mostrar rutas hidráulicas',value=True,key=f'{prefix}_paths')
-            st.markdown(f'<div class="gg-dark"><b>Qué observar</b><br>{meta["learning"]}</div>',unsafe_allow_html=True)
-            st.markdown('**Lecturas esperadas**')
-            _reading_table(data)
-        with scene:
-            render_machine_hydraulics_3d({**data,'visual_amp':amp,'view':view,'show_paths':show_paths,'plotly_key':f'hyd_{prefix}_machine3d'},height=620)
+        st.markdown('### 2 · Modelo visual de la máquina')
+        has_premium = premium_available(machine, subsystem)
+
+        if has_premium:
+            visual_mode = st.radio(
+                'Representación',
+                ['Vista visual de alta fidelidad', '3D interactivo'],
+                horizontal=True,
+                key=f'{prefix}_visual_mode',
+                help='La vista visual mejora reconocimiento de la máquina. El 3D interactivo permite rotar y explorar el estado seleccionado.'
+            )
+        else:
+            visual_mode = '3D interactivo'
+
+        if visual_mode == 'Vista visual de alta fidelidad':
+            control, scene = st.columns([.22,.78], gap='medium')
+            with control:
+                st.markdown(f'<div class="gg-dark"><b>Qué observar</b><br>{meta["learning"]}</div>',unsafe_allow_html=True)
+                st.markdown('**Estado seleccionado**')
+                st.markdown(f'<div class="gg-card"><b>{state}</b><br>{data["motion"]}</div>',unsafe_allow_html=True)
+                st.markdown('**Lecturas esperadas**')
+                _reading_table(data)
+            with scene:
+                render_machine_premium(machine, subsystem, state)
+
+            with st.expander('Explorar además el 3D interactivo del estado actual'):
+                c1,c2,c3 = st.columns([1,1,1])
+                with c1:
+                    amp=st.slider('Amplificación visual',.6,1.8,1.0,.1,key=f'{prefix}_amp_premium',help='Amplifica únicamente el movimiento del 3D interactivo; no altera los cálculos hidráulicos.')
+                with c2:
+                    view=st.selectbox('Vista inicial',['Isométrica','Frente','Lateral','Superior'],index=0,key=f'{prefix}_view_premium')
+                with c3:
+                    show_paths=st.toggle('Mostrar rutas hidráulicas',value=True,key=f'{prefix}_paths_premium')
+                render_machine_hydraulics_3d({**data,'visual_amp':amp,'view':view,'show_paths':show_paths,'plotly_key':f'hyd_{prefix}_machine3d_premium'},height=560)
+        else:
+            control,scene=st.columns([.22,.78],gap='medium')
+            with control:
+                amp=st.slider('Amplificación visual',.6,1.8,1.0,.1,key=f'{prefix}_amp',help='Amplifica únicamente el movimiento representado; no altera los cálculos hidráulicos.')
+                view=st.radio('Vista inicial',['Isométrica','Frente','Lateral','Superior'],index=0,key=f'{prefix}_view')
+                show_paths=st.toggle('Mostrar rutas hidráulicas',value=True,key=f'{prefix}_paths')
+                st.markdown(f'<div class="gg-dark"><b>Qué observar</b><br>{meta["learning"]}</div>',unsafe_allow_html=True)
+                st.markdown('**Lecturas esperadas**')
+                _reading_table(data)
+            with scene:
+                render_machine_hydraulics_3d({**data,'visual_amp':amp,'view':view,'show_paths':show_paths,'plotly_key':f'hyd_{prefix}_machine3d'},height=620)
         next_section = 3
     else:
         st.markdown('### 2 · Lectura funcional del estado')
