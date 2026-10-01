@@ -1,198 +1,235 @@
 from __future__ import annotations
+
 import pandas as pd
 import streamlit as st
 
 from modules.ui_brand import render_app_header
-from modules.hydraulics_applied.hydraulic_data import SYMBOL_LIBRARY, DIRECTIONAL_VALVES, DIAGNOSTICS, READING_RULES
-from modules.hydraulics_applied.hydraulic_engine import cylinder_performance, valve_descriptor, motion_from_4_3_center
-from modules.hydraulics_applied.hydraulic_plotter import line_language_figure, symbol_figure, directional_valve_figure, circuit_state_figure
+from modules.hydraulics_applied.hydraulic_engine import cylinder_performance
+from modules.hydraulics_applied.symbol_catalog_v3 import SYMBOLS, PORTS, families, symbols_in_family
+from modules.hydraulics_applied.symbol_studio import render_symbol, render_valve_builder
 from modules.hydraulics_applied.system_cases import SYSTEM_CASES, system_state, course_comparison_rows, diagnostic_cases
-from modules.hydraulics_applied.animated_system import render_animated_hydraulic_system
+from modules.hydraulics_applied.schematic_pro import render_hydraulic_schematic
 from modules.hydraulics_applied.machine_visual3d import render_machine_hydraulics_3d
+from modules.hydraulics_applied.learning_cases import EXERCISES, LEARNING_PATH
 
 st.markdown('''
 <style>
-:root{--gg-orange:#f28e1c;--gg-black:#202126;--gg-line:#e4e6ea;--gg-soft:#fff7ed;--gg-blue:#2a63b8;--gg-red:#d84030;--gg-yellow:#d6b72c}
-.block-container{max-width:1700px;padding-top:1rem!important;padding-bottom:2rem}
-.gg-note{border:1px solid #e8e5df;background:#faf9f6;border-radius:12px;padding:.9rem 1rem;line-height:1.5}
-.gg-card{border:1px solid var(--gg-line);border-radius:13px;padding:.95rem 1rem;background:#fff;height:100%;line-height:1.48}
-.gg-orange{border:1px solid #f2d1a8;border-left:5px solid var(--gg-orange);border-radius:13px;padding:.95rem 1rem;background:#fffaf4;height:100%}
-.gg-dark{background:#202126;color:#f8f2e9;border-radius:14px;padding:1.05rem 1.15rem;border:1px solid #3a3c42}
-.gg-badge{display:inline-block;background:#fff1df;color:#a55d10;border:1px solid #f2d0a5;padding:.18rem .52rem;border-radius:999px;font-size:.78rem;font-weight:750;margin:.08rem .14rem}
-.gg-route{font-weight:750;letter-spacing:.01em}.gg-route .p{color:#d84030}.gg-route .r{color:#2a63b8}.gg-route .c{color:#a88b08}.gg-route .s{color:#3e854a}
+:root{--gg-orange:#f28e1c;--gg-black:#202126;--gg-line:#e3e5e8;--gg-soft:#fff7ed;--gg-blue:#2a63b8;--gg-red:#d84030;--gg-yellow:#d6b72c;--gg-green:#4e9b57}
+.block-container{max-width:1740px;padding-top:1rem!important;padding-bottom:2rem}
+.gg-note{border:1px solid #e4ded5;background:#faf8f4;border-radius:13px;padding:.9rem 1rem;line-height:1.52}
+.gg-card{border:1px solid var(--gg-line);border-radius:13px;padding:.9rem 1rem;background:#fff;height:100%;line-height:1.48}
+.gg-orange{border:1px solid #f1d0a7;border-left:5px solid var(--gg-orange);border-radius:13px;padding:.9rem 1rem;background:#fffaf4;height:100%;line-height:1.48}
+.gg-dark{background:#202126;color:#f7f1e8;border-radius:14px;padding:1rem 1.15rem;border:1px solid #34363c;line-height:1.52}
+.gg-badge{display:inline-block;background:#fff1df;color:#9d5914;border:1px solid #f2d0a5;padding:.18rem .52rem;border-radius:999px;font-size:.76rem;font-weight:750;margin:.08rem .14rem}
+.gg-step{border-top:3px solid var(--gg-orange);background:#fff;border-radius:11px;border-left:1px solid #e5e6e8;border-right:1px solid #e5e6e8;border-bottom:1px solid #e5e6e8;padding:.8rem .9rem;height:100%}
+.gg-step .n{color:var(--gg-orange);font-weight:850;font-size:1.05rem}.gg-step .t{font-weight:750;margin:.12rem 0 .25rem}.gg-step .d{font-size:.86rem;color:#62666d}
+[data-testid="stMetric"]{border:1px solid #e5e6e8;border-radius:12px;padding:.35rem .55rem;background:#fff}
 </style>
 ''',unsafe_allow_html=True)
 
 render_app_header(
-    title='Hidráulica aplicada · Sistemas de planta y equipos móviles',
-    subtitle='Componente → plano funcional → estado → movimiento → medición → diagnóstico',
+    title='Hidráulica aplicada · Lectura, máquina y diagnóstico',
+    subtitle='Símbolo → función → circuito → estado → máquina → medición → diagnóstico',
     section='MÁQUINAS Y COMPONENTES · POTENCIA FLUIDA',
     logo_width=188,
 )
 
-st.markdown('''<div class="gg-note"><b>Propósito:</b> estudiar la hidráulica como ocurre en terreno: no basta con reconocer un símbolo. Hay que seguir el recorrido del aceite, entender qué componente sostiene o mueve la carga, relacionar el plano con la máquina y decidir dónde medir. Esta versión separa explícitamente <b>sistemas estacionarios</b> y <b>equipos móviles</b>, e incorpora una vista animada inspirada en la lógica del video aportado.</div>''',unsafe_allow_html=True)
+st.markdown('''<div class="gg-note"><b>Enfoque del laboratorio:</b> el objetivo ya no es mirar dibujos separados. Cada actividad conecta el <b>símbolo normalizado</b>, la <b>función del componente</b>, el <b>recorrido del aceite</b>, el <b>movimiento físico</b> y la <b>evidencia que debería medirse en terreno</b>. Los esquemas de maquinaria son reconstrucciones didácticas funcionales y no reemplazan el plano OEM del equipo específico.</div>''',unsafe_allow_html=True)
 
-TABS=st.tabs(['🧭 Arquitectura','🏭 Sistemas estacionarios','🚛 Camión minero','🚜 Cargador frontal','◉ Componentes','⇄ Válvulas','🔧 Diagnóstico','🦺 Terreno y seguridad'])
+study_mode=st.sidebar.radio('Modo de estudio',['Guiado','Intermedio','Técnico'],index=0,help='Guiado muestra más nombres y ayudas. Técnico reduce ayudas y obliga a leer el plano por símbolos y puertos.')
+st.sidebar.caption('La codificación de flujo usa colores funcionales; el naranja queda para destacar selección y marca GG DIMEC.')
+
+TABS=st.tabs(['🧭 Ruta de aprendizaje','🔣 Símbolos y válvulas','🧪 Circuitos didácticos','🏭 Sistemas de planta','🚛 Camión minero','🚜 Cargador frontal','🔎 Diagnóstico','🧠 Ejercicios','🦺 Seguridad y terreno'])
 
 with TABS[0]:
-    st.subheader('La misma hidráulica, dos contextos de aplicación')
-    st.markdown('La lectura funcional es la misma, pero la forma de inspeccionar cambia según el equipo, la maniobra y el riesgo.')
-    df=pd.DataFrame(course_comparison_rows(),columns=['Aspecto','Sistema de planta / estacionario','Equipo móvil'])
-    st.dataframe(df,use_container_width=True,hide_index=True)
-    st.markdown('### Secuencia funcional base')
-    cols=st.columns(7)
-    seq=[('1','Depósito','almacena'),('2','Bomba','genera caudal'),('3','Presión','limita/protege'),('4','Direccional','dirige'),('5','Actuador','hace trabajo'),('6','Retorno','devuelve'),('7','Filtro','protege')]
-    for col,(n,t,s) in zip(cols,seq):
-        with col: st.markdown(f'<div class="gg-card"><b style="color:#f28e1c">{n}</b><br><b>{t}</b><br><span style="font-size:.86rem;color:#666">{s}</span></div>',unsafe_allow_html=True)
-    st.markdown('### Lenguaje de líneas usado en las animaciones')
-    a,b=st.columns([1.0,1.2])
-    with a:
-        st.plotly_chart(line_language_figure(),use_container_width=True,key='hydv2_lines')
-    with b:
-        st.markdown('''<div class="gg-dark"><b>Rojo</b> · presión / potencia activa<br><b>Azul</b> · retorno a tanque<br><b>Verde</b> · succión desde depósito<br><b>Amarillo</b> · pilotaje / load sensing / señal de control<br><br><b>Idea clave:</b> la bomba entrega caudal; la presión aparece cuando ese caudal encuentra resistencia. El actuador solo se mueve si existe caudal, ruta de retorno y fuerza hidráulica suficiente.</div>''',unsafe_allow_html=True)
-    st.markdown('### Relaciones mínimas')
+    st.subheader('Una progresión para aprender a leer hidráulica de verdad')
+    cols=st.columns(6)
+    for col,(n,t,d) in zip(cols,LEARNING_PATH):
+        with col: st.markdown(f'<div class="gg-step"><div class="n">{n}</div><div class="t">{t}</div><div class="d">{d}</div></div>',unsafe_allow_html=True)
+    st.markdown('### Cuatro principios que gobiernan casi toda la lectura inicial')
     c1,c2,c3,c4=st.columns(4)
-    with c1: st.latex(r'F=pA');st.caption('Presión + área → fuerza')
-    with c2: st.latex(r'v=Q/A');st.caption('Caudal + área → velocidad')
-    with c3: st.latex(r'P_h=\Delta p\,Q');st.caption('Potencia hidráulica')
-    with c4: st.latex(r'p_{req}\approx F_{res}/A');st.caption('La carga define presión requerida')
+    with c1:
+        st.latex(r'Q\Rightarrow movimiento')
+        st.caption('Sin caudal no hay desplazamiento del actuador.')
+    with c2:
+        st.latex(r'v=Q/A')
+        st.caption('El caudal disponible determina velocidad para un área dada.')
+    with c3:
+        st.latex(r'F=pA')
+        st.caption('La presión necesaria crece con la carga resistente.')
+    with c4:
+        st.latex(r'P_h=\Delta p\,Q')
+        st.caption('Una caída de presión con caudal sin trabajo útil termina como calor.')
+    st.markdown('### Planta y equipo móvil: misma física, distinta lectura de terreno')
+    st.dataframe(pd.DataFrame(course_comparison_rows(),columns=['Aspecto','Sistema estacionario','Equipo móvil']),use_container_width=True,hide_index=True)
+    st.markdown('### Puertos que deben volverse familiares')
+    pcols=st.columns(7)
+    for col,(p,desc) in zip(pcols,PORTS.items()):
+        with col: st.markdown(f'<div class="gg-card"><b style="font-size:1.15rem;color:#f28e1c">{p}</b><br><span style="font-size:.83rem">{desc}</span></div>',unsafe_allow_html=True)
+
+with TABS[1]:
+    s1,s2=st.tabs(['Biblioteca de símbolos','Constructor de válvulas'])
+    with s1:
+        st.subheader('Biblioteca técnica ampliada')
+        family=st.selectbox('Familia',families(),key='sym_family')
+        candidates=symbols_in_family(family)
+        labels=[name for _,name in candidates]
+        chosen_name=st.selectbox('Símbolo',labels,key='sym_name')
+        key=next(k for k,n in candidates if n==chosen_name)
+        meta=SYMBOLS[key]
+        left,right=st.columns([1.08,.92],gap='large')
+        with left: render_symbol(key,height=365)
+        with right:
+            st.markdown(f'### {meta["name"]}')
+            st.markdown(f'<span class="gg-badge">{meta["family"]}</span><span class="gg-badge">{meta["level"]}</span>',unsafe_allow_html=True)
+            st.write('**Función:**',meta['function'])
+            st.write('**Cómo leerlo:**',meta['how'])
+            st.write('**Condición de referencia:**',meta['rest'])
+        a,b,c=st.columns(3)
+        with a: st.markdown(f'<div class="gg-card"><b>Puertos / conexión</b><br>{meta["ports"]}</div>',unsafe_allow_html=True)
+        with b: st.markdown(f'<div class="gg-card"><b>Qué comprobar</b><br>{meta["field"]}</div>',unsafe_allow_html=True)
+        with c: st.markdown(f'<div class="gg-orange"><b>Falla o error de lectura</b><br>{meta["failure"]}</div>',unsafe_allow_html=True)
+        st.caption('Los dibujos de esta biblioteca son redibujos originales para MechLab; se usan convenciones funcionales de simbología de potencia fluida.')
+    with s2:
+        st.subheader('Construya la válvula antes de intentar memorizarla')
+        a,b,c,d=st.columns(4)
+        ways=a.selectbox('Vías / puertos',[2,3,4],index=2,key='vb_ways')
+        positions=b.selectbox('Posiciones',[2,3],index=1,key='vb_pos')
+        if positions==3 and ways==4:
+            center=c.selectbox('Centro',['Cerrado','Abierto','Tándem','Flotante'],key='vb_center')
+        else:
+            center='—';c.text_input('Centro',value='No aplica',disabled=True,key='vb_center_off')
+        act=d.selectbox('Accionamiento',['Manual + resorte','Solenoide + resorte','Doble solenoide','Pilotaje hidráulico'],key='vb_act')
+        render_valve_builder(ways,positions,center,act,height=405)
+        st.markdown('''<div class="gg-orange"><b>Método de lectura:</b> 1) cuente las casillas = posiciones; 2) cuente los puertos = vías; 3) determine qué casilla es reposo por resortes/accionamientos; 4) siga flechas y bloqueos dentro de esa casilla; 5) recién entonces prediga el movimiento del actuador.</div>''',unsafe_allow_html=True)
 
 
-def system_view(machine:str,prefix:str):
-    subs=list(SYSTEM_CASES[machine].keys())
-    subsystem=st.selectbox('Sistema a estudiar',subs,key=f'{prefix}_sub')
+def _payload(machine,subsystem,state,prefix):
+    data=system_state(machine,subsystem,state)
+    return {**data,'machine':machine,'subsystem':subsystem,'state':state,'states':SYSTEM_CASES[machine][subsystem]['states'],'study_mode':study_mode}
+
+
+def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False):
     meta=SYSTEM_CASES[machine][subsystem]
     state=st.radio('Estado / mando',meta['states'],horizontal=True,key=f'{prefix}_state')
-    data=system_state(machine,subsystem,state)
-    payload={
-        'machine':machine,'subsystem':subsystem,'state':state,'states':meta['states'],
-        'motion':data['motion'],'machine_value':data['machine_value'],'pressure':data['pressure'],
-        'return':data['return'],'pilot':data['pilot'],'suction':data['suction'],'drain':data.get('drain',[]),
-        'notes':data.get('notes',[]),'active_components':data.get('active_components',[]),
-    }
+    data=_payload(machine,subsystem,state,prefix)
     k1,k2,k3,k4=st.columns(4)
     with k1: st.markdown(f'<div class="gg-card"><b>Movimiento</b><br>{data["motion"]}</div>',unsafe_allow_html=True)
-    with k2: st.markdown('<div class="gg-card"><b>Componentes críticos</b><br>'+' · '.join(meta['components'])+'</div>',unsafe_allow_html=True)
+    with k2: st.markdown('<div class="gg-card"><b>Componentes</b><br>'+' · '.join(meta['components'])+'</div>',unsafe_allow_html=True)
     with k3: st.markdown('<div class="gg-card"><b>Qué medir</b><br>'+' · '.join(meta['field'])+'</div>',unsafe_allow_html=True)
     with k4: st.markdown('<div class="gg-orange"><b>Riesgo</b><br>'+' · '.join(meta['risks'])+'</div>',unsafe_allow_html=True)
     st.caption(meta['description'])
-    st.markdown('### Vista funcional animada · plano + actuador + máquina')
-    render_animated_hydraulic_system(payload,height=690)
-    st.markdown('### Rutas activas del estado seleccionado')
-    r1,r2,r3=st.columns(3)
-    with r1: st.markdown('<div class="gg-card"><b style="color:#d84030">Presión</b><br>'+(' → '.join(data['pressure']) if data['pressure'] else 'Sin ruta de presión activa')+'</div>',unsafe_allow_html=True)
-    with r2: st.markdown('<div class="gg-card"><b style="color:#2a63b8">Retorno</b><br>'+(' → '.join(data['return']) if data['return'] else 'Sin retorno principal activo')+'</div>',unsafe_allow_html=True)
-    with r3: st.markdown('<div class="gg-card"><b style="color:#a88b08">Mando / LS</b><br>'+(' → '.join(data['pilot']) if data['pilot'] else 'Sin señal destacada')+'</div>',unsafe_allow_html=True)
-    with st.expander('Modelo físico 3D · relación con la máquina',expanded=True):
-        a,b=st.columns([.28,.72])
-        with a:
-            amp=st.slider('Amplificación visual',.5,2.5,1.0,.1,key=f'{prefix}_amp')
-            speed=st.slider('Velocidad',.25,2.0,1.0,.25,key=f'{prefix}_speed')
-            st.markdown('**Qué buscar**')
-            st.write('• qué actuador está asociado al mando')
-            st.write('• qué parte de la máquina se mueve')
-            st.write('• qué líneas deberían presurizarse')
-            st.write('• qué elemento sostiene/controla la carga')
-        with b:
-            p3={**payload,'visual_amp':amp,'speed':speed}
-            render_machine_hydraulics_3d(p3,height=610)
-    if machine!='Sistema estacionario':
-        st.markdown('### Traducción a terreno')
-        t1,t2,t3,t4=st.columns(4)
-        items=[('1 · Función','¿Qué maniobra intenta hacer el operador?'),('2 · Actuador','¿Qué cilindro/motor produce esa maniobra?'),('3 · Ruta','¿Qué líneas deben tener presión y retorno?'),('4 · Dato','¿Dónde medir para confirmar la hipótesis?')]
-        for col,(tt,tx) in zip([t1,t2,t3,t4],items):
-            with col: st.markdown(f'<div class="gg-card"><b>{tt}</b><br>{tx}</div>',unsafe_allow_html=True)
-
-with TABS[1]:
-    st.subheader('Sistemas estacionarios · unidad hidráulica, cilindro y prensa')
-    st.markdown('En planta, los puntos de medición suelen ser más estables y las tuberías son fijas. El foco es reconstruir la secuencia de energía y separar problemas de <b>presión</b>, <b>caudal</b> y <b>carga</b>.',unsafe_allow_html=True)
-    system_view('Sistema estacionario','stat')
-    with st.expander('Calcular fuerza y velocidad del cilindro',expanded=False):
-        a,b,c,d,e=st.columns(5)
-        q=a.number_input('Q [L/min]',.1,value=80.0,step=5.0,key='stat_q');bore=b.number_input('Ø pistón [mm]',10.0,value=125.0,step=5.0,key='stat_bore');rod=c.number_input('Ø vástago [mm]',1.0,value=70.0,step=5.0,key='stat_rod');p=d.number_input('Presión [bar]',0.0,value=160.0,step=5.0,key='stat_p');load=e.number_input('Carga [kN]',0.0,value=120.0,step=10.0,key='stat_load')
-        try:
-            r=cylinder_performance(q,bore,rod,p,load);m1,m2,m3,m4=st.columns(4);m1.metric('v avance',f'{r.extension_speed_m_s*1000:.1f} mm/s');m2.metric('v retroceso',f'{r.retraction_speed_m_s*1000:.1f} mm/s');m3.metric('F avance',f'{r.extension_force_n/1000:.1f} kN');m4.metric('F retroceso',f'{r.retraction_force_n/1000:.1f} kN')
-        except ValueError as exc: st.error(str(exc))
+    st.markdown('### 1 · Plano funcional')
+    render_hydraulic_schematic(data,height=742)
+    st.markdown('### 2 · Modelo físico 3D')
+    controls_col,scene_col=st.columns([.22,.78],gap='medium')
+    with controls_col:
+        amp=st.slider('Amplificación visual',.5,2.2,1.0,.1,key=f'{prefix}_amp')
+        speed=st.slider('Velocidad animación',.25,2.0,1.0,.25,key=f'{prefix}_speed')
+        st.markdown(f'<div class="gg-dark"><b>Qué observar</b><br>{meta["learning"]}</div>',unsafe_allow_html=True)
+        st.markdown('**Lecturas esperadas**')
+        if data['readings']:
+            st.dataframe(pd.DataFrame([{'Punto':k,'Esperado':v} for k,v in data['readings'].items()]),use_container_width=True,hide_index=True)
+    with scene_col:
+        render_machine_hydraulics_3d({**data,'visual_amp':amp,'speed':speed},height=640)
+    if show_calc:
+        with st.expander('Relacionar el circuito con fuerza y velocidad',expanded=False):
+            a,b,c,d,e=st.columns(5)
+            q=a.number_input('Q [L/min]',.1,value=80.0,step=5.0,key=f'{prefix}_q')
+            bore=b.number_input('Ø pistón [mm]',10.0,value=125.0,step=5.0,key=f'{prefix}_bore')
+            rod=c.number_input('Ø vástago [mm]',1.0,value=70.0,step=5.0,key=f'{prefix}_rod')
+            p=d.number_input('Presión [bar]',0.0,value=160.0,step=5.0,key=f'{prefix}_p')
+            load=e.number_input('Carga [kN]',0.0,value=120.0,step=10.0,key=f'{prefix}_load')
+            try:
+                r=cylinder_performance(q,bore,rod,p,load)
+                m1,m2,m3,m4=st.columns(4)
+                m1.metric('v avance',f'{r.extension_speed_m_s*1000:.1f} mm/s')
+                m2.metric('v retroceso',f'{r.retraction_speed_m_s*1000:.1f} mm/s')
+                m3.metric('F avance',f'{r.extension_force_n/1000:.1f} kN')
+                m4.metric('F retroceso',f'{r.retraction_force_n/1000:.1f} kN')
+            except ValueError as exc: st.error(str(exc))
 
 with TABS[2]:
-    st.subheader('Camión minero · sistemas interconectados')
-    st.markdown('La vista de levante incorpora los estados <b>Raise</b>, <b>Raise snub / overcenter</b>, <b>Hold</b>, <b>Float</b> y <b>Lower</b> para acercarse a la lógica de la animación de referencia, sin copiar un circuito OEM.',unsafe_allow_html=True)
-    system_view('Camión minero','truck')
+    st.subheader('Circuitos didácticos · pasar del símbolo a la función')
+    choices=list(SYSTEM_CASES['Sistema estacionario'].keys())
+    subsystem=st.selectbox('Circuito',choices,key='did_sub')
+    render_case('Sistema estacionario',subsystem,'did',show_calc=subsystem in ('Cilindro 4/3 básico','Carga vertical + contrabalance','Avance regenerativo'))
 
 with TABS[3]:
-    st.subheader('Cargador frontal · implementos y dirección articulada')
-    st.markdown('El cargador conecta banco de implementos, cilindros de levante, cilindro de tilt y dirección articulada. La intención es leer la maniobra completa, no solo el carrete de la válvula.')
-    system_view('Cargador frontal','loader')
+    st.subheader('Sistemas de planta · potencia, secuencia y carga')
+    subsystem=st.selectbox('Sistema',list(SYSTEM_CASES['Sistema estacionario'].keys()),key='plant_sub')
+    render_case('Sistema estacionario',subsystem,'plant',show_calc=True)
 
 with TABS[4]:
-    st.subheader('Biblioteca técnica · símbolo, componente real y función')
-    categories=list(dict.fromkeys(v['category'] for v in SYMBOL_LIBRARY.values()))
-    cat=st.selectbox('Familia',categories,key='hyd2_lib_cat')
-    names=[k for k,v in SYMBOL_LIBRARY.items() if v['category']==cat]
-    name=st.selectbox('Componente',names,key='hyd2_lib_name')
-    item=SYMBOL_LIBRARY[name]
-    c1,c2=st.columns([.9,1.1])
-    with c1: st.plotly_chart(symbol_figure(item['symbol'],name),use_container_width=True,key=f'hyd2_sym_{item["symbol"]}')
-    with c2:
-        st.markdown(f'## {name}');st.markdown(f'<span class="gg-badge">{item["category"]}</span>',unsafe_allow_html=True);st.write('**Función:**',item['function']);st.write('**Puertos:**',item['ports']);st.write('**Cómo reconocerlo:**',item['reading']);st.write('**Qué revisar en terreno:**',item['field'])
-        st.markdown('**Anomalías frecuentes**')
-        for x in item['failures']: st.write('• '+x)
+    st.subheader('Camión minero · plano funcional + ubicación física')
+    subsystem=st.selectbox('Sistema',list(SYSTEM_CASES['Camión minero'].keys()),key='truck_sub')
+    render_case('Camión minero',subsystem,'truck')
 
 with TABS[5]:
-    st.subheader('Válvulas direccionales · leer una posición a la vez')
-    valve=st.selectbox('Configuración',list(DIRECTIONAL_VALVES.keys()),index=4,key='hyd2_valve')
-    desc=valve_descriptor(valve,DIRECTIONAL_VALVES)
-    positions=['Izquierda','Derecha'] if desc['positions']==2 else ['Izquierda','Centro','Derecha']
-    pos=st.radio('Posición a estudiar',positions,horizontal=True,index=1 if len(positions)==3 else 0,key='hyd2_valve_pos')
-    act=st.selectbox('Accionamiento',['Solenoide + retorno por resorte','Palanca + retorno por resorte','Pilotaje hidráulico'],key='hyd2_act')
-    c1,c2=st.columns([1.25,.75])
-    with c1: st.plotly_chart(directional_valve_figure(valve,pos,act),use_container_width=True,key='hyd2_dir_fig')
-    with c2:
-        st.metric('Vías',desc['ports']);st.metric('Posiciones',desc['positions']);st.write('**Reposo:**',desc['rest']);key_map={'Izquierda':'left','Centro':'center','Derecha':'right'};st.write('**Estado:**',DIRECTIONAL_VALVES[valve].get(key_map[pos],'No aplica'));st.write('**Aplicación:**',DIRECTIONAL_VALVES[valve]['use'])
-    st.markdown('### Circuito 4/3 de práctica')
-    center=st.selectbox('Centro',['4/3 centro cerrado','4/3 centro tándem','4/3 centro flotante','4/3 centro abierto'],key='hyd2_center')
-    state=st.radio('Estado',['Izquierda','Centro','Derecha'],horizontal=True,index=1,key='hyd2_state')
-    c3,c4=st.columns([1.25,.75])
-    with c3: st.plotly_chart(circuit_state_figure(center,state),use_container_width=True,key='hyd2_base_circuit')
-    with c4: st.markdown('<div class="gg-orange"><b>Movimiento esperado</b><br>'+motion_from_4_3_center(center,state)+'</div>',unsafe_allow_html=True)
+    st.subheader('Cargador frontal · implementos, LS y articulación')
+    subsystem=st.selectbox('Sistema',list(SYSTEM_CASES['Cargador frontal'].keys()),key='loader_sub')
+    render_case('Cargador frontal',subsystem,'loader')
 
 with TABS[6]:
-    st.subheader('Diagnóstico inicial · síntoma no es causa')
-    cases=diagnostic_cases();sym=st.selectbox('Condición observada',list(cases.keys()),key='hyd2_diag_case');case=cases[sym]
-    st.markdown(f'<div class="gg-orange"><b>Interpretación inicial</b><br>{case["interpretation"]}</div>',unsafe_allow_html=True)
-    st.markdown('### Qué verificar antes de cambiar componentes')
-    cols=st.columns(3)
-    for i,ch in enumerate(case['checks']):
-        with cols[i%3]: st.markdown(f'<div class="gg-card"><b>{i+1:02d}</b><br>{ch}</div>',unsafe_allow_html=True)
-    st.markdown('### Diagnósticos del módulo previo')
-    symptom=st.selectbox('Síntoma adicional',list(DIAGNOSTICS.keys()),key='hyd2_diag_old')
-    for i,step in enumerate(DIAGNOSTICS[symptom]): st.write(f'{i+1}. {step}')
-    st.markdown('### Tres preguntas físicas')
-    a,b,c=st.columns(3)
-    with a: st.latex(r'Q=0\Rightarrow v=0');st.caption('¿Llega caudal?')
-    with b: st.latex(r'v=Q/A');st.caption('¿El caudal disponible explica la velocidad?')
-    with c: st.latex(r'p_{req}\approx F/A');st.caption('¿La presión vence la carga?')
+    st.subheader('Diagnóstico guiado · síntoma ≠ causa')
+    cases=diagnostic_cases();symptom=st.selectbox('Síntoma observado',list(cases.keys()),key='diag_case');case=cases[symptom]
+    st.markdown(f'<div class="gg-orange"><b>Principio físico</b><br>{case["physics"]}</div>',unsafe_allow_html=True)
+    st.markdown('### Proceso de descarte')
+    cols=st.columns(len(case['first']))
+    for i,(col,step) in enumerate(zip(cols,case['first']),1):
+        with col: st.markdown(f'<div class="gg-step"><div class="n">{i}</div><div class="t">Comprobar</div><div class="d">{step}</div></div>',unsafe_allow_html=True)
+    st.markdown('### Qué evidencia cambia la hipótesis')
+    ev1,ev2=st.columns([1.2,.8])
+    with ev1:
+        for e in case['evidence']: st.markdown(f'- {e}')
+    with ev2: st.markdown(f'<div class="gg-dark"><b>Error a evitar</b><br>{case["avoid"]}</div>',unsafe_allow_html=True)
+    st.markdown('### Plantilla de diagnóstico técnico')
+    st.dataframe(pd.DataFrame([
+        ['1','Síntoma','Describir lo observado sin inferir causa.'],
+        ['2','Estado del circuito','Identificar posición de válvulas y carga.'],
+        ['3','Predicción','Definir qué P, Q y movimiento deberían existir.'],
+        ['4','Medición','Elegir el punto que discrimina entre hipótesis.'],
+        ['5','Aislamiento','Separar fuente, control, actuador y carga.'],
+        ['6','Conclusión','Solo concluir cuando la evidencia contradiga/soporte una causa.'],
+    ],columns=['Paso','Acción','Criterio']),use_container_width=True,hide_index=True)
 
 with TABS[7]:
-    st.subheader('Terreno y seguridad · observar, medir y verificar')
-    st.markdown('''<div class="gg-dark"><b>Equipo detenido no significa equipo seguro.</b><br>La presión puede quedar atrapada en líneas, cilindros o acumuladores. Antes de intervenir: aislar, bloquear, descargar presión, asegurar mecánicamente la carga y verificar energía cero.</div>''',unsafe_allow_html=True)
-    st.markdown('### Del plano al equipo')
-    rows=[
-        ['Depósito','tanque, respiradero, visor','nivel, espuma, temperatura, contaminación'],
-        ['Bomba','bomba sobre motor/transmisión o central','ruido, vibración, caudal, succión, drenaje'],
-        ['P','línea principal de presión','presión en carga, pulsación, temperatura'],
-        ['T','retorno a tanque','contrapresión, temperatura, restricción'],
-        ['A / B','mangueras hacia actuador','presión diferencial, sentido, fugas'],
-        ['X / LS','pilotaje / load sensing','presión de mando y respuesta'],
-        ['L / Y','drenaje de carcasa/pilotaje','contrapresión y fuga interna'],
-        ['Acumulador','recipiente cargado con gas','presión almacenada y procedimiento de descarga'],
-    ]
-    st.dataframe(pd.DataFrame(rows,columns=['En el plano','En la máquina','Qué comprobar']),use_container_width=True,hide_index=True)
-    st.markdown('### Secuencia de trabajo')
-    steps=[('1','Asegurar','LOTO, carga apoyada, zona segura.'),('2','Observar','Fugas, ruido, vibración, temperatura, nivel.'),('3','Medir','Presión, caudal, temperatura en puntos definidos.'),('4','Interpretar','Comparar dato real con estado esperado del plano.'),('5','Intervenir','Solo con condición segura y evidencia suficiente.'),('6','Verificar','Probar reparación y registrar condición final.')]
-    cols=st.columns(3)
-    for i,(n,t,tx) in enumerate(steps):
-        with cols[i%3]: st.markdown(f'<div class="gg-card"><b style="color:#f28e1c">{n} · {t}</b><br>{tx}</div>',unsafe_allow_html=True)
+    st.subheader('Ejercicios de lectura y resolución')
+    level=st.radio('Nivel',['Todos','Básico','Intermedio','Avanzado'],horizontal=True,index=0,key='ex_level')
+    pool=[x for x in EXERCISES if level=='Todos' or x['level']==level]
+    ex_title=st.selectbox('Caso',[x['title'] for x in pool],key='ex_case')
+    ex=next(x for x in pool if x['title']==ex_title)
+    st.markdown(f'<span class="gg-badge">{ex["level"]}</span>',unsafe_allow_html=True)
+    st.markdown(f'<div class="gg-card"><b>Caso</b><br>{ex["case"]}</div>',unsafe_allow_html=True)
+    choice=st.radio(ex['question'],ex['options'],key=f'ex_answer_{ex["id"]}')
+    if st.button('Comprobar razonamiento',key=f'ex_check_{ex["id"]}'):
+        if choice==ex['answer']:
+            st.success('La selección es coherente con la evidencia del caso.')
+        else:
+            st.warning('Esa opción no es la que mejor discrimina la causa en este caso.')
+        st.markdown(f'<div class="gg-orange"><b>Explicación</b><br>{ex["explanation"]}</div>',unsafe_allow_html=True)
+        st.info('En terreno: '+ex['field'])
 
-with st.expander('Alcance de los modelos'):
-    st.write('Los circuitos de maquinaria móvil son redibujos didácticos originales basados en la lógica funcional visible en el video aportado y en el material de curso. No sustituyen esquemas OEM ni manuales de servicio. En especial, funciones como overcenter/snubbing, freno y prioridades/load-sensing pueden variar entre fabricantes y modelos.')
+with TABS[8]:
+    st.subheader('Seguridad y traducción a terreno')
+    st.markdown('''<div class="gg-dark"><b>Equipo detenido no significa energía cero.</b><br>La presión puede permanecer atrapada en cámaras, mangueras, manifolds y acumuladores; además una carga elevada conserva energía potencial. La intervención real debe seguir el procedimiento de aislamiento y descarga aplicable al equipo.</div>''',unsafe_allow_html=True)
+    st.markdown('### Método de trabajo antes de tocar una conexión')
+    items=[
+        ('1','Identifique la función','Qué maniobra debería ejecutar y qué carga existe.'),
+        ('2','Lea el plano','Ubique fuente, control, protección, actuador, retorno, pilotaje y drenajes.'),
+        ('3','Ubique físicamente','Encuentre componentes y mangueras reales sin asumir que la disposición coincide con el plano.'),
+        ('4','Prediga','Qué presión, caudal y movimiento espera en el estado seleccionado.'),
+        ('5','Mida','Use puntos de prueba e instrumentos apropiados antes de desmontar.'),
+        ('6','Aísle y verifique','Bloquee, descargue, soporte la carga y confirme ausencia de energía antes de intervenir.'),
+    ]
+    cols=st.columns(3)
+    for i,item in enumerate(items):
+        with cols[i%3]: st.markdown(f'<div class="gg-step"><div class="n">{item[0]}</div><div class="t">{item[1]}</div><div class="d">{item[2]}</div></div>',unsafe_allow_html=True)
+    st.markdown('### Del plano a la máquina')
+    rows=[
+        ['P','Línea de alimentación','Presión disponible y caída hasta la carga'],['T','Retorno','Contrapresión y temperatura'],['A/B','Líneas de trabajo','Presión diferencial y sentido de movimiento'],['X/LS','Señal de pilotaje / carga','Presión de mando, margen y respuesta'],['Y/L','Drenaje','Contrapresión y fuga interna'],['M','Punto de medición','Dato que permite aceptar o descartar una hipótesis']]
+    st.dataframe(pd.DataFrame(rows,columns=['Plano','En el equipo','Qué verificar']),use_container_width=True,hide_index=True)
+
+with st.expander('Base técnica utilizada para esta versión'):
+    st.write('La biblioteca y los ejercicios se construyeron a partir de los materiales aportados sobre lectura de simbología, hidráulica industrial, diseño de circuitos, troubleshooting y mantenimiento. Se privilegió una progresión de técnico: reconocer → leer → seguir flujo → relacionar con máquina → medir → diagnosticar.')
+    st.write('Los esquemas de maquinaria móvil son funcionales y genéricos. Para un equipo real, la validación final debe hacerse contra el esquema hidráulico y manual de servicio del fabricante y la configuración específica de la máquina.')
