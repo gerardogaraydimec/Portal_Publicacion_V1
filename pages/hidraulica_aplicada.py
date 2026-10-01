@@ -9,10 +9,9 @@ from modules.hydraulics_applied.symbol_catalog_v3 import SYMBOLS, PORTS, familie
 from modules.hydraulics_applied.symbol_studio import render_symbol, render_valve_builder
 from modules.hydraulics_applied.system_cases import SYSTEM_CASES, system_state, course_comparison_rows, diagnostic_cases
 from modules.hydraulics_applied.schematic_pro import render_hydraulic_schematic
-from modules.hydraulics_applied.machine_visual3d import (
-    render_machine_hydraulics_3d,
-    premium_available,
-    render_machine_premium,
+from modules.hydraulics_applied.machine_reference import (
+    reference_available,
+    render_machine_reference,
 )
 from modules.hydraulics_applied.learning_cases import EXERCISES, LEARNING_PATH
 
@@ -34,12 +33,12 @@ st.markdown('''
 
 render_app_header(
     title='Hidráulica aplicada · Lectura, máquina y diagnóstico',
-    subtitle='Símbolo → función → circuito → estado → máquina → medición → diagnóstico',
+    subtitle='Símbolo → función → circuito → estado → medición → diagnóstico',
     section='MÁQUINAS Y COMPONENTES · POTENCIA FLUIDA',
     logo_width=188,
 )
 
-st.markdown('''<div class="gg-note"><b>Enfoque V4.3:</b> el esquema y el modelo físico representan la <b>misma condición operacional</b>. Los circuitos móviles son reconstrucciones didácticas funcionales —no planos OEM— y se han organizado para que el técnico pueda seguir fuente → control → actuador → retorno/pilotaje sin cruces innecesarios.</div>''',unsafe_allow_html=True)
+st.markdown('''<div class="gg-note"><b>Enfoque V4.6:</b> la prioridad es la <b>lectura hidráulica real</b>: símbolo → puerto → posición → trayectoria → actuador → medición. En maquinaria móvil se conserva una referencia visual estática para ubicar componentes, pero se elimina el 3D interactivo porque no agrega suficiente valor pedagógico frente al plano funcional.</div>''',unsafe_allow_html=True)
 
 study_mode=st.sidebar.radio('Modo de estudio',['Guiado','Intermedio','Técnico'],index=0,help='Guiado muestra nombres y ayudas. Técnico reduce ayudas para obligar a leer puertos y símbolos.')
 st.sidebar.markdown('**Código funcional de líneas**')
@@ -67,7 +66,7 @@ def _reading_table(data):
         st.caption('No hay lecturas definidas para este estado.')
 
 
-def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False,show_3d:bool=True):
+def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False,show_machine_reference:bool=False):
     meta=SYSTEM_CASES[machine][subsystem]
     state=st.radio('Estado / mando',meta['states'],horizontal=True,key=f'{prefix}_state')
     data=_payload(machine,subsystem,state)
@@ -82,83 +81,45 @@ def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False,show_3
     st.markdown('### 1 · Plano funcional limpio')
     render_hydraulic_schematic(data,height=650)
 
-    if show_3d:
-        st.markdown('### 2 · Modelo visual de la máquina')
-        has_premium = premium_available(machine, subsystem)
+    st.markdown('### 2 · Lectura funcional del estado')
+    r1,r2,r3=st.columns(3)
+    pressure_txt = ' → '.join(data.get('pressure',[])) if data.get('pressure') else 'Sin ruta de presión activa / depende del centro'
+    return_txt = ' → '.join(data.get('return',[])) if data.get('return') else 'Sin retorno activo definido en este estado'
+    pilot_txt = ' → '.join(data.get('pilot',[])) if data.get('pilot') else 'Sin pilotaje activo'
+    with r1:
+        st.markdown(f'<div class="gg-card"><b>Qué debería ocurrir</b><br>{data["motion"]}<br><br><b>Secuencia de lectura</b><br>Fuente → mando → puerto de trabajo → actuador → retorno.</div>',unsafe_allow_html=True)
+    with r2:
+        st.markdown('<div class="gg-card"><b>Qué observar en el plano</b><br>'+meta['learning']+'<br><br><b>Componentes de la función</b><br>'+' → '.join(meta['components'])+'</div>',unsafe_allow_html=True)
+    with r3:
+        st.markdown('<div class="gg-orange"><b>Qué medir para comprobar</b><br>'+' · '.join(meta['field'])+'<br><br><b>Riesgos</b><br>'+' · '.join(meta['risks'])+'</div>',unsafe_allow_html=True)
 
-        if has_premium:
-            visual_mode = st.radio(
-                'Representación',
-                ['Vista visual de alta fidelidad', '3D interactivo'],
-                horizontal=True,
-                key=f'{prefix}_visual_mode',
-                help='La vista visual mejora reconocimiento de la máquina. El 3D interactivo permite rotar y explorar el estado seleccionado.'
-            )
-        else:
-            visual_mode = '3D interactivo'
+    with st.expander('Ver rutas internas activadas en este estado'):
+        st.caption('Estas etiquetas corresponden a los tramos internos del modelo didáctico y sirven para comprobar que el estado seleccionado cambia realmente el circuito.')
+        st.write('**Presión:**', pressure_txt)
+        st.write('**Retorno:**', return_txt)
+        st.write('**Pilotaje / LS:**', pilot_txt)
 
-        if visual_mode == 'Vista visual de alta fidelidad':
-            control, scene = st.columns([.22,.78], gap='medium')
-            with control:
-                st.markdown(f'<div class="gg-dark"><b>Qué observar</b><br>{meta["learning"]}</div>',unsafe_allow_html=True)
-                st.markdown('**Estado seleccionado**')
-                st.markdown(f'<div class="gg-card"><b>{state}</b><br>{data["motion"]}</div>',unsafe_allow_html=True)
-                st.markdown('**Lecturas esperadas**')
-                _reading_table(data)
-            with scene:
-                render_machine_premium(machine, subsystem, state)
+    st.markdown('**Lecturas esperadas en los puntos del plano**')
+    _reading_table(data)
 
-            with st.expander('Explorar además el 3D interactivo del estado actual'):
-                c1,c2,c3 = st.columns([1,1,1])
-                with c1:
-                    amp=st.slider('Amplificación visual',.6,1.8,1.0,.1,key=f'{prefix}_amp_premium',help='Amplifica únicamente el movimiento del 3D interactivo; no altera los cálculos hidráulicos.')
-                with c2:
-                    view=st.selectbox('Vista inicial',['Isométrica','Frente','Lateral','Superior'],index=0,key=f'{prefix}_view_premium')
-                with c3:
-                    show_paths=st.toggle('Mostrar rutas hidráulicas',value=True,key=f'{prefix}_paths_premium')
-                render_machine_hydraulics_3d({**data,'visual_amp':amp,'view':view,'show_paths':show_paths,'plotly_key':f'hyd_{prefix}_machine3d_premium'},height=560)
-        else:
-            control,scene=st.columns([.22,.78],gap='medium')
-            with control:
-                amp=st.slider('Amplificación visual',.6,1.8,1.0,.1,key=f'{prefix}_amp',help='Amplifica únicamente el movimiento representado; no altera los cálculos hidráulicos.')
-                view=st.radio('Vista inicial',['Isométrica','Frente','Lateral','Superior'],index=0,key=f'{prefix}_view')
-                show_paths=st.toggle('Mostrar rutas hidráulicas',value=True,key=f'{prefix}_paths')
-                st.markdown(f'<div class="gg-dark"><b>Qué observar</b><br>{meta["learning"]}</div>',unsafe_allow_html=True)
-                st.markdown('**Lecturas esperadas**')
-                _reading_table(data)
-            with scene:
-                render_machine_hydraulics_3d({**data,'visual_amp':amp,'view':view,'show_paths':show_paths,'plotly_key':f'hyd_{prefix}_machine3d'},height=620)
-        next_section = 3
+    st.markdown('#### Compare los estados antes de memorizar el circuito')
+    state_rows=[]
+    for s_name in meta['states']:
+        s_data=_payload(machine,subsystem,s_name)
+        state_rows.append({
+            'Estado':s_name,
+            'Movimiento / condición':s_data.get('motion','—'),
+            'Lecturas clave':' · '.join(f'{k}: {v}' for k,v in s_data.get('readings',{}).items()) or '—',
+        })
+    st.dataframe(pd.DataFrame(state_rows),use_container_width=True,hide_index=True)
+
+    if show_machine_reference and reference_available(machine, subsystem):
+        st.markdown('### 3 · Referencia visual del equipo')
+        st.caption('Esta imagen solo ayuda a ubicar físicamente los componentes. La lógica hidráulica se estudia en el plano funcional superior.')
+        render_machine_reference(machine, subsystem, state)
+        next_section=4
     else:
-        st.markdown('### 2 · Lectura funcional del estado')
-        r1,r2,r3=st.columns(3)
-        pressure_txt = ' → '.join(data.get('pressure',[])) if data.get('pressure') else 'Sin ruta de presión activa / depende del centro'
-        return_txt = ' → '.join(data.get('return',[])) if data.get('return') else 'Sin retorno activo definido en este estado'
-        pilot_txt = ' → '.join(data.get('pilot',[])) if data.get('pilot') else 'Sin pilotaje activo'
-        with r1:
-            st.markdown(f'<div class="gg-card"><b>Qué debería ocurrir</b><br>{data["motion"]}<br><br><b>Secuencia de lectura</b><br>Fuente → mando → puerto de trabajo → actuador → retorno.</div>',unsafe_allow_html=True)
-        with r2:
-            st.markdown('<div class="gg-card"><b>Qué observar en el plano</b><br>'+meta['learning']+'<br><br><b>Componentes de la función</b><br>'+' → '.join(meta['components'])+'</div>',unsafe_allow_html=True)
-        with r3:
-            st.markdown('<div class="gg-orange"><b>Qué medir para comprobar</b><br>'+' · '.join(meta['field'])+'<br><br><b>Riesgos</b><br>'+' · '.join(meta['risks'])+'</div>',unsafe_allow_html=True)
-        with st.expander('Ver rutas internas activadas en este estado'):
-            st.caption('Estas etiquetas corresponden a los tramos internos del modelo didáctico; sirven para verificar que el estado seleccionado realmente cambia el circuito.')
-            st.write('**Presión:**', pressure_txt)
-            st.write('**Retorno:**', return_txt)
-            st.write('**Pilotaje / LS:**', pilot_txt)
-        st.markdown('**Lecturas esperadas en los puntos del plano**')
-        _reading_table(data)
-        st.markdown('#### Compare los estados antes de memorizar el circuito')
-        state_rows=[]
-        for s_name in meta['states']:
-            s_data=_payload(machine,subsystem,s_name)
-            state_rows.append({
-                'Estado':s_name,
-                'Movimiento / condición':s_data.get('motion','—'),
-                'Lecturas clave':' · '.join(f'{k}: {v}' for k,v in s_data.get('readings',{}).items()) or '—',
-            })
-        st.dataframe(pd.DataFrame(state_rows),use_container_width=True,hide_index=True)
-        next_section = 3
+        next_section=3
 
     if show_calc:
         st.markdown(f'### {next_section} · Parámetros físicos y comprobación')
@@ -175,7 +136,7 @@ def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False,show_3
             m2.metric('v retroceso',f'{r.retraction_speed_m_s*1000:.1f} mm/s')
             m3.metric('F avance',f'{r.extension_force_n/1000:.1f} kN')
             m4.metric('F retroceso',f'{r.retraction_force_n/1000:.1f} kN')
-            st.caption('Estos valores sí cambian con Q, diámetros y presión. La amplificación del 3D solo afecta la visualización.')
+            st.caption('Estos valores cambian con Q, diámetros y presión. No existe ya una amplificación 3D asociada a esta página.')
         except ValueError as exc:
             st.error(str(exc))
 
@@ -235,25 +196,25 @@ with TABS[1]:
 
 with TABS[2]:
     st.subheader('Circuitos didácticos · plano → estado → lectura → medición')
-    st.caption('En estos circuitos no se fuerza una vista 3D: el valor pedagógico está en leer correctamente el plano, entender la posición de la válvula y predecir el comportamiento.')
+    st.caption('El valor pedagógico está en leer correctamente el plano, entender la posición de la válvula y predecir el comportamiento.')
     subsystem=st.selectbox('Circuito',list(SYSTEM_CASES['Sistema estacionario'].keys()),key='did_sub')
-    render_case('Sistema estacionario',subsystem,'did',show_calc=subsystem in ('Cilindro 4/3 básico','Carga vertical + contrabalance','Avance regenerativo'),show_3d=False)
+    render_case('Sistema estacionario',subsystem,'did',show_calc=subsystem in ('Cilindro 4/3 básico','Carga vertical + contrabalance','Avance regenerativo'),show_machine_reference=False)
 
 with TABS[3]:
     st.subheader('Sistemas de planta · potencia, secuencia y carga')
-    st.caption('Aquí priorizamos plano funcional, secuencia y comprobación física. El 3D se reserva para maquinaria móvil cuando ayuda a relacionar circuito y mecanismo.')
+    st.caption('Aquí priorizamos plano funcional, secuencia y comprobación física. No se utiliza 3D interactivo en esta página.')
     subsystem=st.selectbox('Sistema',list(SYSTEM_CASES['Sistema estacionario'].keys()),key='plant_sub')
-    render_case('Sistema estacionario',subsystem,'plant',show_calc=True,show_3d=False)
+    render_case('Sistema estacionario',subsystem,'plant',show_calc=True,show_machine_reference=False)
 
 with TABS[4]:
     st.subheader('Camión minero · circuito funcional + máquina')
     subsystem=st.selectbox('Sistema',list(SYSTEM_CASES['Camión minero'].keys()),key='truck_sub')
-    render_case('Camión minero',subsystem,'truck')
+    render_case('Camión minero',subsystem,'truck',show_machine_reference=True)
 
 with TABS[5]:
     st.subheader('Cargador frontal · implementos, LS y articulación')
     subsystem=st.selectbox('Sistema',list(SYSTEM_CASES['Cargador frontal'].keys()),key='loader_sub')
-    render_case('Cargador frontal',subsystem,'loader')
+    render_case('Cargador frontal',subsystem,'loader',show_machine_reference=True)
 
 with TABS[6]:
     st.subheader('Diagnóstico guiado · primero prediga, después mida')
@@ -305,5 +266,5 @@ with TABS[8]:
     st.dataframe(pd.DataFrame(rows,columns=['Plano','En el equipo','Qué verificar']),use_container_width=True,hide_index=True)
 
 with st.expander('Base técnica y alcance de esta versión'):
-    st.write('La biblioteca, los circuitos y los ejercicios se construyen con los materiales aportados sobre lectura de símbolos, fundamentos hidráulicos, diseño de circuitos, mantenimiento y troubleshooting. La progresión es: reconocer → leer → seguir flujo → relacionar con la máquina → medir → diagnosticar.')
+    st.write('La biblioteca, los circuitos y los ejercicios se construyen con los materiales aportados sobre lectura de símbolos, fundamentos hidráulicos, diseño de circuitos, mantenimiento y troubleshooting. La progresión es: reconocer → leer → seguir flujo → relacionar con el equipo → medir → diagnosticar.')
     st.write('Los circuitos móviles son funcionales y genéricos. Para una máquina real debe utilizarse el esquema hidráulico y el manual de servicio del fabricante correspondiente a su configuración.')
