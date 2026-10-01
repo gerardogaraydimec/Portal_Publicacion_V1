@@ -321,145 +321,179 @@ def _truck(fig, data):
     subsystem = data.get("subsystem", "")
     amp = float(data.get("visual_amp", 1.0))
 
-    _ground_shadow(fig, center=(0.6, 0), size=(7.5, 4.2), opacity=0.11)
+    _ground_shadow(fig, center=(0.2, 0), size=(8.2, 4.5), opacity=0.10)
 
-    # Chasis principal
-    _cuboid(fig, (0.35, 0, -0.03), (7.0, 2.7, 0.34), YELLOW, "Chasis")
-    _cuboid(fig, (-0.05, 0, 0.18), (4.5, 2.15, 0.22), "#c18a21", "Plataforma")
-    _cuboid(fig, (2.95, 0, 0.04), (1.6, 2.3, 0.22), "#c18a21", "Puente trasero")
+    # Chasis más claro y proporcional
+    _cuboid(fig, (0.10, 0, -0.02), (7.45, 2.65, 0.28), YELLOW, "Chasis")
+    _cuboid(fig, (-0.10, 0, 0.18), (4.80, 2.00, 0.18), "#bf8723", "Plataforma")
+    _cuboid(fig, (2.85, 0, 0.02), (1.95, 2.20, 0.18), "#bf8723", "Puente trasero")
+    _cuboid(fig, (3.35, 0, 0.10), (0.65, 2.55, 0.20), "#b67f1e", "Tope trasero")
 
-    # Cabina y capó
-    _cuboid(fig, (-2.55, 0, 0.92), (1.55, 2.05, 1.55), DARK2, "Cabina")
-    _cuboid(fig, (-1.8, 0, 0.54), (1.1, 1.9, 0.62), "#3a3d45", "Capó")
-    _cuboid(fig, (-2.62, 0, 1.16), (1.05, 1.58, 0.62), GLASS, "Parabrisas", opacity=0.78, lighting=LIGHTING_GLASS)
-    _cuboid(fig, (-2.65, -0.82, 1.00), (0.12, 0.38, 0.55), GLASS, "Ventana", opacity=0.72, lighting=LIGHTING_GLASS)
-    _cuboid(fig, (-2.65, 0.82, 1.00), (0.12, 0.38, 0.55), GLASS, "Ventana", opacity=0.72, lighting=LIGHTING_GLASS)
+    # Cabina más reconocible
+    _cuboid(fig, (-2.75, 0, 0.98), (1.45, 1.95, 1.58), DARK2, "Cabina")
+    _cuboid(fig, (-1.92, 0, 0.56), (1.35, 1.78, 0.60), "#393c44", "Capó")
+    _cuboid(fig, (-2.82, 0, 1.22), (0.90, 1.46, 0.64), GLASS, "Parabrisas", opacity=0.78, lighting=LIGHTING_GLASS)
+    _cuboid(fig, (-2.86, -0.74, 1.00), (0.10, 0.42, 0.54), GLASS, "Ventana", opacity=0.72, lighting=LIGHTING_GLASS)
+    _cuboid(fig, (-2.86, 0.74, 1.00), (0.10, 0.42, 0.54), GLASS, "Ventana", opacity=0.72, lighting=LIGHTING_GLASS)
 
     steer = 0.0
     if subsystem == "Dirección hidrostática":
-        steer = {"Izquierda": -0.28, "Derecha": 0.28}.get(state, 0.0) * amp
+        steer = {"Izquierda": -0.24, "Derecha": 0.24}.get(state, 0.0) * amp
 
-    for x in [-2.0, 0.65, 2.25]:
-        for y in [-1.28, 1.28]:
-            _wheel(fig, x, y, -0.48, 0.74 if x < 0 else 0.82, 0.46, steer if x < 0 else 0.0)
+    # 6 ruedas de mejor tamaño
+    for x in (-2.15, 0.35, 2.35):
+        for y in (-1.24, 1.24):
+            _wheel(fig, x, y, -0.50, 0.82 if x > -1.0 else 0.74, 0.42, steer if x < -1.0 else 0.0)
 
-    # Tolva más reconocible
-    angle = {"Raise": 0.70, "Hold": 0.42, "Float": 0.20, "Lower": 0.10}.get(state, 0.10) if subsystem == "Levante de tolva" else 0.10
-    angle *= min(1.28, amp)
-    pivot = (2.50, 0, 0.36)
+    # Tolva mejor proporcionada
+    angle = {"Raise": 0.58, "Hold": 0.34, "Float": 0.16, "Lower": 0.08}.get(state, 0.08) if subsystem == "Levante de tolva" else 0.08
+    angle *= min(1.15, amp)
+    pivot = (2.08, 0, 0.32)
 
-    # Piso, laterales, frente y alero
-    _cuboid_rot_y(fig, (1.10, 0, 1.02), (4.55, 2.30, 0.22), angle, YELLOW, "Piso tolva", origin=pivot)
-    _cuboid_rot_y(fig, (1.02, -1.12, 1.52), (4.35, 0.16, 1.16), angle, YELLOW, "Lateral tolva", origin=pivot)
-    _cuboid_rot_y(fig, (1.02, 1.12, 1.52), (4.35, 0.16, 1.16), angle, YELLOW, "Lateral tolva", origin=pivot)
-    _cuboid_rot_y(fig, (-0.90, 0, 1.48), (0.20, 2.28, 1.16), angle, YELLOW, "Frente tolva", origin=pivot)
-    _cuboid_rot_y(fig, (2.78, 0, 1.28), (0.85, 2.10, 0.18), angle, "#e0b64d", "Alero trasero", origin=pivot)
+    # Tolva: piso + laterales + frente, más compacta y cercana al camión real
+    _cuboid_rot_y(fig, (0.95, 0, 1.04), (4.10, 2.18, 0.20), angle, YELLOW, "Piso tolva", origin=pivot)
+    _cuboid_rot_y(fig, (0.86, -1.03, 1.40), (3.95, 0.14, 0.92), angle, YELLOW, "Lateral tolva", origin=pivot)
+    _cuboid_rot_y(fig, (0.86, 1.03, 1.40), (3.95, 0.14, 0.92), angle, YELLOW, "Lateral tolva", origin=pivot)
+    _cuboid_rot_y(fig, (-0.84, 0, 1.32), (0.16, 2.12, 0.92), angle, YELLOW, "Frente tolva", origin=pivot)
+    _cuboid_rot_y(fig, (2.55, 0, 1.22), (0.62, 2.02, 0.15), angle, "#e0b64d", "Alero trasero", origin=pivot)
 
-    # Subestructura de levante
-    _beam_y(fig, (0.55, -0.58, 0.82), 1.82, 0.12, 0.18, 0.98, METAL, "Biela", origin=(0.0, -0.58, 0.22))
-    _beam_y(fig, (0.55, 0.58, 0.82), 1.82, 0.12, 0.18, 0.98, METAL, "Biela", origin=(0.0, 0.58, 0.22))
-
+    # Cilindros de levante mejor visibles
     if subsystem == "Levante de tolva":
-        cyl_head_z = 0.95 + 0.35 * max(0.0, math.sin(angle))
-        rod_head_z = 1.12 + 0.40 * max(0.0, math.sin(angle))
-        _cylinder(fig, (-0.18, -0.72, 0.22), (1.20, -0.72, cyl_head_z), 0.12, METAL, "Cilindro levante")
-        _cylinder(fig, (-0.18, 0.72, 0.22), (1.20, 0.72, cyl_head_z), 0.12, METAL, "Cilindro levante")
-        _cylinder(fig, (0.92, -0.72, 0.88), (1.55, -0.72, rod_head_z), 0.056, ROD, "Vástago")
-        _cylinder(fig, (0.92, 0.72, 0.88), (1.55, 0.72, rod_head_z), 0.056, ROD, "Vástago")
-        _label(fig, 1.55, 0, 2.80, "TOLVA / CARGA")
-        _label(fig, 0.55, 0, 1.90, "CILINDROS DE LEVANTE", size=10)
+        cyl_top = 0.98 + 0.42 * max(0.0, math.sin(angle))
+        rod_top = 1.18 + 0.44 * max(0.0, math.sin(angle))
+        _cylinder(fig, (0.08, -0.64, 0.18), (1.30, -0.64, cyl_top), 0.13, METAL, "Cilindro levante")
+        _cylinder(fig, (0.08, 0.64, 0.18), (1.30, 0.64, cyl_top), 0.13, METAL, "Cilindro levante")
+        _cylinder(fig, (1.02, -0.64, 0.84), (1.70, -0.64, rod_top), 0.055, ROD, "Vástago")
+        _cylinder(fig, (1.02, 0.64, 0.84), (1.70, 0.64, rod_top), 0.055, ROD, "Vástago")
+        _label(fig, 0.95, 0, 2.66, "TOLVA / CARGA")
+        _label(fig, 0.95, 0, 1.82, "CILINDROS DE LEVANTE", size=10)
     elif subsystem == "Freno con acumuladores":
-        for x in (-0.2, 0.45, 1.1):
-            _cylinder(fig, (x, -0.88, 0.70), (x + 0.55, -0.88, 0.70), 0.15, DARK2, "Acumulador")
-        _label(fig, 0.65, -0.92, 1.20, "ACUMULADORES")
+        for x in (-0.10, 0.62, 1.34):
+            _cylinder(fig, (x, -0.92, 0.68), (x + 0.50, -0.92, 0.68), 0.15, DARK2, "Acumulador")
+        _label(fig, 0.82, -0.92, 1.18, "ACUMULADORES")
     else:
-        _label(fig, -1.4, 0, 2.10, "DIRECCIÓN HIDROSTÁTICA")
+        _label(fig, -1.55, 0, 2.05, "DIRECCIÓN HIDROSTÁTICA")
 
-    _cuboid(fig, (-0.35, 0, 0.55), (0.58, 0.78, 0.60), DARK2, "Unidad hidráulica")
-    _cuboid(fig, (0.45, 0, 0.67), (0.92, 0.96, 0.64), "#34373e", "Banco de válvulas")
-    _label(fig, 0.10, 0, 1.35, "UNIDAD HIDRÁULICA")
+    _cuboid(fig, (-0.45, 0, 0.53), (0.56, 0.74, 0.54), DARK2, "Unidad hidráulica")
+    _cuboid(fig, (0.38, 0, 0.63), (0.88, 0.90, 0.56), "#34373e", "Banco de válvulas")
+    _label(fig, -0.02, 0, 1.26, "UNIDAD HIDRÁULICA")
 
 
 def _loader(fig, data):
     state = data.get("state", "")
     subsystem = data.get("subsystem", "")
     amp = float(data.get("visual_amp", 1.0))
-    steer = {"Izquierda": -0.28, "Derecha": 0.28}.get(state, 0.0) * amp if subsystem == "Dirección articulada" else 0.0
+    steer = {"Izquierda": -0.22, "Derecha": 0.22}.get(state, 0.0) * amp if subsystem == "Dirección articulada" else 0.0
 
-    _ground_shadow(fig, center=(0.2, 0), size=(6.6, 4.1), opacity=0.11)
+    _ground_shadow(fig, center=(0.15, 0), size=(6.8, 4.0), opacity=0.10)
 
-    # Bastidor trasero + motor/cabina
-    _cuboid(fig, (-1.35, 0, 0.00), (2.95, 2.15, 0.38), YELLOW, "Bastidor trasero")
-    _cuboid(fig, (-1.55, 0, 0.30), (2.15, 1.80, 0.26), "#c18a21", "Tapa motor")
-    _cuboid(fig, (-1.82, 0, 0.98), (1.20, 1.60, 1.50), DARK2, "Cabina")
-    _cuboid(fig, (-1.86, 0, 1.18), (0.84, 1.34, 0.62), GLASS, "Cabina", opacity=0.76, lighting=LIGHTING_GLASS)
+    # Bastidor trasero y cabina, más masivos y legibles
+    _cuboid(fig, (-1.38, 0, 0.02), (3.05, 2.18, 0.34), YELLOW, "Bastidor trasero")
+    _cuboid(fig, (-1.52, 0, 0.30), (2.22, 1.72, 0.28), "#bf8723", "Motor")
+    _cuboid(fig, (-1.92, 0, 1.02), (1.22, 1.58, 1.50), DARK2, "Cabina")
+    _cuboid(fig, (-1.98, 0, 1.22), (0.86, 1.30, 0.60), GLASS, "Cabina", opacity=0.78, lighting=LIGHTING_GLASS)
+    _cuboid(fig, (-0.68, 0, 0.40), (0.72, 1.24, 0.42), "#b67f1e", "Contrapeso")
 
-    # Bastidor delantero articulado
-    _cuboid_rot_z(fig, (0.95, 0, 0.00), (2.60, 2.05, 0.34), steer, YELLOW, "Bastidor delantero", origin=(0, 0, 0))
-    _cuboid_rot_z(fig, (1.45, 0, 0.25), (1.65, 1.65, 0.18), steer, "#c18a21", "Soporte delantero", origin=(0, 0, 0))
-    _cylinder(fig, (-0.08, 0, -0.18), (0.24, 0, -0.18), 0.17, METAL, "Pivote")
+    # Bastidor delantero articulado más claro
+    _cuboid_rot_z(fig, (0.98, 0, 0.02), (2.72, 2.00, 0.30), steer, YELLOW, "Bastidor delantero", origin=(0, 0, 0))
+    _cuboid_rot_z(fig, (1.58, 0, 0.24), (1.48, 1.48, 0.18), steer, "#bf8723", "Soporte delantero", origin=(0, 0, 0))
+    _cylinder(fig, (-0.04, 0, -0.14), (0.22, 0, -0.14), 0.16, METAL, "Pivote")
 
     # Ruedas
-    for y in (-1.12, 1.12):
-        _wheel(fig, -2.05, y, -0.46, 0.72, 0.46, 0.0)
-        wx, wy, wz = _rotate_z([(1.60, y, -0.46)], steer, (0, 0, 0))[0]
-        _wheel(fig, wx, wy, wz, 0.78, 0.46, steer)
+    for y in (-1.08, 1.08):
+        _wheel(fig, -2.08, y, -0.46, 0.72, 0.44, 0.0)
+        wx, wy, wz = _rotate_z([(1.66, y, -0.46)], steer, (0, 0, 0))[0]
+        _wheel(fig, wx, wy, wz, 0.80, 0.44, steer)
 
-    # Brazos de levante
-    lift_angle = {"Raise": 0.54, "Hold": 0.28, "Float": 0.10, "Lower": -0.06}.get(state, 0.14) if subsystem == "Levante de brazos LS" else 0.24
-    lift_angle *= min(1.25, amp)
-    arm_origin = np.array([0.95, 0, 0.42])
-    arm_len = 2.95
+    # Brazos de levante, más cortos y robustos para evitar aspecto confuso
+    lift_angle = {"Raise": 0.48, "Hold": 0.24, "Float": 0.08, "Lower": -0.06}.get(state, 0.20) if subsystem == "Levante de brazos LS" else 0.22
+    lift_angle *= min(1.15, amp)
+    arm_origin = np.array([0.92, 0, 0.46])
+    arm_len = 2.45
     end = np.array([arm_origin[0] + arm_len * math.cos(lift_angle), 0, arm_origin[2] + arm_len * math.sin(lift_angle)])
 
-    for y in (-0.74, 0.74):
+    for y in (-0.64, 0.64):
         base_side = _rotate_z([(arm_origin[0], y, arm_origin[2])], steer, (0, 0, 0))[0]
         arm_center_local = ((arm_origin[0] + end[0]) / 2, y, (arm_origin[2] + end[2]) / 2)
         arm_center = _rotate_z([arm_center_local], steer, (0, 0, 0))[0]
         _beam_y(fig, arm_center, arm_len, 0.12, 0.16, lift_angle, YELLOW, "Brazo", origin=base_side)
 
-    # Traviesa superior del brazo
-    p_left = _rotate_z([(end[0] - 0.25, -0.74, end[2] + 0.05)], steer, (0, 0, 0))[0]
-    p_right = _rotate_z([(end[0] - 0.25, 0.74, end[2] + 0.05)], steer, (0, 0, 0))[0]
-    _cylinder(fig, p_left, p_right, 0.08, YELLOW, "Traviesa")
+    # Traviesa superior
+    p_left = _rotate_z([(end[0] - 0.18, -0.64, end[2] + 0.04)], steer, (0, 0, 0))[0]
+    p_right = _rotate_z([(end[0] - 0.18, 0.64, end[2] + 0.04)], steer, (0, 0, 0))[0]
+    _cylinder(fig, p_left, p_right, 0.07, YELLOW, "Traviesa")
 
-    # Balde más legible
-    bucket_angle = {"Rollback": 0.42, "Hold": 0.05, "Dump": -0.60}.get(state, -0.08) if subsystem == "Inclinación de balde" else -0.10
-    bucket_angle *= min(1.25, amp)
-    end_rot = _rotate_z([(end[0], 0, end[2])], steer, (0, 0, 0))[0]
+    # Balde más compacto y reconocible
+    bucket_angle = {"Rollback": 0.34, "Hold": 0.02, "Dump": -0.52}.get(state, -0.06) if subsystem == "Inclinación de balde" else -0.04
+    bucket_angle *= min(1.20, amp)
+    bucket_pivot_local = (end[0] + 0.06, 0, end[2] - 0.02)
+    pivot_rot = _rotate_z([bucket_pivot_local], steer, (0, 0, 0))[0]
+    bucket_center = _rotate_z([(end[0] + 0.50, 0, end[2] - 0.02)], steer, (0, 0, 0))[0]
+    _cuboid_rot_y(fig, bucket_center, (0.96, 1.78, 0.18), bucket_angle, YELLOW, "Piso balde", origin=pivot_rot)
+    _cuboid_rot_y(fig, (end[0] + 0.18, -0.86, end[2] + 0.20), (0.62, 0.12, 0.62), bucket_angle, YELLOW, "Lateral balde", origin=bucket_pivot_local)
+    _cuboid_rot_y(fig, (end[0] + 0.18, 0.86, end[2] + 0.20), (0.62, 0.12, 0.62), bucket_angle, YELLOW, "Lateral balde", origin=bucket_pivot_local)
+    _cuboid_rot_y(fig, (end[0] + 0.82, 0, end[2] + 0.10), (0.18, 1.72, 0.44), bucket_angle, "#e0b64d", "Frente balde", origin=bucket_pivot_local)
+    edge_x = end[0] + 0.88 * math.cos(bucket_angle)
+    edge_z = end[2] - 0.18 * math.sin(bucket_angle) - 0.14
+    e0, e1 = _rotate_z([(edge_x, -0.86, edge_z), (edge_x, 0.86, edge_z)], steer, (0, 0, 0))
+    _cylinder(fig, e0, e1, 0.035, METAL, "Filo")
 
-    bucket_pivot = (end[0] + 0.12, 0, end[2] + 0.02)
-    bucket_center = _rotate_z([(end[0] + 0.62, 0, end[2] + 0.02)], steer, (0, 0, 0))[0]
-    pivot_rot = _rotate_z([bucket_pivot], steer, (0, 0, 0))[0]
-    _cuboid_rot_y(fig, bucket_center, (1.15, 2.00, 0.24), bucket_angle, YELLOW, "Piso balde", origin=pivot_rot)
-    _cuboid_rot_y(fig, (end[0] + 0.22, -0.95, end[2] + 0.28), (0.80, 0.14, 0.80), bucket_angle, YELLOW, "Lateral balde", origin=bucket_pivot)
-    _cuboid_rot_y(fig, (end[0] + 0.22, 0.95, end[2] + 0.28), (0.80, 0.14, 0.80), bucket_angle, YELLOW, "Lateral balde", origin=bucket_pivot)
-    _cuboid_rot_y(fig, (end[0] + 1.05, 0, end[2] + 0.18), (0.22, 1.92, 0.55), bucket_angle, "#e0b64d", "Frente balde", origin=bucket_pivot)
-
-    edge_x = end[0] + 1.05 * math.cos(bucket_angle)
-    edge_z = end[2] - 0.28 * math.sin(bucket_angle) - 0.22
-    e0, e1 = _rotate_z([(edge_x, -0.96, edge_z), (edge_x, 0.96, edge_z)], steer, (0, 0, 0))
-    _cylinder(fig, e0, e1, 0.04, METAL, "Filo")
+    # Cinemática secundaria sencilla para entender la máquina
+    link_a = _rotate_z([(end[0] - 0.34, -0.30, end[2] + 0.06), (end[0] + 0.10, -0.30, end[2] + 0.22)], steer, (0, 0, 0))
+    link_b = _rotate_z([(end[0] - 0.34, 0.30, end[2] + 0.06), (end[0] + 0.10, 0.30, end[2] + 0.22)], steer, (0, 0, 0))
+    _cylinder(fig, link_a[0], link_a[1], 0.045, METAL, "Biela balde")
+    _cylinder(fig, link_b[0], link_b[1], 0.045, METAL, "Biela balde")
 
     # Cilindros
     if subsystem == "Levante de brazos LS":
-        for y in (-0.56, 0.56):
-            _cylinder(fig, (0.02, y, 0.22), (1.55, y, 0.62 + 0.22 * math.sin(lift_angle)), 0.12, METAL, "Cilindro lift")
-            _cylinder(fig, (1.18, y, 0.51), (1.93, y, 0.72 + 0.34 * math.sin(lift_angle)), 0.055, ROD, "Vástago")
-        _label(fig, 1.55, 0, 2.35, "BRAZOS / LEVANTE LS")
+        for y in (-0.54, 0.54):
+            _cylinder(fig, (0.02, y, 0.22), (1.38, y, 0.58 + 0.18 * math.sin(lift_angle)), 0.12, METAL, "Cilindro lift")
+            _cylinder(fig, (1.02, y, 0.48), (1.70, y, 0.68 + 0.26 * math.sin(lift_angle)), 0.055, ROD, "Vástago")
+        _label(fig, 1.62, 0, 2.08, "BRAZOS / LEVANTE LS")
     elif subsystem == "Inclinación de balde":
-        _cylinder(fig, (1.05, 0, 0.98), (end[0] - 0.08, 0, end[2] + 0.40), 0.12, METAL, "Cilindro tilt")
-        _cylinder(fig, (end[0] - 0.38, 0, end[2] + 0.30), (end[0] + 0.15, 0, end[2] + 0.36 + bucket_angle * 0.16), 0.055, ROD, "Vástago")
-        _label(fig, 1.9, 0, 2.25, "TILT / BALDE")
+        p0 = _rotate_z([(1.24, 0, 0.98)], steer, (0, 0, 0))[0]
+        p1 = _rotate_z([(end[0] - 0.12, 0, end[2] + 0.28)], steer, (0, 0, 0))[0]
+        p2 = _rotate_z([(end[0] + 0.08, 0, end[2] + 0.20 + bucket_angle * 0.10)], steer, (0, 0, 0))[0]
+        _cylinder(fig, p0, p1, 0.11, METAL, "Cilindro tilt")
+        _cylinder(fig, p1, p2, 0.05, ROD, "Vástago")
+        _label(fig, 1.88, 0, 2.02, "TILT / BALDE")
     else:
-        _cylinder(fig, (-0.18, -0.68, 0.15), (0.65, -0.72, 0.15), 0.10, METAL, "Cilindro dirección")
-        _cylinder(fig, (-0.18, 0.68, 0.15), (0.65, 0.72, 0.15), 0.10, METAL, "Cilindro dirección")
-        _label(fig, 0, 0, 2.15, "ARTICULACIÓN")
+        _cylinder(fig, (-0.18, -0.66, 0.14), (0.64, -0.70, 0.14), 0.10, METAL, "Cilindro dirección")
+        _cylinder(fig, (-0.18, 0.66, 0.14), (0.64, 0.70, 0.14), 0.10, METAL, "Cilindro dirección")
+        _label(fig, 0.08, 0, 1.92, "ARTICULACIÓN")
 
-    _cuboid(fig, (-0.42, 0, 0.46), (0.58, 0.80, 0.48), DARK2, "Bomba LS")
-    _cuboid(fig, (0.35, 0, 0.66), (0.78, 0.90, 0.56), "#34373e", "Banco de válvulas")
-    _label(fig, 0.02, 0, 1.35, "UNIDAD HIDRÁULICA")
+    _cuboid(fig, (-0.44, 0, 0.42), (0.54, 0.76, 0.46), DARK2, "Bomba LS")
+    _cuboid(fig, (0.34, 0, 0.62), (0.76, 0.88, 0.54), "#34373e", "Banco de válvulas")
+    _label(fig, -0.02, 0, 1.22, "UNIDAD HIDRÁULICA")
 
+
+def _scene_params(machine: str):
+    if machine == "Camión minero":
+        return dict(
+            aspectratio=dict(x=1.85, y=1.05, z=1.00),
+            ranges=dict(x=[-4.2, 4.2], y=[-2.2, 2.2], z=[-0.8, 3.6]),
+            iso_eye=dict(x=2.25, y=2.10, z=1.55),
+            front_eye=dict(x=0.0, y=2.9, z=1.08),
+            side_eye=dict(x=3.55, y=0.0, z=1.05),
+            top_eye=dict(x=0.01, y=0.01, z=4.1),
+        )
+    if machine == "Cargador frontal":
+        return dict(
+            aspectratio=dict(x=1.75, y=1.05, z=0.95),
+            ranges=dict(x=[-3.3, 4.8], y=[-2.1, 2.1], z=[-0.8, 2.8]),
+            iso_eye=dict(x=2.15, y=2.05, z=1.45),
+            front_eye=dict(x=0.0, y=2.8, z=0.98),
+            side_eye=dict(x=3.15, y=0.0, z=0.98),
+            top_eye=dict(x=0.01, y=0.01, z=3.7),
+        )
+    return dict(
+        aspectratio=dict(x=1.9, y=1.15, z=0.9),
+        ranges=dict(x=[-3.4, 3.4], y=[-2.0, 2.0], z=[-0.8, 2.8]),
+        iso_eye=dict(x=2.55, y=2.35, z=1.72),
+        front_eye=dict(x=0.0, y=2.85, z=0.95),
+        side_eye=dict(x=3.25, y=0.0, z=0.95),
+        top_eye=dict(x=0.01, y=0.01, z=3.9),
+    )
 
 def _stationary(fig, data):
     state = data.get("state", "")
@@ -508,11 +542,12 @@ def render_machine_hydraulics_3d(data: dict, height: int = 640):
         _hydraulic_lines(fig, machine, data.get("subsystem", ""), data.get("state", ""))
 
     view = data.get("view", "Isométrica")
+    scn = _scene_params(machine)
     cams = {
-        "Frente": dict(eye=dict(x=0.0, y=2.85, z=0.95), up=dict(x=0, y=0, z=1)),
-        "Lateral": dict(eye=dict(x=3.25, y=0.0, z=0.95), up=dict(x=0, y=0, z=1)),
-        "Superior": dict(eye=dict(x=0.01, y=0.01, z=3.9), up=dict(x=0, y=1, z=0)),
-        "Isométrica": dict(eye=dict(x=2.55, y=2.35, z=1.72), up=dict(x=0, y=0, z=1)),
+        "Frente": dict(eye=scn["front_eye"], up=dict(x=0, y=0, z=1), projection=dict(type="orthographic")),
+        "Lateral": dict(eye=scn["side_eye"], up=dict(x=0, y=0, z=1), projection=dict(type="orthographic")),
+        "Superior": dict(eye=scn["top_eye"], up=dict(x=0, y=1, z=0), projection=dict(type="orthographic")),
+        "Isométrica": dict(eye=scn["iso_eye"], up=dict(x=0, y=0, z=1), projection=dict(type="orthographic")),
     }
     camera = cams.get(view, cams["Isométrica"])
     title = f"{machine} · {data.get('subsystem', '')} · {data.get('state', '')}"
@@ -532,15 +567,15 @@ def render_machine_hydraulics_3d(data: dict, height: int = 640):
         scene=dict(
             bgcolor=DARK,
             aspectmode="manual",
-            aspectratio=dict(x=1.9, y=1.15, z=0.9),
+            aspectratio=scn["aspectratio"],
             camera=camera,
-            xaxis=dict(showgrid=True, gridcolor="#2d3038", zeroline=False, showbackground=False, color="#646a74", title="", showticklabels=False),
-            yaxis=dict(showgrid=True, gridcolor="#2d3038", zeroline=False, showbackground=False, color="#646a74", title="", showticklabels=False),
-            zaxis=dict(showgrid=True, gridcolor="#2d3038", zeroline=False, showbackground=False, color="#646a74", title="", showticklabels=False),
+            xaxis=dict(showgrid=True, gridcolor="#2a2d36", zeroline=False, showbackground=False, color="#525861", title="", showticklabels=False, range=scn["ranges"]["x"]),
+            yaxis=dict(showgrid=True, gridcolor="#2a2d36", zeroline=False, showbackground=False, color="#525861", title="", showticklabels=False, range=scn["ranges"]["y"]),
+            zaxis=dict(showgrid=True, gridcolor="#2a2d36", zeroline=False, showbackground=False, color="#525861", title="", showticklabels=False, range=scn["ranges"]["z"]),
         ),
         annotations=[
             dict(
-                text="Arrastra para rotar · rueda para zoom · líneas de color = asociación hidráulica espacial",
+                text="Arrastra para rotar · rueda para zoom · modelo didáctico simplificado con proporciones más legibles",
                 x=0.5,
                 y=1.02,
                 xref="paper",
