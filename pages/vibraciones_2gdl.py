@@ -56,10 +56,14 @@ with tabs[0]:
 
 with tabs[1]:
     st.subheader('Animación 3D del sistema acoplado')
+    st.markdown('<div class="gg-note"><b>Cómo leer el modelo:</b> arriba se muestran los <b>resortes</b> k₁ y k₂; abajo se muestran los <b>amortiguadores</b> c₁ y c₂. La masa grande es m₁ y la masa pequeña es m₂. Las líneas punteadas marcan la posición de equilibrio.</div>',unsafe_allow_html=True)
     l,r=st.columns([1,2.4])
     with l:
         view=st.selectbox('Movimiento a visualizar',['Respuesta forzada','Modo 1','Modo 2'])
-        ampv=st.slider('Amplificación visual',.5,3.0,1.0,.1);speed=st.slider('Velocidad',.25,2.0,1.0,.25);show_force=st.toggle('Mostrar fuerza aplicada',True)
+        ampv=st.slider('Amplificación visual',.5,3.0,1.0,.1)
+        speed=st.slider('Velocidad',.25,2.0,1.0,.25)
+        show_force=st.toggle('Mostrar fuerza aplicada sobre m₁',True)
+        st.caption('Sugerencia: usa primero la vista Frente para entender la estructura y luego Isométrica para explorarla.')
     with r:
         if view=='Respuesta forzada':
             if not finite_h:
