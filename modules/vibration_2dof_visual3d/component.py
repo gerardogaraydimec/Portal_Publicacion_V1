@@ -160,7 +160,7 @@ try {{
     if(D.show_force !== false) setArrow(forceArrow, fxLbl, fv, fmax, px1, 1.02, 0);
     setArrow(x1Arrow, x1Lbl, a, xmax, px1, -.98, .18);
     setArrow(x2Arrow, x2Lbl, b, xmax, px2, -.98, -.18);
-    legend.innerHTML = `Arriba: <b>resortes</b> k₁ y k₂ · Abajo: <b>amortiguadores</b> c₁ y c₂ · Líneas punteadas: posición de equilibrio.<br>t = ${(tm%dur).toFixed(2)} s · x₁ = ${(a*1000).toFixed(2)} mm · x₂ = ${(b*1000).toFixed(2)} mm`;
+    legend.innerHTML = `Arriba: <b>resortes</b> k₁ y k₂ · Abajo: <b>amortiguadores</b> c₁ y c₂ · Líneas punteadas: posición de equilibrio.<br>t = ${{(tm%dur).toFixed(2)}} s · x₁ = ${{(a*1000).toFixed(2)}} mm · x₂ = ${{(b*1000).toFixed(2)}} mm`;
   }}
 
   function front() {{ camera.position.set(-.2,.05,10.2); controls.target.set(.6,-.05,0); controls.update(); }}
