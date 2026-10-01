@@ -44,7 +44,13 @@ with tabs[0]:
         fspec=go.Figure();fspec.add_trace(go.Scatter(x=f,y=amp,line=dict(color='#4b4c50',width=1.8)));fspec.update_layout(height=275,title='Espectro FFT',xaxis_title='f [Hz]',yaxis_title='Amplitud',margin=dict(l=15,r=10,t=35,b=15));b.plotly_chart(fspec,use_container_width=True)
         c,d=st.columns(2)
         if fr:
-            ford=go.Figure();ford.add_trace(go.Scatter(x=orders,y=amp,line=dict(color='#f28e1c',width=1.8)));[ford.add_vline(x=q,line_dash='dot',line_color='#999') for q in [1,2,3,4]];ford.update_layout(height=255,title='Espectro por órdenes',xaxis_title='Orden X',yaxis_title='Amplitud',xaxis=dict(range=[0,min(10,float(np.max(orders)))]),margin=dict(l=15,r=10,t=35,b=15));c.plotly_chart(ford,use_container_width=True)
+            ford=go.Figure()
+            ford.add_trace(go.Scatter(x=orders,y=amp,mode='lines',line=dict(color='#f28e1c',width=1.8),name='Espectro'))
+            for order_mark in (1.0,2.0,3.0,4.0):
+                ford.add_shape(type='line',x0=order_mark,x1=order_mark,y0=0,y1=1,yref='paper',line=dict(color='#999999',width=1,dash='dot'))
+            order_limit=max(1.0,min(10.0,float(np.nanmax(orders))))
+            ford.update_layout(height=255,title='Espectro por órdenes',xaxis_title='Orden X',yaxis_title='Amplitud',xaxis=dict(range=[0,order_limit]),margin=dict(l=15,r=10,t=35,b=15),showlegend=False)
+            c.plotly_chart(ford,use_container_width=True,key='diag_orders_compact')
         else:c.info('Ingresa rpm > 0 para convertir el espectro a órdenes.')
         hist=go.Figure();hist.add_trace(go.Histogram(x=x,nbinsx=45,marker_color='#c8752d'));hist.update_layout(height=255,title='Distribución de amplitudes',xaxis_title='Amplitud',yaxis_title='Conteo',margin=dict(l=15,r=10,t=35,b=15));d.plotly_chart(hist,use_container_width=True)
     with right:
@@ -56,7 +62,14 @@ with tabs[0]:
 with tabs[1]:
     st.subheader('Lectura por órdenes')
     if fr:
-        max_order=min(20,float(np.max(orders)));fig=go.Figure();fig.add_trace(go.Scatter(x=orders,y=amp,line=dict(color='#c8752d',width=2)));[fig.add_vline(x=o,line_dash='dot',line_color='#999',annotation_text=f'{o}X') for o in range(1,6)];fig.update_layout(height=390,xaxis_title='Orden X',yaxis_title='Amplitud',xaxis=dict(range=[0,max_order]));st.plotly_chart(fig,use_container_width=True)
+        max_order=max(1.0,min(20.0,float(np.nanmax(orders))))
+        fig=go.Figure()
+        fig.add_trace(go.Scatter(x=orders,y=amp,mode='lines',line=dict(color='#c8752d',width=2),name='Espectro'))
+        for order_mark in range(1,6):
+            fig.add_shape(type='line',x0=float(order_mark),x1=float(order_mark),y0=0,y1=1,yref='paper',line=dict(color='#999999',width=1,dash='dot'))
+            fig.add_annotation(x=float(order_mark),y=1.0,yref='paper',text=f'{order_mark}X',showarrow=False,yshift=8,font=dict(size=10,color='#666666'))
+        fig.update_layout(height=390,xaxis_title='Orden X',yaxis_title='Amplitud',xaxis=dict(range=[0,max_order]),showlegend=False)
+        st.plotly_chart(fig,use_container_width=True,key='diag_orders_detail')
         st.info('1X, 2X, 3X… son frecuencias sincronizadas con la velocidad de giro. Su presencia describe el contenido de la señal, pero una firma por sí sola no identifica de manera única una falla.')
     else: st.info('Ingresa una velocidad de referencia para trabajar en órdenes.')
 with tabs[2]:

@@ -39,9 +39,9 @@ with tabs[0]:
     with left:
         a,b=st.columns(2)
         frf1=1000*np.abs(X1g); frf2=1000*np.abs(X2g)
-        fig=go.Figure();fig.add_trace(go.Scatter(x=fgrid,y=frf1,name='|X₁|',line=dict(color='#c8752d',width=2.4)));fig.add_trace(go.Scatter(x=fgrid,y=frf2,name='|X₂|',line=dict(color='#4b4c50',width=2.0)));fig.add_vline(x=modal.fn[0],line_dash='dash',line_color='#999');fig.add_vline(x=modal.fn[1],line_dash='dash',line_color='#999');fig.add_vline(x=modal.antiresonance_hz,line_dash='dot',line_color='#f28e1c');fig.update_layout(height=280,title='Respuesta en frecuencia',xaxis_title='f [Hz]',yaxis_title='Amplitud [mm]',margin=dict(l=15,r=10,t=35,b=15));a.plotly_chart(fig,use_container_width=True)
+        fig=go.Figure();fig.add_trace(go.Scatter(x=fgrid,y=frf1,name='|X₁|',line=dict(color='#c8752d',width=2.4)));fig.add_trace(go.Scatter(x=fgrid,y=frf2,name='|X₂|',line=dict(color='#4b4c50',width=2.0)));fig.add_vline(x=modal.fn[0],line_dash='dash',line_color='#999999');fig.add_vline(x=modal.fn[1],line_dash='dash',line_color='#999999');fig.add_vline(x=modal.antiresonance_hz,line_dash='dot',line_color='#f28e1c');fig.update_layout(height=280,title='Respuesta en frecuencia',xaxis_title='f [Hz]',yaxis_title='Amplitud [mm]',margin=dict(l=15,r=10,t=35,b=15));a.plotly_chart(fig,use_container_width=True)
         modes=modal.modes
-        fm=go.Figure();fm.add_trace(go.Scatter(x=['m₁','m₂'],y=modes[:,0],mode='lines+markers',name='Modo 1'));fm.add_trace(go.Scatter(x=['m₁','m₂'],y=modes[:,1],mode='lines+markers',name='Modo 2'));fm.add_hline(y=0,line_color='#aaa');fm.update_layout(height=280,title='Formas modales normalizadas',yaxis_title='Amplitud relativa',margin=dict(l=15,r=10,t=35,b=15));b.plotly_chart(fm,use_container_width=True)
+        fm=go.Figure();fm.add_trace(go.Scatter(x=['m₁','m₂'],y=modes[:,0],mode='lines+markers',name='Modo 1'));fm.add_trace(go.Scatter(x=['m₁','m₂'],y=modes[:,1],mode='lines+markers',name='Modo 2'));fm.add_hline(y=0,line_color='#aaaaaa');fm.update_layout(height=280,title='Formas modales normalizadas',yaxis_title='Amplitud relativa',margin=dict(l=15,r=10,t=35,b=15));b.plotly_chart(fm,use_container_width=True)
         c,d=st.columns(2)
         duration=6/max(fexc,modal.fn[0],1e-6);tt=np.linspace(0,duration,800);xt=forced_time_response(h,tt)
         if not finite_h:
@@ -74,8 +74,8 @@ with tabs[1]:
 
 with tabs[2]:
     st.subheader('Modos normales')
-    c1,c2=st.columns(2)
-    for j,col in [(0,c1),(1,c2)]:
+    mode_col1,mode_col2=st.columns(2)
+    for j,col in [(0,mode_col1),(1,mode_col2)]:
         with col:
             st.markdown(f'### Modo {j+1} · {modal.fn[j]:.3f} Hz')
             st.write(f'Amplitud relativa: m₁ = {modal.modes[0,j]:.3f}, m₂ = {modal.modes[1,j]:.3f}')
