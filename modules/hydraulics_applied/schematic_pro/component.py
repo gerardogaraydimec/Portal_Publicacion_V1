@@ -38,6 +38,8 @@ function gcomp(key){return el('g',{class:comps.has(key)?'active':''})}
 function activeClass(role,id){return active[role]&&active[role].has(id)?'flow '+role:null}
 function wire(id,role,pts){let d='M'+pts[0][0]+' '+pts[0][1];for(let i=1;i<pts.length;i++)d+=' L'+pts[i][0]+' '+pts[i][1];path(d,'base');const c=activeClass(role,id);if(c)path(d,c)}
 function spring(x,y,h=48,p=S){let q=[];for(let i=0;i<8;i++)q.push((x+(i%2?7:-7))+','+(y+i*h/7));el('polyline',{points:q.join(' '),class:'thin'},p)}
+function springH(x,y,w=44,p=S){let q=[];for(let i=0;i<8;i++)q.push((x+i*w/7)+','+(y+(i%2?7:-7)));el('polyline',{points:q.join(' '),class:'thin'},p)}
+function arrowLine(x1,y1,x2,y2,p=S){line(x1,y1,x2,y2,'thin',p);const a=Math.atan2(y2-y1,x2-x1),L=9;const pts=[[x2,y2],[x2-L*Math.cos(a-.55),y2-L*Math.sin(a-.55)],[x2-L*Math.cos(a+.55),y2-L*Math.sin(a+.55)]];poly(pts.map(q=>q[0]+','+q[1]).join(' '),'tagBox',p)}
 function tag(x,y,code,name){rect(x,y,30,18,'tagBox',4);txt(x+15,y+12,code,'tagTxt');if(mode!=='Técnico')txt(x+38,y+12,name,'name','start')}
 function tp(x,y,name){circle(x,y,11,'tp');txt(x,y+3.5,name,'tpTxt')}
 function port(x,y,name){txt(x,y,name,'port')}
@@ -46,6 +48,13 @@ function tank(x,y,code='T1'){const g=gcomp('Depósito');line(x,y,x,y+62,'thin',g
 function pump(x,y,key='Bomba',variable=false,code='P1'){const g=gcomp(key);circle(x,y,31,comps.has(key)?'sym symActive':'sym',g);poly(`${x-10},${y-12} ${x+16},${y} ${x-10},${y+12}`,'sym',g);if(variable)line(x-38,y+38,x+38,y-38,'thin',g);tag(x-15,y+49,code,variable?'Bomba variable':'Bomba');return g}
 function relief(x,y,key='Alivio',code='V0'){const g=gcomp(key);rect(x-24,y-32,48,64,comps.has(key)?'sym symActive':'sym',3,g);line(x,y+22,x,y-15,'thin',g);poly(`${x-6},${y-5} ${x+6},${y-5} ${x},${y-17}`,'sym',g);spring(x+35,y-26,52,g);tag(x-15,y+44,code,key);return g}
 function check(x,y,key='Load check',code='V2'){const g=gcomp(key);poly(`${x-22},${y-17} ${x+8},${y} ${x-22},${y+17}`,'sym',g);circle(x+20,y,8,'sym',g);tag(x-15,y+28,code,key);return g}
+function counterbalanceValve(x,y,key='Contrabalance',code='V2'){const g=gcomp(key);rect(x-36,y-38,72,76,comps.has(key)?'sym symActive':'sym',4,g);
+ // elemento de control de presión principal
+ arrowLine(x,y+25,x,y-18,g);spring(x+46,y-28,54,g);
+ // check de bypass: flujo libre en sentido inverso
+ poly(`${x-28},${y-26} ${x-8},${y-16} ${x-28},${y-6}`,'sym',g);circle(x+3,y-16,6,'sym',g);line(x-33,y-16,x-28,y-16,'thin',g);line(x+9,y-16,x+30,y-16,'thin',g);
+ // puerto de pilotaje X
+ line(x,y-38,x,y-60,'thin',g);port(x,y-66,'X');tag(x-15,y+49,code,key);return g}
 function pressureValve(x,y,key='Control de descenso',code='V3'){const g=gcomp(key);rect(x-32,y-34,64,68,comps.has(key)?'sym symActive':'sym',3,g);line(x,y+22,x,y-18,'thin',g);poly(`${x-6},${y-7} ${x+6},${y-7} ${x},${y-19}`,'sym',g);spring(x+43,y-28,56,g);tag(x-15,y+45,code,key);return g}
 function shuttle(x,y,key='Shuttle LS',code='V4'){const g=gcomp(key);rect(x-38,y-22,76,44,'sym',3,g);circle(x,y,7,'sym',g);line(x-38,y-12,x-7,y,'thin',g);line(x-38,y+12,x-7,y,'thin',g);line(x+7,y,x+38,y,'thin',g);tag(x-15,y+31,code,key);return g}
 function comp(x,y,key='Compensador',code='V1'){const g=gcomp(key);rect(x-28,y-27,56,54,'sym',3,g);line(x-16,y+15,x+16,y-15,'thin',g);line(x-16,y-15,x+16,y+15,'thin',g);tag(x-15,y+37,code,key);return g}
@@ -53,7 +62,21 @@ function hmu(x,y,code='U1'){circle(x,y,34,'sym');txt(x,y+4,'HMU','port');tag(x-1
 function priority(x,y,code='V1'){rect(x-34,y-27,68,54,'sym',3);txt(x,y+4,'PRIO','port');tag(x-15,y+37,code,'Prioridad')}
 function accum(x,y,code){rect(x-22,y-43,44,86,'sym',20);line(x-22,y,x+22,y,'thin');txt(x,y-14,'G','port');tag(x-15,y+54,code,'Acumulador')}
 function brake(x,y){rect(x-38,y-27,76,54,'sym',3);line(x-24,y+16,x+24,y-16,'thin');tag(x-15,y+37,'V2','Válvula freno')}
-function dcv43(x,y,key='Direccional 4/3',center='closed',code='V1'){const g=gcomp(key),w=54,h=62;for(let i=0;i<3;i++)rect(x+i*w,y,w,h,comps.has(key)?'sym symActive':'sym',0,g);line(x+13,y+h-10,x+41,y+10,'thin',g);line(x+13,y+10,x+41,y+h-10,'thin',g);const cx=x+w;if(center==='float'){line(cx+14,y+12,cx+14,y+33,'thin',g);line(cx+40,y+12,cx+40,y+33,'thin',g);line(cx+14,y+33,cx+40,y+33,'thin',g);line(cx+27,y+33,cx+27,y+h-9,'thin',g)}else if(center==='tandem'){line(cx+14,y+h-13,cx+40,y+h-13,'thin',g);line(cx+14,y+12,cx+14,y+27,'thin',g);line(cx+40,y+12,cx+40,y+27,'thin',g)}else{for(const [xx,yy] of [[cx+14,y+15],[cx+40,y+15],[cx+14,y+h-15],[cx+40,y+h-15]])line(xx-6,yy,xx+6,yy,'thin',g)}line(x+2*w+13,y+10,x+2*w+41,y+h-10,'thin',g);line(x+2*w+13,y+h-10,x+2*w+41,y+10,'thin',g);const mid=x+1.5*w;port(mid-18,y-9,'A');port(mid+18,y-9,'B');port(mid-18,y+h+15,'P');port(mid+18,y+h+15,'T');tag(mid-15,y+h+23,code,key);return g}
+function dcv43(x,y,key='Direccional 4/3',center='closed',code='V1'){const g=gcomp(key),w=58,h=64;for(let i=0;i<3;i++)rect(x+i*w,y,w,h,comps.has(key)?'sym symActive':'sym',0,g);
+ // posición izquierda: P→A y B→T
+ arrowLine(x+16,y+h-12,x+16,y+14,g);arrowLine(x+42,y+14,x+42,y+h-12,g);
+ // posición central
+ const cx=x+w;
+ if(center==='float'){line(cx+16,y+15,cx+16,y+37,'thin',g);line(cx+42,y+15,cx+42,y+37,'thin',g);line(cx+16,y+37,cx+42,y+37,'thin',g);arrowLine(cx+42,y+37,cx+42,y+h-12,g);line(cx+8,y+h-17,cx+24,y+h-17,'thin',g)}
+ else if(center==='tandem'){arrowLine(cx+16,y+h-13,cx+42,y+h-13,g);line(cx+8,y+17,cx+24,y+17,'thin',g);line(cx+34,y+17,cx+50,y+17,'thin',g)}
+ else if(center==='open'){line(cx+16,y+16,cx+16,y+34,'thin',g);line(cx+42,y+16,cx+42,y+34,'thin',g);line(cx+16,y+34,cx+42,y+34,'thin',g);line(cx+16,y+34,cx+16,y+h-14,'thin',g);line(cx+42,y+34,cx+42,y+h-14,'thin',g);circle(cx+29,y+34,3,'tagBox',g)}
+ else{for(const [xx,yy] of [[cx+16,y+17],[cx+42,y+17],[cx+16,y+h-17],[cx+42,y+h-17]])line(xx-8,yy,xx+8,yy,'thin',g)}
+ // posición derecha: P→B y A→T
+ arrowLine(x+2*w+16,y+h-12,x+2*w+42,y+14,g);arrowLine(x+2*w+16,y+14,x+2*w+42,y+h-12,g);
+ const mid=x+1.5*w;port(mid-18,y-9,'A');port(mid+18,y-9,'B');port(mid-18,y+h+15,'P');port(mid+18,y+h+15,'T');
+ // centrado por resortes: ayuda a identificar el reposo sin asumir el accionamiento real
+ springH(x-42,y+h/2,36,g);springH(x+3*w+6,y+h/2,36,g);
+ tag(mid-15,y+h+23,code,key);return g}
 function cyl(x,y,key='Cilindro',code='A1',tel=false){const g=gcomp(key);if(tel){rect(x,y,125,56,'sym',4,g);rect(x+40,y+8,115,40,'sym',4,g);line(x+155,y+28,x+205,y+28,'thin',g);port(x-10,y+17,'A');port(x-10,y+47,'B')}else{rect(x,y,155,58,'sym',4,g);line(x+56,y,x+56,y+58,'thin',g);line(x+56,y+29,x+200,y+29,'thin',g);port(x+20,y-8,'A');port(x+124,y+74,'B')}tag(x+58,y+69,code,key);return g}
 function cylV(x,y,key='Cilindro vertical',code='A1'){rect(x,y,62,150,'sym',4);line(x,y+77,x+62,y+77,'thin');line(x+31,y+77,x+31,y-52,'thin');port(x-12,y+118,'A');port(x+74,y+42,'B');tag(x+15,y+162,code,key)}
 function note(x,y,w,title,body){rect(x,y,w,50,'note',8);txt(x+12,y+16,title,'noteTitle','start');txt(x+12,y+35,body,'noteBody','start')}
@@ -63,8 +86,23 @@ function headerLanes(){lane(108,'SEÑAL / LS');lane(205,'TRABAJO A');lane(292,'T
 
 function stationary(){headerLanes();tank(42,393);pump(184,405,'Bomba fija',false);relief(290,438,'Alivio');dcv43(430,260,'Direccional 4/3','closed');cyl(900,175,'Cilindro doble efecto');
  wire('tank-pump','suction',[[130,438],[153,438],[153,405]]);wire('pump-p','pressure',[[215,405],[403,405],[403,353]]);wire('p-valve','pressure',[[403,353],[484,353]]);wire('valve-a','pressure',[[466,260],[466,205],[920,205]]);wire('a-cyl','pressure',[[920,205],[920,175]]);wire('cyl-b','return',[[1024,233],[1024,292],[520,292]]);wire('b-valve','return',[[520,292],[520,260]]);wire('valve-t','return',[[520,322],[520,470],[130,470],[130,455]]);wire('t-filter','return',[[520,470],[130,470]]);wire('filter-tank','return',[[130,470],[130,455]]);wire('p-relief','pressure',[[290,405],[290,406]]);wire('relief-t','return',[[290,470],[130,470]]);tp(360,405,'P');tp(735,205,'A');tp(735,292,'B');note(40,30,330,'LECTURA','P abajo; A/B arriba; T retorna por la franja inferior.');note(390,30,350,'REGLA','Primero centro de la 4/3; luego posición accionada.');note(780,30,420,'MEDICIÓN','Compare P, A, B y T antes de culpar a un componente.')}
-function counterbal(){headerLanes();tank(42,393);pump(184,405,'Bomba');relief(290,438,'Alivio');dcv43(430,260,'Direccional','closed');pressureValve(760,205,'Contrabalance','V2');cylV(1040,175,'Cilindro vertical');
- wire('tank-pump','suction',[[130,438],[153,438],[153,405]]);wire('pump-p','pressure',[[215,405],[484,405],[484,353]]);wire('p-valve','pressure',[[484,353],[484,322]]);wire('valve-a','pressure',[[466,260],[466,205],[728,205]]);wire('a-cb-check','pressure',[[728,205],[760,205]]);wire('cb-cyl','pressure',[[792,205],[1030,205],[1030,293]]);wire('cyl-b','return',[[1114,217],[1114,292],[520,292],[520,260]]);wire('b-valve','return',[[1114,292],[520,292]]);wire('valve-t','return',[[520,322],[520,470],[130,470]]);wire('t-tank','return',[[130,470],[130,455]]);wire('b-pilot','pilot',[[640,292],[640,108],[760,108],[760,171]]);wire('pilot-cb','pilot',[[760,108],[760,171]]);wire('load-cb','pressure',[[1030,293],[792,205]]);tp(680,205,'A');tp(680,292,'B');tp(760,108,'X');note(40,30,330,'CARGA MOTRIZ','El control de carga gobierna la salida del lado cargado.');note(390,30,350,'DESCENSO','El pilotaje X abre de forma controlada el contrabalance.');note(780,30,420,'SEGURIDAD','Sostener mecánicamente la carga antes de intervenir.')}
+function counterbal(){headerLanes();tank(42,393);pump(184,405,'Bomba');relief(290,438,'Alivio');dcv43(430,260,'Direccional','closed');counterbalanceValve(760,205,'Contrabalance','V2');cylV(1040,175,'Cilindro vertical');
+ wire('tank-pump','suction',[[130,438],[153,438],[153,405]]);
+ wire('pump-p','pressure',[[215,405],[484,405],[484,353]]);wire('p-valve','pressure',[[484,353],[484,322]]);
+ // rama A: válvula → contrabalance → cámara de carga
+ wire('valve-a','pressure',[[466,260],[466,205],[724,205]]);wire('a-cb-check','pressure',[[724,205],[760,205]]);wire('cb-cyl','pressure',[[796,205],[1030,205],[1030,293]]);
+ // rama B: mando de descenso / cámara opuesta
+ wire('valve-b','pressure',[[520,260],[520,292],[1114,292],[1114,217]]);wire('b-cyl','pressure',[[1114,292],[1114,217]]);
+ // retorno desde B durante elevación
+ wire('cyl-b','return',[[1114,217],[1114,292],[520,292]]);wire('b-valve','return',[[520,292],[520,260]]);
+ // retorno controlado desde la cámara cargada durante descenso, sin diagonales
+ wire('cyl-cb','return',[[1030,293],[1030,205],[796,205]]);wire('cb-a','return',[[724,205],[620,205],[620,245],[466,245],[466,260]]);
+ wire('valve-t','return',[[520,322],[520,470],[130,470]]);wire('t-tank','return',[[130,470],[130,455]]);
+ // pilotaje X separado de las líneas de potencia
+ wire('b-pilot','pilot',[[640,292],[640,108],[760,108],[760,145]]);wire('pilot-cb','pilot',[[760,108],[760,145]]);
+ tp(680,205,'A');tp(680,292,'B');tp(760,108,'X');
+ routeLabel(835,196,'línea de carga');routeLabel(835,284,'mando de descenso');
+ note(40,30,330,'CARGA MOTRIZ','El control de carga gobierna la salida del lado cargado.');note(390,30,350,'DESCENSO','X pilota la apertura; la salida A queda dosificada.');note(780,30,420,'LECTURA','Separe potencia A/B de la señal X antes de diagnosticar.')}
 function regen(){headerLanes();tank(42,393);pump(184,405,'Bomba');relief(290,438,'Alivio');dcv43(430,260,'Direccional','closed');check(700,205,'Check regeneración','V2');cyl(930,175,'Cilindro','A1');
  wire('tank-pump','suction',[[130,438],[153,438],[153,405]]);wire('pump-p','pressure',[[215,405],[484,405],[484,353]]);wire('p-valve','pressure',[[484,353],[484,322]]);wire('valve-a','pressure',[[466,260],[466,205],[678,205]]);wire('a-cyl','pressure',[[722,205],[950,205],[950,175]]);wire('cyl-b-regen','pressure',[[1054,233],[1054,292],[820,292],[820,205],[722,205]]);wire('regen-a','pressure',[[678,205],[466,205]]);wire('cyl-b','return',[[1054,233],[1054,292],[520,292]]);wire('b-valve','return',[[520,292],[520,260]]);wire('valve-t','return',[[520,322],[520,470],[130,470]]);wire('t-tank','return',[[130,470],[130,455]]);wire('valve-b','pressure',[[520,260],[520,292],[1054,292]]);wire('b-cyl','pressure',[[1054,292],[1054,233]]);wire('cyl-a','return',[[950,175],[950,205],[466,205]]);wire('a-valve','return',[[950,205],[466,205]]);tp(365,405,'P');tp(610,205,'A');tp(610,292,'B');note(40,30,330,'AVANCE RÁPIDO','El caudal del lado vástago se suma al caudal de bomba.');note(390,30,350,'FUERZA','A y B presurizados reducen la fuerza neta disponible.');note(780,30,420,'TRANSICIÓN','Al aumentar la carga se abandona regeneración para recuperar fuerza.')}
 function sequenceC(){headerLanes();tank(42,393);pump(184,405,'Bomba');relief(290,438,'Alivio');dcv43(410,260,'Direccional','closed');cyl(740,175,'Cilindro A','A1');pressureValve(830,292,'Válvula de secuencia','V2');cyl(1020,175,'Cilindro B','A2');

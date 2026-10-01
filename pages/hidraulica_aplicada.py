@@ -63,7 +63,7 @@ def _reading_table(data):
         st.caption('No hay lecturas definidas para este estado.')
 
 
-def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False):
+def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False,show_3d:bool=True):
     meta=SYSTEM_CASES[machine][subsystem]
     state=st.radio('Estado / mando',meta['states'],horizontal=True,key=f'{prefix}_state')
     data=_payload(machine,subsystem,state)
@@ -78,20 +78,52 @@ def render_case(machine:str,subsystem:str,prefix:str,show_calc:bool=False):
     st.markdown('### 1 · Plano funcional limpio')
     render_hydraulic_schematic(data,height=650)
 
-    st.markdown('### 2 · Modelo físico 3D')
-    control,scene=st.columns([.22,.78],gap='medium')
-    with control:
-        amp=st.slider('Amplificación visual',.6,1.8,1.0,.1,key=f'{prefix}_amp',help='Amplifica únicamente el movimiento representado; no altera los cálculos hidráulicos.')
-        view=st.radio('Vista inicial',['Isométrica','Frente','Lateral','Superior'],index=0,key=f'{prefix}_view')
-        show_paths=st.toggle('Mostrar rutas hidráulicas',value=True,key=f'{prefix}_paths')
-        st.markdown(f'<div class="gg-dark"><b>Qué observar</b><br>{meta["learning"]}</div>',unsafe_allow_html=True)
-        st.markdown('**Lecturas esperadas**')
+    if show_3d:
+        st.markdown('### 2 · Modelo físico de la máquina')
+        control,scene=st.columns([.22,.78],gap='medium')
+        with control:
+            amp=st.slider('Amplificación visual',.6,1.8,1.0,.1,key=f'{prefix}_amp',help='Amplifica únicamente el movimiento representado; no altera los cálculos hidráulicos.')
+            view=st.radio('Vista inicial',['Isométrica','Frente','Lateral','Superior'],index=0,key=f'{prefix}_view')
+            show_paths=st.toggle('Mostrar rutas hidráulicas',value=True,key=f'{prefix}_paths')
+            st.markdown(f'<div class="gg-dark"><b>Qué observar</b><br>{meta["learning"]}</div>',unsafe_allow_html=True)
+            st.markdown('**Lecturas esperadas**')
+            _reading_table(data)
+        with scene:
+            render_machine_hydraulics_3d({**data,'visual_amp':amp,'view':view,'show_paths':show_paths,'plotly_key':f'hyd_{prefix}_machine3d'},height=620)
+        next_section = 3
+    else:
+        st.markdown('### 2 · Lectura funcional del estado')
+        r1,r2,r3=st.columns(3)
+        pressure_txt = ' → '.join(data.get('pressure',[])) if data.get('pressure') else 'Sin ruta de presión activa / depende del centro'
+        return_txt = ' → '.join(data.get('return',[])) if data.get('return') else 'Sin retorno activo definido en este estado'
+        pilot_txt = ' → '.join(data.get('pilot',[])) if data.get('pilot') else 'Sin pilotaje activo'
+        with r1:
+            st.markdown(f'<div class="gg-card"><b>Qué debería ocurrir</b><br>{data["motion"]}<br><br><b>Secuencia de lectura</b><br>Fuente → mando → puerto de trabajo → actuador → retorno.</div>',unsafe_allow_html=True)
+        with r2:
+            st.markdown('<div class="gg-card"><b>Qué observar en el plano</b><br>'+meta['learning']+'<br><br><b>Componentes de la función</b><br>'+' → '.join(meta['components'])+'</div>',unsafe_allow_html=True)
+        with r3:
+            st.markdown('<div class="gg-orange"><b>Qué medir para comprobar</b><br>'+' · '.join(meta['field'])+'<br><br><b>Riesgos</b><br>'+' · '.join(meta['risks'])+'</div>',unsafe_allow_html=True)
+        with st.expander('Ver rutas internas activadas en este estado'):
+            st.caption('Estas etiquetas corresponden a los tramos internos del modelo didáctico; sirven para verificar que el estado seleccionado realmente cambia el circuito.')
+            st.write('**Presión:**', pressure_txt)
+            st.write('**Retorno:**', return_txt)
+            st.write('**Pilotaje / LS:**', pilot_txt)
+        st.markdown('**Lecturas esperadas en los puntos del plano**')
         _reading_table(data)
-    with scene:
-        render_machine_hydraulics_3d({**data,'visual_amp':amp,'view':view,'show_paths':show_paths,'plotly_key':f'hyd_{prefix}_machine3d'},height=620)
+        st.markdown('#### Compare los estados antes de memorizar el circuito')
+        state_rows=[]
+        for s_name in meta['states']:
+            s_data=_payload(machine,subsystem,s_name)
+            state_rows.append({
+                'Estado':s_name,
+                'Movimiento / condición':s_data.get('motion','—'),
+                'Lecturas clave':' · '.join(f'{k}: {v}' for k,v in s_data.get('readings',{}).items()) or '—',
+            })
+        st.dataframe(pd.DataFrame(state_rows),use_container_width=True,hide_index=True)
+        next_section = 3
 
     if show_calc:
-        st.markdown('### 3 · Parámetros físicos y comprobación')
+        st.markdown(f'### {next_section} · Parámetros físicos y comprobación')
         a,b,c,d,e=st.columns(5)
         q=a.number_input('Q [L/min]',.1,value=80.0,step=5.0,key=f'{prefix}_q')
         bore=b.number_input('Ø pistón [mm]',10.0,value=125.0,step=5.0,key=f'{prefix}_bore')
@@ -149,22 +181,31 @@ with TABS[1]:
     with s2:
         st.subheader('Construya la válvula antes de intentar memorizarla')
         a,b,c,d=st.columns(4)
-        ways=a.selectbox('Vías / puertos',[2,3,4],index=2,key='vb_ways');positions=b.selectbox('Posiciones',[2,3],index=1,key='vb_pos')
-        if positions==3 and ways==4:center=c.selectbox('Centro',['Cerrado','Abierto','Tándem','Flotante'],key='vb_center')
-        else:center='—';c.text_input('Centro',value='No aplica',disabled=True,key='vb_center_off')
-        act=d.selectbox('Accionamiento',['Manual + resorte','Solenoide + resorte','Doble solenoide','Pilotaje hidráulico'],key='vb_act')
-        render_valve_builder(ways,positions,center,act,height=405)
+        ways=a.selectbox('Vías / puertos',[2,3,4],index=2,key='vb_ways')
+        valid_positions=[2,3] if ways==4 else [2]
+        positions=b.selectbox('Posiciones',valid_positions,index=(1 if ways==4 else 0),key='vb_pos')
+        if positions==3 and ways==4:
+            center=c.selectbox('Centro',['Cerrado','Abierto','Tándem','Flotante'],key='vb_center')
+            act_options=['Palanca + centrado por resortes','Doble solenoide + centrado por resortes','Doble pilotaje hidráulico + centrado por resortes','Solenoide pilotado + centrado por resortes']
+        else:
+            center='—'
+            c.text_input('Centro',value='No aplica',disabled=True,key='vb_center_off')
+            act_options=['Manual + resorte','Solenoide + resorte','Pilotaje hidráulico + resorte','Doble solenoide con detent']
+        act=d.selectbox('Accionamiento',act_options,key='vb_act')
+        render_valve_builder(ways,positions,center,act,height=445)
         st.markdown('''<div class="gg-orange"><b>Método de lectura:</b> 1) casillas = posiciones; 2) líneas externas = vías/puertos; 3) identifique reposo por resorte/accionamiento; 4) siga flechas y bloqueos; 5) prediga P, T, A y B; 6) recién entonces prediga movimiento.</div>''',unsafe_allow_html=True)
 
 with TABS[2]:
-    st.subheader('Circuitos didácticos · símbolo → función → medición')
+    st.subheader('Circuitos didácticos · plano → estado → lectura → medición')
+    st.caption('En estos circuitos no se fuerza una vista 3D: el valor pedagógico está en leer correctamente el plano, entender la posición de la válvula y predecir el comportamiento.')
     subsystem=st.selectbox('Circuito',list(SYSTEM_CASES['Sistema estacionario'].keys()),key='did_sub')
-    render_case('Sistema estacionario',subsystem,'did',show_calc=subsystem in ('Cilindro 4/3 básico','Carga vertical + contrabalance','Avance regenerativo'))
+    render_case('Sistema estacionario',subsystem,'did',show_calc=subsystem in ('Cilindro 4/3 básico','Carga vertical + contrabalance','Avance regenerativo'),show_3d=False)
 
 with TABS[3]:
     st.subheader('Sistemas de planta · potencia, secuencia y carga')
+    st.caption('Aquí priorizamos plano funcional, secuencia y comprobación física. El 3D se reserva para maquinaria móvil cuando ayuda a relacionar circuito y mecanismo.')
     subsystem=st.selectbox('Sistema',list(SYSTEM_CASES['Sistema estacionario'].keys()),key='plant_sub')
-    render_case('Sistema estacionario',subsystem,'plant',show_calc=True)
+    render_case('Sistema estacionario',subsystem,'plant',show_calc=True,show_3d=False)
 
 with TABS[4]:
     st.subheader('Camión minero · circuito funcional + máquina')

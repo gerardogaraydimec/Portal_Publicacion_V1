@@ -145,8 +145,8 @@ def _state(machine: str, subsystem: str, state: str):
         if state=="Elevar":
             return _set(d,pressure=["pump-p","p-valve","valve-a","a-cb-check","cb-cyl"],ret=["cyl-b","b-valve","valve-t","t-tank"],motion="La carga sube; el check del contrabalance permite libre flujo hacia el cilindro",value=1,active=["Bomba","Direccional","Contrabalance","Cilindro vertical"],readings={"P":"según carga","A/carga":"alta","piloto":"baja","T":"baja"})
         if state=="Bajar controlado":
-            return _set(d,pressure=["pump-p","p-valve","valve-b","b-cyl"],ret=["cyl-a","a-cb","cb-valve","valve-t","t-tank"],pilot=["b-pilot","pilot-cb"],motion="La bomba presuriza el lado de descenso y el pilotaje abre el contrabalance de forma controlada",value=-1,active=["Direccional","Contrabalance","Cilindro vertical"],readings={"B":"presión de mando","piloto":"presente","A/carga":"controlada > retorno","T":"baja"})
-        return _set(d,pressure=["load-cb"],motion="Carga sostenida: el contrabalance bloquea la salida del aceite",value=.45,active=["Contrabalance"],readings={"A/carga":"presión de carga atrapada","piloto":"0/bajo","T":"baja"})
+            return _set(d,pressure=["pump-p","p-valve","valve-b","b-cyl"],ret=["cyl-cb","cb-a","valve-t","t-tank"],pilot=["b-pilot","pilot-cb"],motion="La bomba presuriza el lado de descenso y el pilotaje abre el contrabalance de forma controlada",value=-1,active=["Direccional","Contrabalance","Cilindro vertical"],readings={"B":"presión de mando","piloto":"presente","A/carga":"controlada > retorno","T":"baja"})
+        return _set(d,pressure=["cb-cyl"],motion="Carga sostenida: el contrabalance bloquea la salida del aceite",value=.45,active=["Contrabalance"],readings={"A/carga":"presión de carga atrapada","piloto":"0/bajo","T":"baja"})
 
     if machine=="Sistema estacionario" and subsystem=="Avance regenerativo":
         if state=="Avance rápido":
