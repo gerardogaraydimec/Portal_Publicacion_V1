@@ -121,22 +121,6 @@ torsion_resistencia = st.Page(
 )
 # --- fin ampliación ---
 
-# --- Vibraciones · ampliación MechLab ---
-vibraciones_2gdl = st.Page(
-    "pages/vibraciones_2gdl.py",
-    title="Vibraciones · 2GDL y TMD",
-    icon="🎼",
-    url_path="vibraciones-2gdl",
-)
-diagnostico_vibracional = st.Page(
-    "pages/diagnostico_vibracional.py",
-    title="Diagnóstico vibracional · FFT y Órdenes",
-    icon="📡",
-    url_path="diagnostico-vibracional",
-)
-# --- fin ampliación vibraciones ---
-
-
 
 pg = st.navigation(
     {
@@ -150,8 +134,6 @@ pg = st.navigation(
             biblioteca_perfiles,
         ],
         "Máquinas y Componentes": [
-            vibraciones_2gdl,
-            diagnostico_vibracional,
             von_mises_lab,
         ],
         "Dinámica y Vibraciones": [
