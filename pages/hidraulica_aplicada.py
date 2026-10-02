@@ -7,6 +7,7 @@ from modules.ui_brand import render_app_header
 from modules.hydraulics_applied.hydraulic_engine import cylinder_performance
 from modules.hydraulics_applied.symbol_catalog_v3 import SYMBOLS, PORTS, families, symbols_in_family
 from modules.hydraulics_applied.symbol_studio import render_symbol, render_valve_builder, valve_connection_table
+from modules.hydraulics_applied.advanced_components import ADVANCED_COMPONENTS, component_rows, component_state_names, render_advanced_component
 from modules.hydraulics_applied.system_cases import SYSTEM_CASES, system_state, course_comparison_rows, diagnostic_cases
 from modules.hydraulics_applied.schematic_pro import render_hydraulic_schematic
 from modules.hydraulics_applied.machine_reference import (
@@ -38,7 +39,7 @@ render_app_header(
     logo_width=188,
 )
 
-st.markdown('''<div class="gg-note"><b>Enfoque V4.7:</b> la prioridad es la <b>lectura hidráulica real</b>: símbolo → puerto → posición → trayectoria → actuador → medición. En maquinaria móvil se conserva una referencia visual estática para ubicar componentes, pero se elimina el 3D interactivo porque no agrega suficiente valor pedagógico frente al plano funcional.</div>''',unsafe_allow_html=True)
+st.markdown('''<div class="gg-note"><b>Enfoque V4.9:</b> la prioridad es la <b>lectura hidráulica real</b>: símbolo → puerto → posición → trayectoria → actuador → medición. En maquinaria móvil se conserva una referencia visual estática para ubicar componentes, pero se elimina el 3D interactivo porque no agrega suficiente valor pedagógico frente al plano funcional.</div>''',unsafe_allow_html=True)
 
 study_mode=st.sidebar.radio('Modo de estudio',['Guiado','Intermedio','Técnico'],index=0,help='Guiado muestra nombres y ayudas. Técnico reduce ayudas para obligar a leer puertos y símbolos.')
 st.sidebar.markdown('**Código funcional de líneas**')
@@ -161,7 +162,7 @@ with TABS[0]:
         with col: st.markdown(f'<div class="gg-card"><b style="font-size:1.15rem;color:#f28e1c">{p}</b><br><span style="font-size:.83rem">{desc}</span></div>',unsafe_allow_html=True)
 
 with TABS[1]:
-    s1,s2,s3=st.tabs(['Biblioteca de símbolos','Constructor de válvulas','Cómo leer un plano'])
+    s1,s2,s3,s4=st.tabs(['Biblioteca de símbolos','Constructor de válvulas','Componentes avanzados','Cómo leer un plano'])
     with s1:
         st.subheader(f'Biblioteca técnica · {len(SYMBOLS)} símbolos/elementos')
         family=st.selectbox('Familia',families(),key='sym_family')
@@ -196,6 +197,28 @@ with TABS[1]:
         st.dataframe(pd.DataFrame(valve_connection_table(ways,positions,center,act)),use_container_width=True,hide_index=True)
         st.markdown('''<div class="gg-orange"><b>Método de lectura:</b> 1) casillas = posiciones; 2) líneas externas = vías/puertos; 3) identifique reposo por resorte/accionamiento; 4) lea una sola casilla por vez; 5) siga P, T, A y B; 6) recién entonces prediga movimiento.</div>''',unsafe_allow_html=True)
     with s3:
+        st.subheader('Componentes avanzados · símbolo → estado → flujo → medición')
+        st.caption('Esta sección conecta el símbolo con su comportamiento dentro de un circuito. Las rutas activas conservan animación para seguir el aceite sin depender de flechas grandes.')
+        comp_labels=[name for _,name in component_rows()]
+        comp_name=st.selectbox('Componente',comp_labels,key='adv_component')
+        comp_key=next(k for k,n in component_rows() if n==comp_name)
+        comp_meta=ADVANCED_COMPONENTS[comp_key]
+        adv_state=st.radio('Estado funcional',component_state_names(comp_key),horizontal=True,key=f'adv_state_{comp_key}')
+        render_advanced_component(comp_key,adv_state,height=520)
+        c1,c2,c3=st.columns(3)
+        with c1:
+            st.markdown(f'<div class="gg-card"><b>Puertos / conexión</b><br>{comp_meta["ports"]}<br><br><b>Función</b><br>{comp_meta["principle"]}</div>',unsafe_allow_html=True)
+        with c2:
+            st.markdown(f'<div class="gg-card"><b>Qué medir en terreno</b><br>{comp_meta["measure"]}</div>',unsafe_allow_html=True)
+        with c3:
+            st.markdown(f'<div class="gg-orange"><b>Falla o mala interpretación</b><br>{comp_meta["failure"]}</div>',unsafe_allow_html=True)
+        st.markdown('#### Mapa de decisión')
+        decision_rows=[]
+        for k,v in ADVANCED_COMPONENTS.items():
+            decision_rows.append({'Necesidad':v['family'],'Componente':v['name'],'Puertos clave':v['ports'],'Pregunta de lectura':'¿qué presión, señal o ruta gobierna su apertura/regulación?'})
+        st.dataframe(pd.DataFrame(decision_rows),use_container_width=True,hide_index=True)
+        st.info('Regla de trabajo: describa primero qué mantiene o limita el componente; luego siga la línea activa; finalmente elija puntos de medición capaces de confirmar o descartar esa hipótesis.')
+    with s4:
         st.subheader('Cómo leer un plano hidráulico sin perderse en las líneas')
         st.caption('El objetivo es seguir la función, no memorizar la forma completa del plano.')
         c1,c2,c3=st.columns(3)
